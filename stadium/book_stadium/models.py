@@ -18,7 +18,7 @@ class User(models.Model):
 class Stadium(models.Model):
     name = models.CharField(max_length=100, blank=False)
     address = models.CharField(max_length=100, null=True, blank=False)
-    owner = models.ForeignKey(User, on_delete=models.SET_NULL)
+    owner = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     filed_count = models.IntegerField(blank=False)
 
     def __str__(self):
@@ -32,16 +32,16 @@ class TimeFrame(models.Model):
         return f'{self.start_time} - {self.end_time}'
 
 class StadiumTimeFrame(models.Model):
-    stadium = models.ForeignKey(Stadium, on_delete=models.SET_NULL)
-    time_frame = models.ForeignKey(TimeFrame, on_delete=models.SET_NULL)
+    stadium = models.ForeignKey(Stadium, null=True, on_delete=models.SET_NULL)
+    time_frame = models.ForeignKey(TimeFrame, null=True, on_delete=models.SET_NULL)
     price = models.IntegerField(blank=False)
 
     def __str__(self):
         return f'{self.stadium} - {self.time_frame}'
 
 class Order(models.Model):
-    user = models.ForeignKey(User, on_delete=models.SET_NULL)
-    stadium_time_frame = models.ForeignKey(StadiumTimeFrame, on_delete=models.SET_NULL)
+    user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+    stadium_time_frame = models.ForeignKey(StadiumTimeFrame, null=True,on_delete=models.SET_NULL)
     field_number = models.IntegerField()
     order_datetime = models.DateTimeField(auto_now_add=True)
     is_accepted = models.BooleanField(default=False)
@@ -50,4 +50,3 @@ class Order(models.Model):
 
     def __str__(self):
         return f'Booked by {self.user}'
-
