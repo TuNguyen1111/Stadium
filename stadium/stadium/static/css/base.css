@@ -1,0 +1,49 @@
+.navbar img {
+    width: 60px;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+}
+
+.navbar ul {
+    display: flex;
+}
+
+.navbar ul li {
+    list-style: none;
+}
+
+.navbar ul li a {
+    text-decoration: none;
+    color: black;
+    margin-right: 20px;
+}
+
+.modal-header {
+    width: 100%;
+    background-color: rgb(173, 169, 169);
+}
+
+.footerLoginForm {
+    display: flex;
+    justify-content: space-between;
+}
+
+.footerLoginForm a {
+    text-decoration: none;
+    color: black;
+}
+
+.footerLoginForm a:hover {
+    color: blue;
+}
+
+img {
+    width: 40px;
+}
+
+.modal-body select {
+    margin-bottom: 20px;
+}
