@@ -1,49 +1,103 @@
 .navbar img {
-    width: 60px;
+  width: 60px;
 }
 
 .navbar {
-    display: flex;
-    justify-content: space-between;
 }
-
-.navbar ul {
-    display: flex;
+.menu {
+  display: flex;
 }
-
-.navbar ul li {
-    list-style: none;
-}
-
-.navbar ul li a {
-    text-decoration: none;
-    color: black;
-    margin-right: 20px;
+.navbar a {
+  text-decoration: none;
+  color: black;
+  margin-right: 20px;
 }
 
 .modal-header {
-    width: 100%;
-    background-color: rgb(173, 169, 169);
+  width: 100%;
+  background-color: #0d6efd;
+  color: white;
 }
 
-.footerLoginForm {
-    display: flex;
-    justify-content: space-between;
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
 }
-
-.footerLoginForm a {
-    text-decoration: none;
-    color: black;
+a {
+  text-decoration: none;
+  color: black;
 }
-
-.footerLoginForm a:hover {
-    color: blue;
+a:hover {
+  color: blue;
 }
-
 img {
-    width: 40px;
+  width: 40px;
 }
 
 .modal-body select {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.inputs {
+  width: 100%;
+}
+
+.modal p {
+  padding-top: 20px;
+}
+.modal button {
+  margin-top: 20px;
+}
+.modal i {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+.sidenav {
+  height: 100%;
+  width: 0;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: #111;
+  overflow-x: hidden;
+  transition: 0.5s;
+  padding-top: 60px;
+}
+
+.sidenav a {
+  padding: 8px 8px 8px 32px;
+  text-decoration: none;
+  font-size: 25px;
+  color: #818181;
+  display: block;
+  transition: 0.3s;
+}
+
+.sidenav a:hover {
+  color: #f1f1f1;
+}
+
+.sidenav .closebtn {
+  position: absolute;
+  top: 0;
+  right: 25px;
+  font-size: 36px;
+  margin-left: 50px;
+}
+
+@media screen and (max-height: 450px) {
+  .sidenav {
+    padding-top: 15px;
+  }
+  .sidenav a {
+    font-size: 18px;
+  }
 }

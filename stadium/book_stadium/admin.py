@@ -15,6 +15,12 @@ class UserAdmin(UserAdmin):
         (None, {'fields': ('username', 'password',
                            'role', 'is_superuser', 'is_active')}),
     )
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('email', 'password1', 'password2', 'is_superuser', 'phone_number', 'username', 'role')}
+            ),
+        )
     list_filter = ["is_superuser", "role"]
 
 
