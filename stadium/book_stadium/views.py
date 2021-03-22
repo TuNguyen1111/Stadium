@@ -4,4 +4,5 @@ from django.shortcuts import render, redirect, HttpResponse
 
 
 def home(request):
-    return render(request, 'book_stadium/login.html')
+    return render(request, 'book_stadium/home.html')
+
