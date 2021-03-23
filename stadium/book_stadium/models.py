@@ -53,7 +53,10 @@ class User(AbstractUser):
     objects = CustomUserManager()
 
     def __str__(self):
-        return self.username
+        if self.username:
+            return self.username
+        else:
+            return self.email
 
 
 class Stadium(models.Model):
@@ -81,8 +84,8 @@ class StadiumTimeFrame(models.Model):
     time_frame = models.ForeignKey(TimeFrame, on_delete=models.CASCADE)
     price = models.IntegerField()
 
-    def __str__(self):
-        return f'{self.stadium} - {self.time_frame}'
+    # def __str__(self):
+    #     return f'{self.stadium} - {self.time_frame}'
 
 
 class Order(models.Model):

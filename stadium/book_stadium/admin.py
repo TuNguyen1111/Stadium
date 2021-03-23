@@ -23,11 +23,13 @@ class UserAdmin(UserAdmin):
         )
     list_filter = ["is_superuser", "role"]
 
+class AdminTimeFrame(admin.ModelAdmin):
+    list_display = ['stadium', 'time_frame', 'price']
 
 admin.site.register(User, UserAdmin)
 admin.site.register(Stadium)
 admin.site.register(TimeFrame)
-admin.site.register(StadiumTimeFrame)
+admin.site.register(StadiumTimeFrame, AdminTimeFrame)
 admin.site.register(Order)
 
 # class UserCreationForm(forms.ModelForm):

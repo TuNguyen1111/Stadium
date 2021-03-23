@@ -1,0 +1,30 @@
+{% extends 'book_stadium/base.html' %}
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/createStadium.css' %}">
+{% endblock %}
+{% block content %}
+    <div class="add-stadium">
+        <form action="{% url 'create_stadium' %}" method="post">
+            {% csrf_token %}
+            <h1 class="pt-5">Thêm sân</h1>
+            <div class="form-group pt-4">
+              <label for="exampleFormControlInput1">Tên sân</label>
+              <input name="name" type="text" class="form-control" id="exampleFormControlInput1" >
+            </div>
+            <div class="form-group pt-4">
+                <label for="exampleFormControlInput1">Địa chỉ</label>
+                <input name="address" type="text" class="form-control" id="exampleFormControlInput1">
+              </div>
+              <div class="form-group pt-4">
+                <label for="exampleFormControlInput1">Số lượng có thể đặt</label>
+                <input name="field_count" type="number" class="form-control" id="exampleFormControlInput1">
+              </div>
+            <input type="submit" value="Thêm" class="btn btn-success mt-4"> 
+          </form>
+
+    </div>
+{% endblock %}
+{% block javascript %}
+<script src="{% static 'js/createStadium.js' %}"></script>
+{% endblock %}

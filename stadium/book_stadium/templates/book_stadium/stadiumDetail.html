@@ -1,0 +1,61 @@
+{% extends 'book_stadium/base.html' %}
+{% load static %}
+{% block css %}
+<link rel="stylesheet" href="{% static 'css/stadiumDetail.css' %}">
+{% endblock %}
+{% block content %}
+    <div class="stadium-detail">
+            <h1 class="pt-5">{{ stadium.name }}</h1>
+            <div class="form-info">
+                <h2>
+                    Thông tin chung
+                </h2>
+                <form action="#" method="post">
+                    {% csrf_token %}
+                <div class="form-group pt-4">
+                  <label for="exampleFormControlInput1" class="text-left">Tên sân</label>
+                  <h3 for="">{{ stadium.name }}</h3>
+                  <!-- <input name="name" type="text" class="form-control" id="exampleFormControlInput1" value=""> -->
+                </div>
+                <div class="form-group pt-4">
+                    <label for="exampleFormControlInput1">Địa chỉ</label>
+                    <!-- <input name="address" type="text" class="form-control" id="exampleFormControlInput1"> -->
+                    <h3 for="">{{ stadium.address }}</h3>
+                  </div>
+                  <div class="form-group pt-4">
+                    <label for="exampleFormControlInput1">Số lượng có thể đặt</label>
+                    <!-- <input name="field_count" type="number" class="form-control" id="exampleFormControlInput1"> -->
+                    <h3>{{ stadium.field_count }}</h3>
+                  </div>
+                <input type="submit" value="Lưu thông tin" class="btn btn-primary mt-4"> 
+              </form>
+            </div>
+            <div class="form-timeframe">
+                <h2>
+                    Các khung giờ
+                </h2>
+                <form action="#" method="post">
+                    {% csrf_token %}
+                    <table class="table">
+                        <thead class="thead-dark">
+                          <tr>
+                            <th scope="col">Khung giờ</th>
+                            <th scope="col">Giá tiền</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                              </tr>
+                          </tbody>
+                          </table>
+                          <input type="submit" value="Lưu khung giờ" class="btn btn-primary mt-4 mb-5"> 
+              </form>
+            </div>
+          
+    </div>
+{% endblock %}
+{% block javascript %}
+<script src="{% static 'js/stadiumDetail.js' %}"></script>
+{% endblock %}

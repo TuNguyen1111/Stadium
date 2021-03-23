@@ -1,0 +1,12 @@
+.add-stadium{
+    width: 80%;
+    margin: auto;
+}
+
+.add-stadium .form-group{
+    width: 100%;
+}
+
+.add-stadium input{
+    text-align:right;
+}
