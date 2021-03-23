@@ -8,13 +8,6 @@ from .models import User, Stadium, StadiumTimeFrame, TimeFrame
 # Create your views here.
 
 
-def get_or_none(model, filter):
-    try:
-        item = model.objects.get(**filter)
-        return item
-    except ObjectDoesNotExist:
-        return None
-
 class Home(View):
     template_name = 'book_stadium/home.html'
     def get(self, request):
@@ -89,29 +82,29 @@ class createStadium(LoginRequiredMixin, View):
             field_count=field_count,
             owner=owner,
             )
+        time_frames = TimeFrame.objects.all()
+        for i in time_frames:
+            time_frame = StadiumTimeFrame.objects.create(
+                stadium=stadium,
+                time_frame=i,
+                price=300,
+            )
         return redirect('create_stadium')
 
 
-class StadiumDetail(View):
+class StadiumDetail(LoginRequiredMixin, View):
+    login_url = 'home'
     def get(self, request, pk):
         fields_by_owner = Stadium.objects.filter(owner=request.user)
         current_stadium = Stadium.objects.get(id=pk)
-        time_frames = TimeFrame.objects.all()
-        prices = []
-        for i in time_frames:
-            price = get_or_none(StadiumTimeFrame, {'stadium':current_stadium, 'time_frame':i})
-            if price:
-                price=price.price
-            else:
-                price = "Not available"
-            prices.append(price)
-        print(prices)
-        stadium_info = {
+        times_and_prices = StadiumTimeFrame.objects.filter(stadium=current_stadium)
+        page_info = {
             'fields':fields_by_owner,
             'stadium': current_stadium,
+            'times_and_prices': times_and_prices,
         }
         return render(
             request,
             'book_stadium/stadiumDetail.html',
-            stadium_info,
+            page_info,
             )
