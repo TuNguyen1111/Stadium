@@ -1,6 +1,8 @@
 .add-stadium{
     width: 80%;
     margin: auto;
+    border: 1px solid black;
+    
 }
 
 .add-stadium .form-group{
@@ -8,5 +10,9 @@
 }
 
 .add-stadium input{
-    text-align:right;
+    text-align: left;
+}
+
+button {
+    color: #0d6efd;
 }

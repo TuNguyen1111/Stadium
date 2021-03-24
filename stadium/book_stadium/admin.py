@@ -12,7 +12,7 @@ class UserAdmin(UserAdmin):
 
     # None is a Header of User Detail in Admin page
     fieldsets = (
-        (None, {'fields': ('username', 'password',
+        (None, {'fields': ('username', 'password', 'phone_number',
                            'role', 'is_superuser', 'is_active')}),
     )
     add_fieldsets = (

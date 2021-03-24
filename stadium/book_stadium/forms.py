@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import User
+from .models import User, Order
 
 
 class UserCreationForm(UserCreationForm):
@@ -17,4 +17,7 @@ class UserCreationForm(UserCreationForm):
         #     return user
 
 
-# class RegisterForm(UserCreationForm):
+class OrderForm(forms.ModelForm):
+    class Meta:
+        model = Order
+        fields = '__all__'

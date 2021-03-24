@@ -23,9 +23,34 @@
     <div class="container">
         <header>
             <nav class="navbar">
-                <img class='logo' src="https://varunit.com/wp-content/uploads/2018/09/varunit-logo-square-black-bg.png" alt="">
+              <img class='logo' src="https://varunit.com/wp-content/uploads/2018/09/varunit-logo-square-black-bg.png" alt="">
+              <ul>
+                <li><a href="#">Đặt sân ngay</a></li>
+                <li><a href="#">Tìm sân</a></li>
+                {% if user.is_authenticated %}
+                <li>
+                  <a class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {{user.username}}
+                  </a>  
+                     <div class="dropdown-menu dropdown-menu-right">
+                        <a href="#" class="dropdown-item" type="button">Thông tin tài khoản</a>
+                        {% if user.role == "owner" %}
+                        <a href="#" class="dropdown-item" type="button">Sân bóng của tôi</a>
+                        <a href="#" class="dropdown-item" type="button">Trạng thái đặt sân</a>
+                        {% else %}
+                        <a href="#" class="dropdown-item" type="button">Lịch sử đặt sân</a>
+                        {% endif %}
+                        <a class="dropdown-item" href="{% url 'logout' %}">Đăng xuất</a>
+                      </div>
+                  
+                </li>
+                {% else %}
+                        <li><button type="button" class="btn btn-primary" onclick="turnOnModalLogin()" >Đăng nhập</button></li>
+                {% endif %}
+              </ul>
+                <!-- <img class='logo' src="https://varunit.com/wp-content/uploads/2018/09/varunit-logo-square-black-bg.png" alt="">
                 <div class="menu">
-                    <a href="#">Đạt sân ngay</a>
+                    <a href="#">Đặt sân ngay</a>
                     <a href="#">Tìm sân</a>
                     {% if user.is_authenticated %}
                     <div class="btn-group">
@@ -46,20 +71,20 @@
                     {% else %}
                         <button type="button" class="btn btn-primary" onclick="turnOnModalLogin()" >Đăng nhập</button>
                     {% endif %}
-                </div>
+                </div> -->
             </nav>
         </header>
         <section>
           {% if user.role == "owner" %}
-          <div class="col-2">
+          <div class="col-2 sidebar">
             <div class="sidenav">
               <button class="dropdown-btn slideIn">
                 Quản lý sân
                 <i class="fa fa-caret-down"></i>
               </button>
               <div class="dropdown-container">
-                {% for i in fields %}
-                  <a href="{% url 'stadium_detail' i.id %}">{{i.name}}</a>
+                {% for field in fields %}
+                  <a href="{% url 'stadium_detail' field.id %}">{{field.name}}</a>
                 {% endfor %}
                 <a href="{% url 'create_stadium' %}">Thêm sân</a>
               </div>
@@ -68,8 +93,8 @@
                 <i class="fa fa-caret-down"></i>
               </button>
               <div class="dropdown-container">
-                {% for i in fields %}
-                  <a href="#">{{i.name}}</a>
+                {% for field in fields %}
+                  <a href="#">{{field.name}}</a>
                 {% endfor %}
               </div>
             </div>

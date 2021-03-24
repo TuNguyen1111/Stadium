@@ -84,8 +84,8 @@ class StadiumTimeFrame(models.Model):
     time_frame = models.ForeignKey(TimeFrame, on_delete=models.CASCADE)
     price = models.IntegerField()
 
-    # def __str__(self):
-    #     return f'{self.stadium} - {self.time_frame}'
+    def __str__(self):
+        return f'{self.stadium}, {self.time_frame}'
 
 
 class Order(models.Model):
@@ -95,8 +95,8 @@ class Order(models.Model):
     field_number = models.PositiveSmallIntegerField()
     order_datetime = models.DateTimeField(auto_now_add=True)
     is_accepted = models.BooleanField()
-    customer_phone_number = models.CharField(max_length=12)
-    customer_name = models.CharField(max_length=100)
+    customer_phone_number = models.CharField(max_length=12, blank=True)
+    customer_name = models.CharField(max_length=100, blank=True)
 
     def __str__(self):
         return f'Booked by {self.user}'

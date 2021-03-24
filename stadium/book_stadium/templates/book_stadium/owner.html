@@ -1,5 +1,54 @@
 {% extends 'book_stadium/base.html' %}
 {% load static %}
 {% block content %}
-    
+<link rel="stylesheet" href="{% static 'css/owner.css' %}">
+{% for orders in total_orders %}
+    {% for order in orders %}
+    <div class="card" style="width: 18rem;">
+        <div class="card-body shadow">
+            <form action="" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                  <label for="exampleInputEmail1">Người đặt</label>
+                  <input type="text" class="form-control" value="{{order.user}}">
+                </div>
+        
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Khung giờ</label>
+                    <input type="text" class="form-control" value="{{order.stadium_time_frame}}">
+                </div>
+        
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Sân số</label>
+                    <input type="text" class="form-control" value="{{order.field_number}}">
+                </div>
+        
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Ngày đặt</label>
+                    <input type="text" class="form-control" value="{{order.order_datetime}}">
+                </div>
+        
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Số điện thoại</label>
+                    <input type="text" class="form-control" value="{{order.user.phone_number}}">
+                </div>
+                {% if not user.is_authenticated %}
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Tên khách hàng</label>
+                    <input type="text" class="form-control" value="{{order.user}}">
+                </div>
+                {% endif %}
+        
+                <div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="customCheck1">
+                    <label class="custom-control-label" for="customCheck1">Chấp nhận</label>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Lưu</button>
+            </form>
+        </div>
+      </div>
+    {% endfor %}
+{% endfor %}
+
 {% endblock %}

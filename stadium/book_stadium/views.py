@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect, HttpResponse
 from django.views import View
+from django.views.generic.edit import FormView
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ObjectDoesNotExist
-from .models import User, Stadium, StadiumTimeFrame, TimeFrame
+from .models import User, Stadium, StadiumTimeFrame, TimeFrame, Order
+from .forms import OrderForm
 # Create your views here.
 
 
@@ -34,25 +36,40 @@ class Logout(View):
         logout(request)
         return redirect('home')
 
-
-class OwnerPage(LoginRequiredMixin, View):
+class OwnerPage(LoginRequiredMixin, FormView):
     login_url = "home"
+    template_name = "book_stadium/owner.html"
+    form_class = OrderForm
+
     def get(self, request):
         if request.user.role != 'owner':
             logout(request)
             return redirect('home')
         fields_by_owner = Stadium.objects.filter(owner=request.user)
-        fields = {'fields':fields_by_owner}
+        fields_by_owner2 = Stadium.objects.get(owner=request.user)
+        stadium_time_frames = StadiumTimeFrame.objects.filter(stadium=fields_by_owner2)
+        total_orders = []
+        for order in range(len(stadium_time_frames)):
+            owner_order = Order.objects.filter(stadium_time_frame=stadium_time_frames[order])
+            if len(owner_order) > 0:
+                total_orders.append(owner_order)
+        print("Cac san cua chu san la: ", stadium_time_frames)
+        fields = {
+            'fields': fields_by_owner,
+            'total_orders': total_orders,
+        }
         return render(request, 
         'book_stadium/owner.html',
         fields,
         )
 
+    
+
+
 
 class Register(View):
     def post(self, request):
         role = request.POST.get('role')
-
         email = request.POST.get('email')
         password = request.POST.get('password')
         password = make_password(password)
@@ -61,7 +78,7 @@ class Register(View):
         return redirect('home')
 
 
-class createStadium(LoginRequiredMixin, View):
+class CreateStadium(LoginRequiredMixin, View):
     login_url = 'home'
     def get(self, request):
         fields_by_owner = Stadium.objects.filter(owner=request.user)
@@ -87,9 +104,9 @@ class createStadium(LoginRequiredMixin, View):
             time_frame = StadiumTimeFrame.objects.create(
                 stadium=stadium,
                 time_frame=i,
-                price=300,
+                price=300000,
             )
-        return redirect('create_stadium')
+        return redirect('stadium_detail', pk=stadium.id)
 
 
 class StadiumDetail(LoginRequiredMixin, View):
@@ -108,3 +125,15 @@ class StadiumDetail(LoginRequiredMixin, View):
             'book_stadium/stadiumDetail.html',
             page_info,
             )
+
+    def post(self, request, pk):
+        name = request.POST.get('name')
+        address = request.POST.get('address')
+        field_count = request.POST.get('field_count')
+        stadium = Stadium.objects.get(id=pk)
+        stadium.name = name
+        stadium.address = address
+        print(stadium.address)
+        stadium.field_count = field_count
+        stadium.save()
+        return redirect('stadium_detail', pk=stadium.id)

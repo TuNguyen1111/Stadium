@@ -8,5 +8,14 @@
 }
 
 .add-stadium input{
-    text-align:right;
+    text-align: left;
+}
+
+.inputField {
+    display: flex;
+    align-items: center;
+}
+
+i{
+    margin-left: 10px;
 }
