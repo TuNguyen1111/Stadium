@@ -19,3 +19,9 @@
 i{
     margin-left: 10px;
 }
+
+.form-set {
+    width: 80%;
+    display: flex;
+    justify-content: space-between;
+}

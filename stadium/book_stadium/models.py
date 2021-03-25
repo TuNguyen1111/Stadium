@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils.translation import ugettext_lazy as _
-
+from django.utils import timezone
 
 class Roles(models.TextChoices):
     OWNER = 'owner', 'Chủ sân'
@@ -93,7 +93,7 @@ class Order(models.Model):
     stadium_time_frame = models.ForeignKey(
         StadiumTimeFrame, null=True, on_delete=models.SET_NULL)
     field_number = models.PositiveSmallIntegerField()
-    order_datetime = models.DateTimeField(auto_now_add=True)
+    order_datetime = models.DateTimeField(default=timezone.now)
     is_accepted = models.BooleanField()
     customer_phone_number = models.CharField(max_length=12, blank=True)
     customer_name = models.CharField(max_length=100, blank=True)

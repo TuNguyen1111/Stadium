@@ -1,79 +1,75 @@
 {% extends 'book_stadium/base.html' %}
 {% load static %}
+{% load crispy_forms_tags %}
+
 {% load humanize %}
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/stadiumDetail.css' %}">
 {% endblock %}
 {% block content %}
     <div class="stadium-detail">
-            <h1 class="pt-5">{{ stadium.name }}</h1>
-            <div class="form-info">
-                <h2>
-                    Thông tin chung
-                </h2>
-                <form action="{% url 'stadium_detail' stadium.id %}" method="POST" class="stadium-form-detail">
-                  {% csrf_token %}
-                  <div class="form-group mt-4">
-                    <label for="exampleInputEmail1">Tên sân: </label>
-                    <div class="inputField">
-                      <input type="text" class="form-control" id="name" name="name" disabled="true" value="{{stadium.name}}">
-                      <i data-name="name" class="fas fa-pen-square"></i>
-                    </div>
-                    
-                  </div>
-
-                  <div class="form-group mt-4">
-                      <label for="exampleInputEmail1">Địa chỉ: </label>
-                      <div class="inputField">
-                        <input type="text" class="form-control" id="address" name="address" disabled="true" value="{{stadium.address}}">
-                        <i data-name="address" class="fas fa-pen-square"></i>
-                      </div>
-                  </div>
-
-                  <div class="form-group mt-4">
-                      <label for="exampleInputEmail1">Số sân có thể đặt: </label>
-                      <div class="inputField">
-                        <input type="text" class="form-control" id="field-count" name="field_count" disabled="true" value="{{stadium.field_count}}">
-                        <i data-name="field-count" class="fas fa-pen-square"></i>
-                      </div>
-                  </div>
-          
-                  <button type="submit" id="saveDetailBtn" class="btn btn-primary mt-5" disabled="true">Lưu thông tin</button>
-                </form>
-            </div>
-            <div class="form-timeframe">
-                <h2>
-                    Các khung giờ
-                </h2>
-                <form action="#" method="post" class="stadium-form-time-frames">
-                    {% csrf_token %}
-                    <table class="table">
-                        <thead class="thead-dark">
-                          <tr>
-                            <th>Khung giờ</th>
-                            <th class="col-2">Giá tiền</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {% for i in times_and_prices %}
-                            <tr>
-                                <td>{{i.time_frame}}</td>
-                                <td>
-                                  <div class="inputField text-center">
-                                    <input type="text" class="form-control" id="{{forloop.counter0}}" disabled="true" value="{{ i.price|intcomma }}">
-                                    <i data-name="{{ forloop.counter0 }}" class="fas fa-pen-square"></i>
-                                  </div>
-                                </td>
-                                
-                              </tr>
-                            {% endfor %}
-                          </tbody>
-                          </table>
-                          <button type="submit" id="saveTimeFramesBtn" class="btn btn-primary mt-5" disabled="true">Lưu khung giờ</button>
-              </form>
-            </div>
-
+      <h1 class="pt-5">{{ stadium.name }}</h1>
+      <div class="form-info">
+          <h2>
+              Thông tin chung
+          </h2>
+          <form action="" method="POST" class="stadium-form-detail">
+            {% csrf_token %}
+            {% for input in formDetail %}
+              <div class="form-group mt-4">
+                <label for="exampleInputEmail1">{{input.label}}: </label>
+                <div class="inputField">
+                  {{input}}
+                  <i data-name="name" class="fas fa-pen-square"></i>
+                </div>
+              </div>
+            {% endfor %}
+            <input type="hidden" name="form_type" value="form_detail">
+            <button type="submit" id="saveDetailBtn" class="btn btn-primary mt-5" disabled="true">Lưu thông tin</button>
+          </form>
+      </div>
+  
+    <div class="form-timeframe">
+        <h2>
+            Các khung giờ
+        </h2>
+        <form action="{% url 'stadium_detail' stadium.id %}" method="POST" class="stadium-form-time-frames" id="stadium-form-time-frames">
+          {{ formTimeFrame.management_form }}
+            {% csrf_token %}
+            <table class="table">
+              <thead class="thead-dark">
+                <tr>
+                  <th>Khung giờ</th>
+                  <th class="col-2">Giá tiền</th>
+                </tr>
+              </thead>
+              <tbody>
+                
+                {% for form in formTimeFrame %}
+                  {% for hidden in form.hidden_fields %}
+                      {{ hidden }}
+                  {% endfor %}
+                  <tr>
+                      <td>{{form.time_frame}}
+                      </td>
+                      <td>
+                        <div class="inputField text-center">
+                          {{form.price}}
+                          <!-- <input type="text" class="form-control" id="{{forloop.counter0}}" name="price" disabled="true" value="{{ form.price.value|intcomma }}"> -->
+                          <i data-name="{{form.price.auto_id }}" class="fas fa-pen-square"></i>
+                        </div>
+                      </td>
+                      
+                    </tr>
+                {% endfor %}
+                </tbody>
+              </table>
+            <input type="hidden" name="form_type" value="form_time">
+            <button type="submit" id="saveTimeFramesBtn" class="btn btn-primary mt-5" disabled="true">Lưu khung giờ</button>
+      </form>
     </div>
+
+</div>
 {% endblock %}
 {% block javascript %}
 <script src="{% static 'js/stadiumDetail.js' %}"></script>
