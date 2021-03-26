@@ -11,12 +11,10 @@ function turnOnModalRegister() {
 }
 
 var dropdown = document.getElementsByClassName("dropdown-btn");
-var i;
 
-for (i = 0; i < dropdown.length; i++) {
+for (let i = 0; i < dropdown.length; i++) {
   dropdown[i].addEventListener("click", function() {
     let arrow = this.querySelector("i")
-    console.log(arrow)
     if (arrow.className == "fa fa-caret-down"){
         arrow.classList.remove("fa-caret-down")
         arrow.classList.add("fa-caret-up")
@@ -25,7 +23,6 @@ for (i = 0; i < dropdown.length; i++) {
       arrow.classList.remove("fa-caret-up")
       arrow.classList.add("fa-caret-down")
     }
-    console.log(arrow)
     this.classList.toggle("active");
     var dropdownContent = this.nextElementSibling;
     if (dropdownContent.style.display === "block") {

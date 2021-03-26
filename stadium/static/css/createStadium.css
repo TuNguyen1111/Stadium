@@ -1,7 +1,9 @@
 .add-stadium{
+    border-radius: 20px;
+    padding: 20px;
     width: 80%;
     margin: auto;
-    border: 1px solid black;
+    border: 1px solid rgb(182, 158, 158);
     
 }
 

@@ -8,7 +8,7 @@ from django.contrib.auth.admin import UserAdmin
 class UserAdmin(UserAdmin):
     model = User
     add_form = UserCreationForm
-    list_display = ['email', 'username', 'role']
+    list_display = ['id','phone_number','email', 'username', 'role']
 
     # None is a Header of User Detail in Admin page
     fieldsets = (

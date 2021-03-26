@@ -12,16 +12,25 @@ from .forms import OrderForm, StadiumForm, StadiumTimeFrameForm, UserCreationFor
 
 MY_BACKEND = CustomBackend()
 class Home(View):
+    form_class = UserCreationForm
     template_name = 'book_stadium/home.html'
     def get(self, request):
-        return render(request, self.template_name)
+        context = {
+            'register_form' : self.form_class
+        }
+        return render(
+            request, 
+            self.template_name,
+            context
+            )
 
 
 class Login(View):
     def post(self, request):
+        # login chưa chuyển form đâu nhé. Lười vc =)) bạn tự chuyển nha.có 2 dòng thôi
         email = request.POST.get('email')
         password = request.POST.get('password')
-        user = MY_BACKEND.authenticate(username=email, password=password)
+        user = MY_BACKEND.authenticate(request, username=email, password=password)
         if user:
             login(request, user)
             if user.role == 'owner':
@@ -38,6 +47,7 @@ class Logout(View):
     def get(self, request):
         logout(request)
         return redirect('home')
+
 
 class OwnerPage(LoginRequiredMixin, View):
     login_url = "home"
@@ -66,37 +76,62 @@ class OwnerPage(LoginRequiredMixin, View):
         )
 
 class Register(View):
+    # t đã chỉnh username field của bảng user thành id rồi để đảm bảo nó duy nhất nên là phone_number với email có thể ko có cũng đc nha.
+    form_class = UserCreationForm
     def post(self, request):
-        role = request.POST.get('role')
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        password = make_password(password)
-        user = User.objects.create(email=email, role=role, password=password)
-        user.save()
+        create_user_form = self.form_class(request.POST)
+        if create_user_form.is_valid():
+            # kiểm tra form có vaild hay ko thôi chứ không dùng form.save() nhé =)) chúng ta tạo user bằng tay
+            email_or_phone = request.POST.get('email_or_phone')
+            password = request.POST.get('password1')
+            password = make_password(password)
+            role = request.POST.get('role')
+            if '@' in email_or_phone:
+                user = User.objects.create(
+                    email=email_or_phone,
+                    password=password,
+                    role=role
+                )
+            else:
+                user = User.objects.create(
+                    phone_number=email_or_phone,
+                    password=password,
+                    role=role
+                )
+        else:
+            # sửa đẩy form.errors về html nha
+            print(create_user_form.errors)
         return redirect('home')
 
 
 class CreateStadium(LoginRequiredMixin, View):
     login_url = 'home'
+    create_stadium_form = StadiumForm
+
     def get(self, request):
         fields_by_owner = Stadium.objects.filter(owner=request.user)
-        fields = {'fields':fields_by_owner}
+        form = self.create_stadium_form
+        context = {
+            'fields':fields_by_owner,
+            'form':form
+            }
         return render(
             request, 
             'book_stadium/createStadium.html',
-            fields)
+            context)
 
     def post(self,request):
-        name = request.POST.get('name')
-        address = request.POST.get('address')
-        field_count = request.POST.get('field_count')
+        create_stadium_form = self.create_stadium_form(request.POST, request.FILES)
         owner = request.user
-        stadium = Stadium.objects.create(
-            name=name, 
-            address=address, 
-            field_count=field_count,
-            owner=owner,
-            )
+        if create_stadium_form.is_valid():
+            # nếu form valid thì đẩy owner bằng request.user rồi mới save nha
+            instance = create_stadium_form.save(commit=False)
+            instance.owner = owner
+            instance.save()
+        else:
+            # tương tự, nhớ đẩy error về cho HTML
+            print(create_stadium_form.errors)
+        stadium = Stadium.objects.get(name=request.POST.get("name"))
         time_frames = TimeFrame.objects.all()
         for i in time_frames:
             time_frame = StadiumTimeFrame.objects.create(
@@ -135,14 +170,17 @@ class StadiumDetail(LoginRequiredMixin, View):
         formname = request.POST.get('form_type')
         current_stadium = Stadium.objects.get(id=pk)
         stadium = Stadium.objects.get(id=pk)
+        owner = request.user
         if formname == 'form_detail':
-            print("AAAAAAAAA")
-            formDetail = StadiumForm(request.POST, instance=stadium)
-            if formDetail.is_valid():
-                formDetail.save()
+            form_detail = StadiumForm(request.POST, request.FILES, instance=stadium)
+            if form_detail.is_valid():
+                # như trên, đẩy owner vào. 
+                instance = form_detail.save(commit=False)
+                instance.owner = owner
+                instance.save()
+            else:
+                print(form_detail.errors)
         else:
-            print('SSSSSSSSSSS')
-            print("REQUEST", request.POST)
             formTimeFrame = self.formset(request.POST, instance=stadium)
             if formTimeFrame.is_valid():
                 formTimeFrame.save()

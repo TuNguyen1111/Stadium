@@ -42,12 +42,12 @@ class CustomUserManager(BaseUserManager):
 
 
 class User(AbstractUser):
-    username = models.CharField(max_length=100)
+    username = models.CharField(max_length=100, default='User')
     name = models.CharField(max_length=100, blank=True)
     phone_number = models.CharField(max_length=12, blank=True)
     role = models.CharField(max_length=20, choices=Roles.choices)
-    email = models.EmailField(_('email address'), unique=True)
-    USERNAME_FIELD = 'email'
+    email = models.EmailField(_('email address'),blank=True)
+    USERNAME_FIELD = 'id'
     REQUIRED_FIELDS = []
 
     objects = CustomUserManager()
@@ -64,6 +64,7 @@ class Stadium(models.Model):
     address = models.CharField(max_length=100, blank=True)
     owner = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     field_count = models.PositiveSmallIntegerField()
+    image = models.ImageField(upload_to="book_stadium", default=None, null=True, blank=True)
     time_frames = models.ManyToManyField(
         'TimeFrame', through='StadiumTimeFrame')
 

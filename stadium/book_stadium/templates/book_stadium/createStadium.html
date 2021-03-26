@@ -4,8 +4,8 @@
 <link rel="stylesheet" href="{% static 'css/createStadium.css' %}">
 {% endblock %}
 {% block content %}
-    <div class="add-stadium">
-        <form action="{% url 'create_stadium' %}" method="post">
+<div class="add-stadium">
+  <!-- <form action="{% url 'create_stadium' %}" method="post">
             {% csrf_token %}
             <h1 class="pt-5">Thêm sân</h1>
             <div class="form-group pt-4">
@@ -21,9 +21,21 @@
                 <input name="field_count" type="number" class="form-control" id="exampleFormControlInput1">
               </div>
             <input type="submit" value="Thêm" class="btn btn-primary mt-4"> 
-          </form>
-
+          </form> -->
+  <form action="{% url 'create_stadium' %}" method="post" enctype="multipart/form-data">
+    <h1 class="pt-5">Thêm sân</h1>
+    {% csrf_token %}
+    {% for i in form %}
+    <div class="form-group pt-4">
+      {{i.label}}
+      {{i}}
     </div>
+
+    {% endfor %}
+    <input type="submit" value="Thêm" class="btn btn-primary mt-4">
+  </form>
+
+</div>
 {% endblock %}
 {% block javascript %}
 <script src="{% static 'js/createStadium.js' %}"></script>

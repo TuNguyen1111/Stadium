@@ -4,17 +4,26 @@ from .models import User, Order, Stadium, StadiumTimeFrame
 from crispy_forms.helper import FormHelper
 
 class UserCreationForm(UserCreationForm):
+    # đống này để set custom cho Register form nha
+    email_or_phone = forms.CharField(label="Email hoặc số điện thoại",max_length=254)
+    password1 = forms.CharField(
+        label="Mật khẩu", widget=forms.PasswordInput,
+        help_text="""
+        Mật khẩu không chứa thông tin cá nhân <br>
+        Mật khẩu phải lớn hơn 8 ký tự <br>
+        Mật khẩu gồm ít nhất 1 chữ hoa, 1 chữ thường, 1 số, 1 ký tự đặc biệt
+        """
+    )
+    password2 = forms.CharField(
+        label="Nhập lại mật khẩu", widget=forms.PasswordInput,
+        help_text=""
+    )
     class Meta:
         model = User
-        fields = '__all__'
-
-        # def save(self, commit=True):
-        #     # Save the provided password in hashed format
-        #     user = super(UserCreationForm, self).save(commit=False)
-        #     user.set_password(self.cleaned_data["password"])
-        #     if commit:
-        #         user.save()
-        #     return user
+        fields = ['role', 'email_or_phone', 'password1', 'password2']
+        labels = {
+            'role': 'Bạn là',
+        }
 
 
 class OrderForm(forms.ModelForm):
@@ -31,28 +40,54 @@ class OrderForm(forms.ModelForm):
 
 
 class StadiumForm(forms.ModelForm):
+    # sửa lại class form theo kiểu t quen. M thích thì sửa lại như cũ cũng đc
+    # viết thế này để t check có instance truyền vào không. Do dùng chung form để add với edit
+    def __init__(self, *args, **kwargs):
+        super(StadiumForm, self).__init__(*args, **kwargs)
+        # check xem có truyền instance vào không
+        self._newly_created = kwargs.get('instance')
+        # cái này để set input cho ảnh trông đỡ xấu, xoá thử đi để trải nghiệm nếu muốn
+        self.fields['image'] = forms.FileField(widget=forms.FileInput)
+        # update input ảnh tự động tìm ảnh. Sau phải validate lại bằng JS đấy
+        self.fields['image'].widget.attrs.update({
+            'accept': '.png, .jpg, .jpeg"'
+        })
+        # nếu mà có instance thì disable input
+        if self._newly_created:
+            for name in self.fields.keys():
+                self.fields[name].widget.attrs.update({
+                    'class': 'form-control',
+                    'disabled': True
+                })
+
+        else:
+            for name in self.fields.keys():
+                self.fields[name].widget.attrs.update({
+                    'class': 'form-control',
+                })
+        # ẩn trường owner trong form đi.
+        self.fields['owner'].required = False
+        self.fields['owner'].widget = forms.HiddenInput()
+
+
     class Meta:
         model = Stadium
-        fields = ['name', 'address', 'field_count']
+        fields = ['name', 'address', 'field_count', 'image', 'owner']
         labels = {
             'name': 'Tên sân',
             'address': 'Địa chỉ',
-            'field_count': 'Số sân có thể đặt'
+            'field_count': 'Số sân có thể đặt',
+            'image': 'Ảnh sân',
+            'owner': ''
         }
-        widgets = {}
-        for field in fields:
-            widgets[field] = forms.TextInput(
-               attrs={
-                   'class': 'form-control',
-                   'id': '{}'.format(field),
-                   'disabled': True,
-               }
-           )
 
-class StadiumTimeFrameForm(forms.ModelForm):
+
+class StadiumTimeFrameForm(forms.Form):
     class Meta:
         model = StadiumTimeFrame
         fields = ['time_frame', 'price']
+
+       
 
 
 class UserProfileForm(forms.ModelForm):

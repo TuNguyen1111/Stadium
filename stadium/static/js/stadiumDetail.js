@@ -8,7 +8,7 @@ var oldValuesTimeFrames = {}
 for (let i = 1; i < stadiumFormDetail.length; i++) {
     oldValuesDetail[stadiumFormDetail[i].id] = stadiumFormDetail[i].value
 }
-
+console.log(oldValuesDetail)
 for (let i = 1; i < stadiumFormTimeFrames.length; i++) {
     oldValuesTimeFrames[stadiumFormTimeFrames[i].id] = stadiumFormTimeFrames[i].value
 }
@@ -58,10 +58,10 @@ function checkValueOfTimeFrameInput() {
 
 function addEventInput() {
     for (let i = 1; i < stadiumFormDetail.length; i++) {
-        stadiumFormDetail[i].addEventListener('keyup', checkValueOfDetailInput)
+        stadiumFormDetail[i].addEventListener('input', checkValueOfDetailInput)
     }
     for (let i = 1; i < stadiumFormTimeFrames.length; i++) {
-        stadiumFormTimeFrames[i].addEventListener('keyup', checkValueOfTimeFrameInput)
+        stadiumFormTimeFrames[i].addEventListener('input', checkValueOfTimeFrameInput)
         stadiumFormTimeFrames[i].disabled = true
     }
 }

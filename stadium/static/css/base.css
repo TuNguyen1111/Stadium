@@ -48,9 +48,7 @@ a {
 a:hover {
   color: black;
 }
-img {
-  width: 40px;
-}
+
 
 .modal-body select {
   margin-bottom: 20px;
@@ -66,9 +64,6 @@ form {
   width: 100%;
 }
 
-.modal p {
-  padding-top: 20px;
-}
 .modal button {
   margin-top: 20px;
 }
@@ -127,13 +122,12 @@ section{
 
 /* Add an active class to the active dropdown button */
 .active {
-  /* background-color: green; */
+  /* background-color: black; */
   /* color: white; */
 }
 
 /* Dropdown container (hidden by default). Optional: add a lighter background color and some left padding to change the design of the dropdown content */
 .dropdown-container {
-  display: none;
   /* background-color: #262626; */
   padding-left: 8px;
 }
@@ -156,3 +150,4 @@ section{
 .col {
   display: flex;
 }
+

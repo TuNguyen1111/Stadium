@@ -7,67 +7,72 @@
 <link rel="stylesheet" href="{% static 'css/stadiumDetail.css' %}">
 {% endblock %}
 {% block content %}
-    <div class="stadium-detail">
-      <h1 class="pt-5">{{ stadium.name }}</h1>
-      <div class="form-info">
-          <h2>
-              Thông tin chung
-          </h2>
-          <form action="" method="POST" class="stadium-form-detail">
-            {% csrf_token %}
-            {% for input in formDetail %}
-              <div class="form-group mt-4">
-                <label for="exampleInputEmail1">{{input.label}}: </label>
-                <div class="inputField">
-                  {{input}}
-                  <i data-name="name" class="fas fa-pen-square"></i>
-                </div>
-              </div>
-            {% endfor %}
-            <input type="hidden" name="form_type" value="form_detail">
-            <button type="submit" id="saveDetailBtn" class="btn btn-primary mt-5" disabled="true">Lưu thông tin</button>
-          </form>
-      </div>
-  
-    <div class="form-timeframe">
-        <h2>
-            Các khung giờ
-        </h2>
-        <form action="{% url 'stadium_detail' stadium.id %}" method="POST" class="stadium-form-time-frames" id="stadium-form-time-frames">
-          {{ formTimeFrame.management_form }}
-            {% csrf_token %}
-            <table class="table">
-              <thead class="thead-dark">
-                <tr>
-                  <th>Khung giờ</th>
-                  <th class="col-2">Giá tiền</th>
-                </tr>
-              </thead>
-              <tbody>
-                
-                {% for form in formTimeFrame %}
-                  {% for hidden in form.hidden_fields %}
-                      {{ hidden }}
-                  {% endfor %}
-                  <tr>
-                      <td>{{form.time_frame}}
-                      </td>
-                      <td>
-                        <div class="inputField text-center">
-                          {{form.price}}
-                          <!-- <input type="text" class="form-control" id="{{forloop.counter0}}" name="price" disabled="true" value="{{ form.price.value|intcomma }}"> -->
-                          <i data-name="{{form.price.auto_id }}" class="fas fa-pen-square"></i>
-                        </div>
-                      </td>
-                      
-                    </tr>
-                {% endfor %}
-                </tbody>
-              </table>
-            <input type="hidden" name="form_type" value="form_time">
-            <button type="submit" id="saveTimeFramesBtn" class="btn btn-primary mt-5" disabled="true">Lưu khung giờ</button>
-      </form>
+<div class="stadium-detail">
+  <h1 class="pt-5">{{ stadium.name }}</h1>
+  <div class="form-info">
+    <div class="info">
+      <h2 class="col-5">
+        Thông tin chung
+      </h2>
+      <!-- Thêm cái ảnh này nè =))) -->
+      <img class="col-7" src="{{stadium.image.url}}" alt="stadium-image" height="150px" width="400px">
     </div>
+    <form action="" method="POST" class="stadium-form-detail" enctype="multipart/form-data">
+      {% csrf_token %}
+      {% for input in formDetail.visible_fields %}
+      <div class="form-group mt-4">
+        <label for="exampleInputEmail1">{{input.label}} </label>
+        <div class="inputField">
+          {{input}}
+          <i data-name="{{input.auto_id }}" class="fas fa-pen-square"></i>
+        </div>
+      </div>
+      {% endfor %}
+      <input type="hidden" name="form_type" value="form_detail">
+      <button type="submit" id="saveDetailBtn" class="btn btn-primary mt-5" disabled="true">Lưu thông tin</button>
+    </form>
+  </div>
+
+  <div class="form-timeframe">
+    <h2>
+      Các khung giờ
+    </h2>
+    <form action="{% url 'stadium_detail' stadium.id %}" method="POST" class="stadium-form-time-frames"
+      id="stadium-form-time-frames">
+      {{ formTimeFrame.management_form }}
+      {% csrf_token %}
+      <table class="table">
+        <thead class="thead-dark">
+          <tr>
+            <th>Khung giờ</th>
+            <th class="col-2">Giá tiền</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          {% for form in formTimeFrame %}
+          {% for hidden in form.hidden_fields %}
+          {{ hidden }}
+          {% endfor %}
+          <tr>
+            <td>{{form.time_frame}}
+            </td>
+            <td>
+              <div class="inputField text-center">
+                {{form.price}}
+                <!-- <input type="text" class="form-control" id="{{forloop.counter0}}" name="price" disabled="true" value="{{ form.price.value|intcomma }}"> -->
+                <i data-name="{{form.price.auto_id }}" class="fas fa-pen-square"></i>
+              </div>
+            </td>
+
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <input type="hidden" name="form_type" value="form_time">
+      <button type="submit" id="saveTimeFramesBtn" class="btn btn-primary mt-5 mb-5" disabled="true">Lưu khung giờ</button>
+    </form>
+  </div>
 
 </div>
 {% endblock %}
