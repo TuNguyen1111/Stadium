@@ -26,6 +26,7 @@ class UserCreationForm(UserCreationForm):
         }
 
 
+
 class OrderForm(forms.ModelForm):
     class Meta:
         model = Order

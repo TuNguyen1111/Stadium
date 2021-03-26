@@ -98,6 +98,11 @@ class Register(View):
                     password=password,
                     role=role
                 )
+            login(request, user)
+            if user.role == "owner":
+                return redirect('owner')
+            else:
+                return redirect('home')
         else:
             # sửa đẩy form.errors về html nha
             print(create_user_form.errors)
