@@ -34,7 +34,7 @@
               {{user.username}}
             </a>
             <div class="dropdown-menu dropdown-menu-right">
-              <a href="#" class="dropdown-item" type="button">Thông tin tài khoản</a>
+              <a href="{% url 'user_profile' user.id %}" class="dropdown-item" type="button">Thông tin tài khoản</a>
               {% if user.role == "owner" %}
               <a href="#" class="dropdown-item" type="button">Sân bóng của tôi</a>
               <a href="#" class="dropdown-item" type="button">Trạng thái đặt sân</a>
@@ -172,6 +172,7 @@
             <div class="inputs">
               <div class="mb-3">
                 {{i|as_crispy_field }}
+                
               </div>
               {% endfor %}
               <div class="social-login text-center">
@@ -190,6 +191,9 @@
                   <i class="fa fa-linkedin-square fa-2x" aria-hidden="true"></i>
                 </a>
               </div>
+              <!-- {% for error in create_user_form.errors %}
+								<p id='messages'>{{error}}</p>
+						  {% endfor %} -->
             </div>
             <!-- 
                     <div class="mb-3">

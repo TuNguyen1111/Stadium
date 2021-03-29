@@ -15,6 +15,7 @@ urlpatterns = [
     path('them-san/', views.CreateStadium.as_view(), name='create_stadium'),
     path('chi-tiet-san/<int:pk>', views.StadiumDetail.as_view(), name='stadium_detail'),
     path('accepted/<int:id>', views.isAccepted, name='accepted'),
+    path('trang-ca-nhan/<int:id>', views.UserProfile.as_view(), name='user_profile'),
 ]
 # đống này nữa
 urlpatterns += staticfiles_urlpatterns()

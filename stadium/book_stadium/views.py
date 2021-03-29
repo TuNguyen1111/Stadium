@@ -7,19 +7,21 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.hashers import make_password
 from django.forms import inlineformset_factory
 from .models import User, Stadium, StadiumTimeFrame, TimeFrame, Order
-from .forms import OrderForm, StadiumForm, StadiumTimeFrameForm, UserCreationForm
+from .forms import OrderForm, StadiumForm, StadiumTimeFrameForm, UserCreationForm, UserProfileForm
+from django.contrib import messages
 # Create your views here.
 
 MY_BACKEND = CustomBackend()
 class Home(View):
     form_class = UserCreationForm
     template_name = 'book_stadium/home.html'
+
     def get(self, request):
         context = {
-            'register_form' : self.form_class
+            'register_form' : self.form_class,
         }
         return render(
-            request, 
+            request,
             self.template_name,
             context
             )
@@ -38,9 +40,10 @@ class Login(View):
                 if len(fields_by_owner) == 0:
                     return redirect('create_stadium')
                 return redirect('owner')
-            return redirect('home')
-        else:
-            return redirect('home')
+            else:
+                if user.username == 'User' or user.phone_number == None:
+                    return redirect('user_profile', user.id)
+        return redirect('home')
 
 
 class Logout(View):
@@ -52,7 +55,7 @@ class Logout(View):
 class OwnerPage(LoginRequiredMixin, View):
     login_url = "home"
     template_name = "book_stadium/owner.html"
-    
+
     def get(self, request):
         if request.user.role != 'owner':
             logout(request)
@@ -65,12 +68,12 @@ class OwnerPage(LoginRequiredMixin, View):
             owner_order = Order.objects.filter(stadium_time_frame=stadium_time_frames[order])
             if len(owner_order) > 0:
                 total_orders.append(owner_order)
-        #print("Total order: ", total_orders[0][0].id)
+        print("Total order: ", total_orders[0][0])
         fields = {
             'fields': fields_by_owner,
             'total_orders': total_orders,
         }
-        return render(request, 
+        return render(request,
         'book_stadium/owner.html',
         fields,
         )
@@ -78,34 +81,24 @@ class OwnerPage(LoginRequiredMixin, View):
 class Register(View):
     # t đã chỉnh username field của bảng user thành id rồi để đảm bảo nó duy nhất nên là phone_number với email có thể ko có cũng đc nha.
     form_class = UserCreationForm
+
     def post(self, request):
         create_user_form = self.form_class(request.POST)
         if create_user_form.is_valid():
-            # kiểm tra form có vaild hay ko thôi chứ không dùng form.save() nhé =)) chúng ta tạo user bằng tay
-            email_or_phone = request.POST.get('email_or_phone')
-            password = request.POST.get('password1')
-            password = make_password(password)
-            role = request.POST.get('role')
-            if '@' in email_or_phone:
-                user = User.objects.create(
-                    email=email_or_phone,
-                    password=password,
-                    role=role
-                )
-            else:
-                user = User.objects.create(
-                    phone_number=email_or_phone,
-                    password=password,
-                    role=role
-                )
+
+            user = create_user_form.save()
             login(request, user)
             if user.role == "owner":
                 return redirect('owner')
             else:
                 return redirect('home')
+        
         else:
             # sửa đẩy form.errors về html nha
             print(create_user_form.errors)
+            return render(request, 'book_stadium/home.html', {
+                'create_user_form': create_user_form
+            })
         return redirect('home')
 
 
@@ -121,7 +114,7 @@ class CreateStadium(LoginRequiredMixin, View):
             'form':form
             }
         return render(
-            request, 
+            request,
             'book_stadium/createStadium.html',
             context)
 
@@ -151,7 +144,7 @@ class StadiumDetail(LoginRequiredMixin, View):
     login_url = 'home'
     formset = inlineformset_factory(Stadium, StadiumTimeFrame, fields=['time_frame', 'price'], extra=0)
     def get(self, request, pk):
-        
+
         fields_by_owner = Stadium.objects.filter(owner=request.user)
         current_stadium = Stadium.objects.get(id=pk)
         times_and_prices = StadiumTimeFrame.objects.filter(stadium=current_stadium)
@@ -179,7 +172,7 @@ class StadiumDetail(LoginRequiredMixin, View):
         if formname == 'form_detail':
             form_detail = StadiumForm(request.POST, request.FILES, instance=stadium)
             if form_detail.is_valid():
-                # như trên, đẩy owner vào. 
+                # như trên, đẩy owner vào.
                 instance = form_detail.save(commit=False)
                 instance.owner = owner
                 instance.save()
@@ -193,7 +186,7 @@ class StadiumDetail(LoginRequiredMixin, View):
                 print(formTimeFrame.errors)
 
         return redirect('stadium_detail', pk=stadium.id)
-        
+
 
 
 def isAccepted(request, id):
@@ -203,4 +196,26 @@ def isAccepted(request, id):
         order.is_accepted = True
         order.save()
         #print(order)
-        return redirect('owner') 
+        return redirect('owner')
+
+
+class UserProfile(View):
+    form_class = UserProfileForm
+
+    def get(self, request, id):
+        user = User.objects.get(id=id)
+        fields_by_owner = Stadium.objects.filter(owner=request.user)
+        form = self.form_class(instance=user)
+        context = {
+            'form': form,
+            'fields':fields_by_owner,
+        }
+        return render(request, 'book_stadium/userProfile.html', context)
+
+    def post(self, request, id):
+        user = User.objects.get(id=id)
+        form = self.form_class(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+        return redirect('user_profile', user.id)
+            

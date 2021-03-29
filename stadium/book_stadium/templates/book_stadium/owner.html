@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="{% static 'css/owner.css' %}">
 {% for orders in total_orders %}
     {% for order in orders %}
-        {% if order.is_accepted %}
+        {% if not order.is_accepted %}
             <div class="card" style="width: 18rem;">
                 <div class="card-body shadow">
                     <form action="{% url 'accepted' order.id %}" method="POST">

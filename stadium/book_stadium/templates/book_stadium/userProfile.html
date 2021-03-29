@@ -1,6 +1,24 @@
 {% extends 'book_stadium/base.html' %}
+{% load crispy_forms_tags %}
 {% load static %}
 
 {% block content %}
-
+<link rel="stylesheet" href="{% static 'css/userProfile.css' %}">
+<div class="content-section">
+    <!-- <div class="media">
+      <img class="rounded-circle account-img" src="{{ user.profile.image.url }}">
+      <div class="media-body">
+        <h2 class="account-heading">{{ user.username }}</h2>
+        <p class="text-secondary">{{ user.email }}</p>
+      </div>
+    </div> -->
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <legend class="border-bottom mb-4">Thông tin người dùng</legend>
+        {{ form|crispy }}
+        <div class="form-group mt-4">
+            <button class="btn btn-outline-info" type="submit">Cập nhật</button>
+        </div>
+    </form>
+</div>
 {% endblock %}

@@ -23,5 +23,3 @@ class CustomBackend(ModelBackend):
         except User.DoesNotExist:
             return None
 
-    def has_perm(self, user_obj, perm, obj=None):
-        return False

@@ -44,9 +44,9 @@ class CustomUserManager(BaseUserManager):
 class User(AbstractUser):
     username = models.CharField(max_length=100, default='User')
     name = models.CharField(max_length=100, blank=True)
-    phone_number = models.CharField(max_length=12, blank=True)
+    phone_number = models.CharField(max_length=12, unique=True, blank=True)
     role = models.CharField(max_length=20, choices=Roles.choices, default='player')
-    email = models.EmailField(_('email address'),blank=True)
+    email = models.EmailField(_('email address'), blank=True)
     USERNAME_FIELD = 'id'
     REQUIRED_FIELDS = []
 

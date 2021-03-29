@@ -2,6 +2,10 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import User, Order, Stadium, StadiumTimeFrame
 from crispy_forms.helper import FormHelper
+from django.contrib.auth.hashers import make_password
+from .models import User, Stadium, StadiumTimeFrame, TimeFrame, Order
+from django.contrib import messages
+from django.core.exceptions import ValidationError
 
 class UserCreationForm(UserCreationForm):
     # đống này để set custom cho Register form nha
@@ -25,7 +29,36 @@ class UserCreationForm(UserCreationForm):
             'role': 'Bạn là',
         }
 
-
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.set_password(self.cleaned_data["password1"])
+        if commit:
+            email_or_phone = self.cleaned_data.get('email_or_phone')
+            password = self.cleaned_data.get('password1')
+            password = make_password(password)
+            role = self.cleaned_data.get('role')
+            
+            if '@' in email_or_phone:
+                user = User.objects.create(
+                    email=email_or_phone,
+                    password=password,
+                    role=role
+                )
+            else:
+                user = User.objects.create(
+                    phone_number=email_or_phone,
+                    password=password,
+                    role=role
+                )
+            user.save()
+        return user
+        
+    def clean_email_or_phone(self):
+        user = self.cleaned_data['email_or_phone']
+        user_data = User.objects.get(phone_number=user)
+        if user_data:
+            raise ValidationError('Already have phone number!')
+        return user
 
 class OrderForm(forms.ModelForm):
     class Meta:
@@ -60,7 +93,6 @@ class StadiumForm(forms.ModelForm):
                     'class': 'form-control',
                     'disabled': True
                 })
-
         else:
             for name in self.fields.keys():
                 self.fields[name].widget.attrs.update({
@@ -94,4 +126,9 @@ class StadiumTimeFrameForm(forms.Form):
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = '__all__'
+        fields = ['username', 'phone_number', 'email']
+        labels = {
+            'username': 'Tên người dùng',
+            'phone_number': 'Số điện thoại',
+            'email': 'Email'
+        }
