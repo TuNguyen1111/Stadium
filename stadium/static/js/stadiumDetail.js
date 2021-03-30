@@ -20,7 +20,7 @@ function getInput() {
         input.disabled = false
     }else {
         input.disabled = true
-        
+
     }
 }
 
@@ -39,7 +39,7 @@ function checkValueOfDetailInput() {
         }
     }else {
         saveBtn.disabled = true
-        
+
     }
 }
 
@@ -67,3 +67,10 @@ function addEventInput() {
 }
 
 addEventInput()
+
+
+var inputTags = document.querySelectorAll('select')
+
+var value = inputTags[0].options[inputTags[0].selectedIndex].text;
+
+console.log(value)

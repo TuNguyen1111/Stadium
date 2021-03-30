@@ -37,7 +37,7 @@ class UserCreationForm(UserCreationForm):
             password = self.cleaned_data.get('password1')
             password = make_password(password)
             role = self.cleaned_data.get('role')
-            
+
             if '@' in email_or_phone:
                 user = User.objects.create(
                     email=email_or_phone,
@@ -52,12 +52,12 @@ class UserCreationForm(UserCreationForm):
                 )
             user.save()
         return user
-        
+
     def clean_email_or_phone(self):
         user = self.cleaned_data['email_or_phone']
-        user_data = User.objects.get(phone_number=user)
+        user_data = User.objects.filter(phone_number=user)
         if user_data:
-            raise ValidationError('Already have phone number!')
+            raise forms.ValidationError('Already have phone number!')
         return user
 
 class OrderForm(forms.ModelForm):
@@ -81,7 +81,7 @@ class StadiumForm(forms.ModelForm):
         # check xem có truyền instance vào không
         self._newly_created = kwargs.get('instance')
         # cái này để set input cho ảnh trông đỡ xấu, xoá thử đi để trải nghiệm nếu muốn
-        self.fields['image'] = forms.FileField(widget=forms.FileInput)
+        self.fields['image'] = forms.FileField(label='Ảnh', widget=forms.FileInput)
         # update input ảnh tự động tìm ảnh. Sau phải validate lại bằng JS đấy
         self.fields['image'].widget.attrs.update({
             'accept': '.png, .jpg, .jpeg"'
@@ -119,9 +119,6 @@ class StadiumTimeFrameForm(forms.Form):
     class Meta:
         model = StadiumTimeFrame
         fields = ['time_frame', 'price']
-
-       
-
 
 class UserProfileForm(forms.ModelForm):
     class Meta:

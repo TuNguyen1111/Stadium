@@ -9,13 +9,25 @@ from django.forms import inlineformset_factory
 from .models import User, Stadium, StadiumTimeFrame, TimeFrame, Order
 from .forms import OrderForm, StadiumForm, StadiumTimeFrameForm, UserCreationForm, UserProfileForm
 from django.contrib import messages
+from datetime import date
 # Create your views here.
 
 MY_BACKEND = CustomBackend()
+
+def checkRoleOfUser(request, user):
+    if user.role == "owner":
+        fields_by_owner = Stadium.objects.filter(owner=request.user)
+        if len(fields_by_owner) == 0:
+            return redirect('create_stadium')
+        return redirect('owner')
+    else:
+        if user.username == 'User' or user.phone_number == None:
+            return redirect('user_profile', user.id)
+        return redirect('home')
 class Home(View):
     form_class = UserCreationForm
     template_name = 'book_stadium/home.html'
-
+    #fields_by_owner = Stadium.objects.filter(owner=request.user)
     def get(self, request):
         context = {
             'register_form' : self.form_class,
@@ -26,23 +38,54 @@ class Home(View):
             context
             )
 
+class Register(View):
+    # t đã chỉnh username field của bảng user thành id rồi để đảm bảo nó duy nhất nên là phone_number với email có thể ko có cũng đc nha.
+    form_class = UserCreationForm
+
+    def post(self, request):
+        create_user_form = self.form_class(request.POST)
+        if create_user_form.is_valid():
+            user = create_user_form.save()
+            login(request, user, backend='book_stadium.myBackend.CustomBackend')
+            #checkRoleOfUser(request, user)
+            if user.role == "owner":
+                fields_by_owner = Stadium.objects.filter(owner=request.user)
+                if len(fields_by_owner) == 0:
+                    return redirect('create_stadium')
+                return redirect('owner')
+
+            else:
+                if user.username == '' or user.phone_number == None:
+                    return redirect('user_profile', user.id)
+                return redirect('home')
+        else:
+            # sửa đẩy form.errors về html nha
+            context = {
+                'register_form': create_user_form
+            }
+            print(create_user_form.errors)
+            return render(request, 'book_stadium/home.html', context)
+        return redirect('home')
+
 
 class Login(View):
     def post(self, request):
-        # login chưa chuyển form đâu nhé. Lười vc =)) bạn tự chuyển nha.có 2 dòng thôi
         email = request.POST.get('email')
         password = request.POST.get('password')
         user = MY_BACKEND.authenticate(request, username=email, password=password)
         if user:
-            login(request, user)
+            login(request, user, backend='book_stadium.myBackend.CustomBackend')
+            #checkRoleOfUser(request, user)
             if user.role == 'owner':
                 fields_by_owner = Stadium.objects.filter(owner=request.user)
                 if len(fields_by_owner) == 0:
                     return redirect('create_stadium')
                 return redirect('owner')
             else:
-                if user.username == 'User' or user.phone_number == None:
+                if user.username == '' or user.phone_number == None:
                     return redirect('user_profile', user.id)
+        else:
+            messages.info(request, 'Tên đăng nhập hoặc mật khẩu không đúng! Thử lại hộ cái bạn êiiiiii')
         return redirect('home')
 
 
@@ -60,7 +103,6 @@ class OwnerPage(LoginRequiredMixin, View):
         if request.user.role != 'owner':
             logout(request)
             return redirect('home')
-        fields_by_owner = Stadium.objects.filter(owner=request.user)
         fields_by_owner2 = Stadium.objects.get(owner=request.user)
         stadium_time_frames = StadiumTimeFrame.objects.filter(stadium=fields_by_owner2)
         total_orders = []
@@ -70,36 +112,16 @@ class OwnerPage(LoginRequiredMixin, View):
                 total_orders.append(owner_order)
         print("Total order: ", total_orders[0][0])
         fields = {
-            'fields': fields_by_owner,
             'total_orders': total_orders,
         }
+        if request.user.is_authenticated:
+            fields_by_owner = Stadium.objects.filter(owner=request.user)
+            fields['field'] = fields_by_owner
         return render(request,
         'book_stadium/owner.html',
         fields,
         )
 
-class Register(View):
-    # t đã chỉnh username field của bảng user thành id rồi để đảm bảo nó duy nhất nên là phone_number với email có thể ko có cũng đc nha.
-    form_class = UserCreationForm
-
-    def post(self, request):
-        create_user_form = self.form_class(request.POST)
-        if create_user_form.is_valid():
-
-            user = create_user_form.save()
-            login(request, user)
-            if user.role == "owner":
-                return redirect('owner')
-            else:
-                return redirect('home')
-        
-        else:
-            # sửa đẩy form.errors về html nha
-            print(create_user_form.errors)
-            return render(request, 'book_stadium/home.html', {
-                'create_user_form': create_user_form
-            })
-        return redirect('home')
 
 
 class CreateStadium(LoginRequiredMixin, View):
@@ -144,7 +166,6 @@ class StadiumDetail(LoginRequiredMixin, View):
     login_url = 'home'
     formset = inlineformset_factory(Stadium, StadiumTimeFrame, fields=['time_frame', 'price'], extra=0)
     def get(self, request, pk):
-
         fields_by_owner = Stadium.objects.filter(owner=request.user)
         current_stadium = Stadium.objects.get(id=pk)
         times_and_prices = StadiumTimeFrame.objects.filter(stadium=current_stadium)
@@ -217,5 +238,4 @@ class UserProfile(View):
         form = self.form_class(request.POST, instance=user)
         if form.is_valid():
             form.save()
-        return redirect('user_profile', user.id)
-            
+        return redirect('home')

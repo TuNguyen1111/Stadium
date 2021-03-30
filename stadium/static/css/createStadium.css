@@ -2,9 +2,9 @@
     border-radius: 20px;
     padding: 20px;
     width: 80%;
-    margin: auto;
+    margin-top: 40px;
     border: 1px solid rgb(182, 158, 158);
-    
+
 }
 
 .add-stadium .form-group{
@@ -17,4 +17,16 @@
 
 button {
     color: #0d6efd;
+}
+
+.col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.alert-primary {
+    width: 80%;
+    text-align: center;
+    font-size: 30px;
 }

@@ -8,6 +8,7 @@ from . import views
 from .views import isAccepted
 urlpatterns = [
     path('', views.Home.as_view(), name='home'),
+     path('social-auth/', include('social_django.urls', namespace="social")),
     path('login/', views.Login.as_view(), name='login'),
     path('logout/', views.Logout.as_view(), name='logout'),
     path('owner/', views.OwnerPage.as_view(), name='owner'),

@@ -4,14 +4,17 @@
 <link rel="stylesheet" href="{% static 'css/createStadium.css' %}">
 {% endblock %}
 {% block content %}
-<div class="add-stadium">
+<div class="alert alert-primary" role="alert">
+    Hãy nhập thông tin sân của bạn
+</div>
+<div class="add-stadium shadow">
   <form action="{% url 'create_stadium' %}" method="post" enctype="multipart/form-data">
     <h1 class="pt-5">Thêm sân</h1>
     {% csrf_token %}
-    {% for i in form %}
+    {% for input in form %}
     <div class="form-group pt-4">
-      {{i.label}}
-      {{i}}
+      {{input.label}}
+      {{input}}
     </div>
     {% endfor %}
     <input type="submit" value="Thêm" class="btn btn-primary mt-4">

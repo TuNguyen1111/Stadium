@@ -49,31 +49,8 @@
           <li><button type="button" class="btn btn-primary" onclick="turnOnModalLogin()">Đăng nhập</button></li>
           {% endif %}
         </ul>
-        <!-- <img class='logo' src="https://varunit.com/wp-content/uploads/2018/09/varunit-logo-square-black-bg.png" alt="">
-                <div class="menu">
-                    <a href="#">Đặt sân ngay</a>
-                    <a href="#">Tìm sân</a>
-                    {% if user.is_authenticated %}
-                    <div class="btn-group">
-                      <a class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        {{user.username}}
-                      </a>
-                      <div class="dropdown-menu dropdown-menu-right">
-                        <a href="#" class="dropdown-item" type="button">Thông tin tài khoản</a>
-                        {% if user.role == "owner" %}
-                        <a href="#" class="dropdown-item" type="button">Sân bóng của tôi</a>
-                        <a href="#" class="dropdown-item" type="button">Trạng thái đặt sân</a>
-                        {% else %}
-                        <a href="#" class="dropdown-item" type="button">Lịch sử đặt sân</a>
-                        {% endif %}
-                        <a class="dropdown-item" href="{% url 'logout' %}">Đăng xuất</a>
-                      </div>
-                    </div>
-                    {% else %}
-                        <button type="button" class="btn btn-primary" onclick="turnOnModalLogin()" >Đăng nhập</button>
-                    {% endif %}
-                </div> -->
       </nav>
+
     </header>
     <section>
       {% if user.role == "owner" %}
@@ -85,9 +62,9 @@
           </button>
           <div class="dropdown-container" style="display: block;">
             {% for field in fields %}
-            <a class=" " href="{% url 'stadium_detail' field.id %}">{{field.name}}</a>
+            <a class="field-name" href="{% url 'stadium_detail' field.id %}">{{field.name}}</a>
             {% endfor %}
-            <a class=" " href="{% url 'create_stadium' %}">Thêm sân</a>
+            <a class="field-name" href="{% url 'create_stadium' %}">Thêm sân</a>
           </div>
           <button class="dropdown-btn slideIn">
             Trạng thái sân
@@ -95,7 +72,7 @@
           </button>
           <div class="dropdown-container" style="display: block;">
             {% for field in fields %}
-            <a class=" " href="#">{{field.name}}</a>
+            <a class="field-name" href="#">{{field.name}}</a>
             {% endfor %}
           </div>
         </div>
@@ -105,7 +82,6 @@
         {%block content%}
         {% endblock %}
       </div>
-
     </section>
   </div>
 
@@ -137,7 +113,7 @@
               <a href="#">
                 <i class="fa fa-facebook-official fa-2x" aria-hidden="true"></i>
               </a>
-              <a href="">
+              <a href="{% url 'social:begin' 'google-oauth2' %}">
                 <i class="fa fa-google fa-2x" aria-hidden="true"></i>
               </a>
               <a href="">
@@ -149,6 +125,11 @@
             </div>
           </form>
         </div>
+        {% for message in messages %}
+            <div id="error-message" class="alert alert-danger" role="alert">
+                {{message}}
+            </div>
+		{% endfor %}
         <div class="modal-footer">
           <a href="#">Quên mật khẩu</a>
           <a href="#" onclick="turnOnModalRegister()">Tạo tài khoản mới</a>
@@ -168,11 +149,11 @@
         <div class="modal-body">
           <form action="{% url 'register' %}" method="POST">
             {% csrf_token %}
-            {%for i in register_form%}
+            {%for input in register_form%}
             <div class="inputs">
               <div class="mb-3">
-                {{i|as_crispy_field }}
-                
+                {{input|as_crispy_field }}
+
               </div>
               {% endfor %}
               <div class="social-login text-center">
@@ -191,44 +172,7 @@
                   <i class="fa fa-linkedin-square fa-2x" aria-hidden="true"></i>
                 </a>
               </div>
-              <!-- {% for error in create_user_form.errors %}
-								<p id='messages'>{{error}}</p>
-						  {% endfor %} -->
             </div>
-            <!-- 
-                    <div class="mb-3">
-                        <select class="form-select" name="role">
-                            <option selected value="player">Người đặt</option>
-                            <option value="owner">Chủ sân</option>
-                          </select>
-                        <div id="emailHelp" class="form-text">Tiếp tục ĐM các bạn</div>
-                      </div>
-                    <div class="mb-3">
-                        <label for="exampleInputEmail1" class="form-label">Email hoặc số điện thoại</label>
-                        <input type="email" class="form-control" name="email" aria-describedby="emailHelp">
-                        <div id="emailHelp" class="form-text">ĐM các bạn</div>
-                      </div>
-                      <div class="mb-3">
-                        <label for="exampleInputPassword1" class="form-label">Mật khẩu</label>
-                        <input type="password" name="password" class="form-control" id="exampleInputPassword1">
-                      </div>
-                  </div>
-                  <button type="submit" class="btn btn-primary">Đăng ký</button>
-                  <p>Hoặc đăng nhập với: </p>
-                  <div class="social-login">
-                        <a href="#">
-                            <i class="fa fa-facebook-official fa-2x" aria-hidden="true"></i>
-                        </a>
-                        <a href="">
-                            <i class="fa fa-google fa-2x" aria-hidden="true"></i>
-                        </a>
-                        <a href="">
-                            <i class="fa fa-instagram fa-2x" aria-hidden="true"></i>
-                        </a>
-                        <a href="">
-                            <i class="fa fa-linkedin-square fa-2x" aria-hidden="true"></i>
-                        </a>
-                  </div> -->
           </form>
         </div>
       </div>

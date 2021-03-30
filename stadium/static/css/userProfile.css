@@ -3,4 +3,10 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-} 
+}
+
+.alert-primary {
+    width: 80%;
+    text-align: center;
+    font-size: 30px;
+}

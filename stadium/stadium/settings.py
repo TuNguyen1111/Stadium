@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'crispy_forms',
     'book_stadium',
+    'social_django',
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -106,7 +107,17 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTHENTICATION_BACKENDS = [
     # 'django.contrib.auth.backends.ModelBackend',
     'book_stadium.myBackend.CustomBackend',
+    'social_core.backends.google.GoogleOAuth2',
 ]
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '366063184074-fu2m8j2majmq267sfvqm452tb6tbddl3.apps.googleusercontent.com'     # App ID
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'TUgmYpyphafvmpPuX8LB4i05'  # App Secret
+SOCIAL_AUTH_FACEBOOK_KEY = '260989362230969'          # App ID
+SOCIAL_AUTH_FACEBOOK_SECRET = '4b619e32f69fd018e1d2f8f408aa7c35'
+
+LOGIN_URL = '/auth/login/google-oauth2/'
+
+LOGIN_REDIRECT_URL = '/'
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
