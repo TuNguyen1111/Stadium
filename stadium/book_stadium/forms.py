@@ -115,7 +115,9 @@ class StadiumForm(forms.ModelForm):
         }
 
 
-class StadiumTimeFrameForm(forms.Form):
+class StadiumTimeFrameForm(forms.ModelForm):
+    time_frame = forms.ModelChoiceField(queryset=TimeFrame.objects.all(), disabled=True)
+
     class Meta:
         model = StadiumTimeFrame
         fields = ['time_frame', 'price']

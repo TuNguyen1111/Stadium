@@ -5,6 +5,7 @@
 
 .stadium-detail .form-group{
     width: 100%;
+
 }
 
 .add-stadium input{
@@ -20,16 +21,19 @@ i{
     margin-left: 10px;
 }
 
-.form-set {
-    width: 80%;
+.col {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
 }
 
-.info{
-    display: flex;
+h1{
+    width: 100%;
+    text-align: center;
+    border-bottom: 2px solid rgb(122, 122, 122) ;
+    color: #73f19d;
 }
 
-/* .sidenav a{
-    background-color: #0d6efd;
-} */
+.stadium-img{
+    width: 100%;
+    height: 25%;
+}

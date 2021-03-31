@@ -3,7 +3,59 @@
 {% load static %}
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/owner.css' %}">
+
 {% for orders in total_orders %}
+    {% for order in orders%}
+
+    {% endfor %}
+{% endfor %}
+
+<table class="table">
+  <thead>
+    <tr>
+        <th scope="col">Ngày đặt</th>
+        <th scope="col">Khung giờ</th>
+        <th scope="col">Sân số</th>
+        <th scope="col">Người đặt</th>
+        <th scope="col"></th>
+
+    </tr>
+  </thead>
+  <tbody>
+    {% for orders in total_orders %}
+        {% for order in orders%}
+        <tr>
+            <td>{{order.order_datetime}}</td>
+            <td>{{order.stadium_time_frame}}</td>
+            <td>{{order.field_number}}</td>
+            <td>{{order.user}}</td>
+            <td>
+                {% if order.is_accepted %}
+                Đã duyệt
+                {% else %}
+                <form action="{% url 'accepted' order.id %}" method="POST">
+                    {% csrf_token %}
+                    <input class="btn btn-success accepted" type="submit" value="Duyệt">
+                </form>
+                {% endif %}
+
+            </td>
+          </tr>
+        {% endfor %}
+    {% endfor %}
+  </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+<!-- {% for orders in total_orders %}
     {% for order in orders %}
         {% if not order.is_accepted %}
             <div class="card" style="width: 18rem;">
@@ -14,22 +66,22 @@
                         <label for="exampleInputEmail1">Người đặt</label>
                         <input type="text" class="form-control" name="username_order" value="{{order.user}}">
                         </div>
-                
+
                         <div class="form-group">
                             <label for="exampleInputEmail1">Khung giờ</label>
                             <input type="text" class="form-control" name="time_frame" value="{{order.stadium_time_frame}}">
                         </div>
-                
+
                         <div class="form-group">
                             <label for="exampleInputEmail1">Sân số</label>
                             <input type="text" class="form-control" name="field_number" value="{{order.field_number}}">
                         </div>
-                
+
                         <div class="form-group">
                             <label for="exampleInputEmail1">Ngày đặt</label>
                             <input type="text" class="form-control" name="order_datetime" value="{{order.order_datetime}}">
                         </div>
-                
+
                         <div class="form-group">
                             <label for="exampleInputEmail1">Số điện thoại</label>
                             <input type="text" class="form-control" name="phone_number" value="{{order.user.phone_number}}">
@@ -40,14 +92,14 @@
                             <input type="text" class="form-control" name="name_customer" value="{{order.user}}">
                         </div>
                         {% endif %}
-                
+
                         <button type="submit" class="btn btn-primary">Chấp nhận</button>
                     </form>
                 </div>
             </div>
         {% endif %}
     {% endfor %}
-{% endfor %}
+{% endfor %} -->
 {% endblock %}
 {% block javascript %}
 <script src="{% static 'js/owner.js' %}" type="text/javascript"></script>

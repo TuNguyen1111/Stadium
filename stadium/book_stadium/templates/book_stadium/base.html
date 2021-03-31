@@ -23,7 +23,7 @@
 <body>
   <div class="container">
     <header>
-      <nav class="navbar">
+      <div class="navbar">
         <img class='logo' src="https://varunit.com/wp-content/uploads/2018/09/varunit-logo-square-black-bg.png" alt="">
         <ul>
           <li><a href="#">Đặt sân ngay</a></li>
@@ -46,15 +46,15 @@
 
           </li>
           {% else %}
-          <li><button type="button" class="btn btn-primary" onclick="turnOnModalLogin()">Đăng nhập</button></li>
+          <li><button type="button" class="btn btn-success" onclick="turnOnModalLogin()">Đăng nhập</button></li>
           {% endif %}
         </ul>
-      </nav>
+    </div>
 
     </header>
-    <section>
+    <section class="shadow">
       {% if user.role == "owner" %}
-      <div class="col-2 sidebar">
+      <div class="col-2 sidebar shadow">
         <div class="sidenav">
           <button class="dropdown-btn slideIn">
             Quản lý sân
@@ -72,7 +72,7 @@
           </button>
           <div class="dropdown-container" style="display: block;">
             {% for field in fields %}
-            <a class="field-name" href="#">{{field.name}}</a>
+            <a class="field-name" href="{% url 'owner' %}">{{field.name}}</a>
             {% endfor %}
           </div>
         </div>
@@ -107,7 +107,7 @@
                 <input type="password" name="password" class="form-control" id="exampleInputPassword1">
               </div>
             </div>
-            <button type="submit" class="btn btn-primary">Đăng nhập</button>
+            <button type="submit" class="btn btn-success">Đăng nhập</button>
             <p>Hoặc đăng nhập với: </p>
             <div class="social-login">
               <a href="#">
@@ -157,7 +157,7 @@
               </div>
               {% endfor %}
               <div class="social-login text-center">
-                <button type="submit" class="btn btn-primary">Đăng ký</button>
+                <button type="submit" class="btn btn-success">Đăng ký</button>
                 <p>Hoặc đăng nhập với: </p>
                 <a href="#" class="text-center">
                   <i class="fa fa-facebook-official fa-2x" aria-hidden="true"></i>

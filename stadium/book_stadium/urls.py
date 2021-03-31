@@ -1,6 +1,5 @@
 from django.urls import path, include
-# check lại chỗ này để hiện ảnh nhé. Có gì hỏi a Trung vụ hiện ảnh từ db ra xem ntn.
-# cái này là t đi cop về được
+
 from django.conf import settings
 from django.contrib.staticfiles.urls import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
@@ -18,9 +17,9 @@ urlpatterns = [
     path('accepted/<int:id>', views.isAccepted, name='accepted'),
     path('trang-ca-nhan/<int:id>', views.UserProfile.as_view(), name='user_profile'),
 ]
-# đống này nữa
+
 urlpatterns += staticfiles_urlpatterns()
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
-# với trong settings.py nữa
+

@@ -68,9 +68,18 @@ function addEventInput() {
 
 addEventInput()
 
+// function changeSelectTag() {
+//     let inputTags = document.querySelectorAll('select')
+//     for (let i = 0; i < inputTags.length; i++) {
+//     let item = inputTags[i]
+//         let pTag = document.createElement('p')
+//         let value = item.options[item.selectedIndex].text;
+//         pTag.innerHTML = value
+//         item.parentNode.replaceChild(pTag, item)
+//     }
+// }
 
-var inputTags = document.querySelectorAll('select')
+// changeSelectTag()
 
-var value = inputTags[0].options[inputTags[0].selectedIndex].text;
 
-console.log(value)
+

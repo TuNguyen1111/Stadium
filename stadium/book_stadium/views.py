@@ -55,7 +55,7 @@ class Register(View):
                 return redirect('owner')
 
             else:
-                if user.username == '' or user.phone_number == None:
+                if user.username == '' or user.phone_number == '':
                     return redirect('user_profile', user.id)
                 return redirect('home')
         else:
@@ -82,7 +82,7 @@ class Login(View):
                     return redirect('create_stadium')
                 return redirect('owner')
             else:
-                if user.username == '' or user.phone_number == None:
+                if user.username == '' or user.phone_number == '':
                     return redirect('user_profile', user.id)
         else:
             messages.info(request, 'Tên đăng nhập hoặc mật khẩu không đúng! Thử lại hộ cái bạn êiiiiii')
@@ -104,24 +104,31 @@ class OwnerPage(LoginRequiredMixin, View):
             logout(request)
             return redirect('home')
         fields_by_owner2 = Stadium.objects.get(owner=request.user)
+        fields_by_owner = Stadium.objects.filter(owner=request.user)
         stadium_time_frames = StadiumTimeFrame.objects.filter(stadium=fields_by_owner2)
         total_orders = []
         for order in range(len(stadium_time_frames)):
             owner_order = Order.objects.filter(stadium_time_frame=stadium_time_frames[order])
             if len(owner_order) > 0:
                 total_orders.append(owner_order)
-        print("Total order: ", total_orders[0][0])
         fields = {
             'total_orders': total_orders,
+            'fields': fields_by_owner
         }
-        if request.user.is_authenticated:
-            fields_by_owner = Stadium.objects.filter(owner=request.user)
-            fields['field'] = fields_by_owner
         return render(request,
         'book_stadium/owner.html',
         fields,
         )
 
+def isAccepted(request, id):
+    if request.method == 'POST':
+        user = request.POST.get('username_order')
+        order = Order.objects.get(id=id)
+        order.is_accepted = True
+
+        order.save()
+        #print(order)
+        return redirect('owner')
 
 
 class CreateStadium(LoginRequiredMixin, View):
@@ -164,7 +171,8 @@ class CreateStadium(LoginRequiredMixin, View):
 
 class StadiumDetail(LoginRequiredMixin, View):
     login_url = 'home'
-    formset = inlineformset_factory(Stadium, StadiumTimeFrame, fields=['time_frame', 'price'], extra=0)
+    formset = inlineformset_factory(Stadium, StadiumTimeFrame, form=StadiumTimeFrameForm, extra=0)
+
     def get(self, request, pk):
         fields_by_owner = Stadium.objects.filter(owner=request.user)
         current_stadium = Stadium.objects.get(id=pk)
@@ -207,17 +215,6 @@ class StadiumDetail(LoginRequiredMixin, View):
                 print(formTimeFrame.errors)
 
         return redirect('stadium_detail', pk=stadium.id)
-
-
-
-def isAccepted(request, id):
-    if request.method == 'POST':
-        user = request.POST.get('username_order')
-        order = Order.objects.get(id=id)
-        order.is_accepted = True
-        order.save()
-        #print(order)
-        return redirect('owner')
 
 
 class UserProfile(View):

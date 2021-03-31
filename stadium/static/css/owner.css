@@ -2,8 +2,8 @@ form {
     width: 80%;
     margin: auto;
     margin-bottom: 40px;
-    
-} 
+
+}
 .form-group {
     width: 100%;
     margin-bottom: 20px;;
@@ -11,12 +11,15 @@ form {
 
 button {
     margin-top: 20px;
-    margin-bottom: 30px;
 }
 
 .card {
     height: 600px;
     margin-left: 60px;
     margin-top: 40px;
+}
+
+.accepted {
+    padding: 2px;
 }
 
