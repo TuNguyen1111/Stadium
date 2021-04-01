@@ -111,10 +111,92 @@ class OwnerPage(LoginRequiredMixin, View):
             owner_order = Order.objects.filter(stadium_time_frame=stadium_time_frames[order])
             if len(owner_order) > 0:
                 total_orders.append(owner_order)
+
+        all_orders = [
+            {
+            'ngay': '22/2/2020',
+            'khung_gio': {
+            '6h': {
+                'con_trong': 4,
+                'nguoi_dat':[
+                    {
+                    'sdt': '0912321312',
+                    'ten': 'ong',
+                    'da_duyet': False
+                    },
+                    {
+                    'sdt': '01211231',
+                    'ten': 's',
+                    'da_duyet': False
+                    },
+                ]
+            },
+            '8h30': {
+                'con_trong': 3,
+                'nguoi_dat': [
+                    {
+                    'sdt': '23423423',
+                    'ten': '2aaaaa',
+                    'da_duyet': False
+                    },
+                    {
+                    'sdt': '0876756',
+                    'ten': 'dd',
+                    'da_duyet': False
+                    },
+                ]
+            },
+            }
+        },
+
+         {
+            'ngay': '23/2/2020',
+            'khung_gio': {
+            '6h': {
+                'con_trong': 3,
+                'nguoi_dat':[
+                    {
+                    'sdt': '0763743',
+                    'ten': 'ong2',
+                    'da_duyet': False
+                    },
+                    {
+                    'sdt': '04545454',
+                    'ten': 's2',
+                    'da_duyet': False
+                    },
+                ]
+            },
+            '8h30': {
+                'con_trong': 3,
+                'nguoi_dat': [
+                    {
+                    'sdt': '0121212',
+                    'ten': 'ba',
+                    'da_duyet': False
+                    },
+                    {
+                    'sdt': '04456456',
+                    'ten': 'da',
+                    'da_duyet': False
+                    },
+                ]
+            },
+            }
+        },
+        ]
+        print(all_orders[0]['khung_gio'])
+
+
         fields = {
             'total_orders': total_orders,
-            'fields': fields_by_owner
+            'fields': fields_by_owner,
+            'all_orders': all_orders
         }
+
+
+
+
         return render(request,
         'book_stadium/owner.html',
         fields,
@@ -236,3 +318,6 @@ class UserProfile(View):
         if form.is_valid():
             form.save()
         return redirect('home')
+
+
+

@@ -1,54 +1,50 @@
 {% extends 'book_stadium/base.html' %}
 {% load crispy_forms_tags %}
 {% load static %}
-{% block content %}
+{% block css %}
 <link rel="stylesheet" href="{% static 'css/owner.css' %}">
+{% endblock %}
 
-{% for orders in total_orders %}
-    {% for order in orders%}
+{% block content %}
 
-    {% endfor %}
-{% endfor %}
+{% for orders in all_orders %}
 
-<table class="table">
-  <thead>
-    <tr>
-        <th scope="col">Ngày đặt</th>
-        <th scope="col">Khung giờ</th>
-        <th scope="col">Sân số</th>
-        <th scope="col">Người đặt</th>
-        <th scope="col"></th>
-
-    </tr>
-  </thead>
-  <tbody>
-    {% for orders in total_orders %}
-        {% for order in orders%}
+    <h1>{{orders.ngay}}</h1>
+    <table class="table">
+    <thead>
         <tr>
-            <td>{{order.order_datetime}}</td>
-            <td>{{order.stadium_time_frame}}</td>
-            <td>{{order.field_number}}</td>
-            <td>{{order.user}}</td>
-            <td>
-                {% if order.is_accepted %}
-                Đã duyệt
-                {% else %}
-                <form action="{% url 'accepted' order.id %}" method="POST">
-                    {% csrf_token %}
-                    <input class="btn btn-success accepted" type="submit" value="Duyệt">
-                </form>
-                {% endif %}
-
-            </td>
-          </tr>
+            <th scope="col">Khung giờ</th>
+            <th scope="col">Còn trống</th>
+            <th scope="col">Người đặt</th>
+            <th scope="col"></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for time, value in orders.khung_gio.items %}
+            <tr>
+                <td>{{time}}</td>
+                <td>{{value.con_trong}}</td>
+                <td>
+                    {% for users in value.nguoi_dat %}
+                        <p>{{users.sdt}}({{users.ten}})</p>
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for users in value.nguoi_dat %}
+                        {% if users.da_duyet %}
+                        <p>Đã duyệt</p>
+                        {% else %}
+                        <form action="">
+                            <input type="submit" value="Duyệt">
+                        </form>
+                        {% endif %}
+                    {% endfor %}
+                </td>
+            </tr>
         {% endfor %}
-    {% endfor %}
-  </tbody>
-</table>
-
-
-
-
+    </tbody>
+    </table>
+{% endfor %}
 
 
 

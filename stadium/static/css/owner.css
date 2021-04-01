@@ -23,3 +23,7 @@ button {
     padding: 2px;
 }
 
+.col {
+    display: flex;
+    flex-direction: column;
+}
