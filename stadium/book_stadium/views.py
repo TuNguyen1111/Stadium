@@ -1,15 +1,20 @@
-from django.shortcuts import render, redirect, HttpResponse
+from datetime import date
+
+from django.contrib import messages
+from django.contrib.auth import login, logout
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.forms import inlineformset_factory
+from django.shortcuts import HttpResponse, redirect, render
 from django.views import View
 from django.views.generic.edit import FormView
-from django.contrib.auth import login, logout
+from django.utils import timezone
+
+from .forms import (OrderForm, StadiumForm, StadiumTimeFrameForm,
+                    UserCreationForm, UserProfileForm)
+from .models import Order, Stadium, StadiumTimeFrame, TimeFrame, User
 from .myBackend import CustomBackend
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.hashers import make_password
-from django.forms import inlineformset_factory
-from .models import User, Stadium, StadiumTimeFrame, TimeFrame, Order
-from .forms import OrderForm, StadiumForm, StadiumTimeFrameForm, UserCreationForm, UserProfileForm
-from django.contrib import messages
-from datetime import date
+
 # Create your views here.
 
 MY_BACKEND = CustomBackend()
@@ -103,113 +108,71 @@ class OwnerPage(LoginRequiredMixin, View):
         if request.user.role != 'owner':
             logout(request)
             return redirect('home')
-        fields_by_owner2 = Stadium.objects.get(owner=request.user)
+
         fields_by_owner = Stadium.objects.filter(owner=request.user)
-        stadium_time_frames = StadiumTimeFrame.objects.filter(stadium=fields_by_owner2)
-        total_orders = []
-        for order in range(len(stadium_time_frames)):
-            owner_order = Order.objects.filter(stadium_time_frame=stadium_time_frames[order])
-            if len(owner_order) > 0:
-                total_orders.append(owner_order)
+        fields_by_owner2 = fields_by_owner.first()
+        now = timezone.now()
+        orders = Order.objects.filter(stadium_time_frame__stadium=fields_by_owner2)\
+                              .order_by('order_datetime')
+        print(orders)
+        all_orders = []
 
-        all_orders = [
-            {
-            'ngay': '22/2/2020',
-            'khung_gio': {
-            '6h': {
-                'con_trong': 4,
-                'nguoi_dat':[
-                    {
-                    'sdt': '0912321312',
-                    'ten': 'ong',
-                    'da_duyet': False
-                    },
-                    {
-                    'sdt': '01211231',
-                    'ten': 's',
-                    'da_duyet': False
-                    },
-                ]
-            },
-            '8h30': {
-                'con_trong': 3,
-                'nguoi_dat': [
-                    {
-                    'sdt': '23423423',
-                    'ten': '2aaaaa',
-                    'da_duyet': False
-                    },
-                    {
-                    'sdt': '0876756',
-                    'ten': 'dd',
-                    'da_duyet': False
-                    },
-                ]
-            },
-            }
-        },
+        for order in orders:
+            is_same_day = False
+            if all_orders:
+                #lay ra order cuoi va check xem co cung ngay hay khong
+                last_order = all_orders[-1]
+                is_same_day = last_order['ngay'] == order.order_datetime.date().strftime('%Y/%m/%d')
 
-         {
-            'ngay': '23/2/2020',
-            'khung_gio': {
-            '6h': {
-                'con_trong': 3,
-                'nguoi_dat':[
-                    {
-                    'sdt': '0763743',
-                    'ten': 'ong2',
-                    'da_duyet': False
-                    },
-                    {
-                    'sdt': '04545454',
-                    'ten': 's2',
-                    'da_duyet': False
-                    },
-                ]
-            },
-            '8h30': {
-                'con_trong': 3,
-                'nguoi_dat': [
-                    {
-                    'sdt': '0121212',
-                    'ten': 'ba',
-                    'da_duyet': False
-                    },
-                    {
-                    'sdt': '04456456',
-                    'ten': 'da',
-                    'da_duyet': False
-                    },
-                ]
-            },
+            if is_same_day:
+                current_order = all_orders[-1]
+            else:
+                current_order = {
+                    'ngay': order.order_datetime.date().strftime('%Y/%m/%d'),
+                    'khung_gio': {}
+                }
+                all_orders.append(current_order)
+
+            time_frames = current_order['khung_gio']
+            time = str(order.stadium_time_frame.time_frame)
+
+            is_same_timeframe = time in time_frames
+            if is_same_timeframe:
+                current_timeframe = time_frames[time]
+                print("sdfasdfsdafasfas", time_frames[time])
+            else:
+                current_timeframe = {
+                    'con_trong': None,
+                    'nguoi_dat': []
+                }
+                time_frames[time] = current_timeframe
+
+            customer = {
+                'sdt': order.user.phone_number,
+                'ten': order.user.username,
+                'da_duyet': order.is_accepted,
+                'order_id': order.id
             }
-        },
-        ]
-        print(all_orders[0]['khung_gio'])
+            current_timeframe['nguoi_dat'].append(customer)
+        import json
+        print(json.dumps(all_orders, indent=4))
 
 
         fields = {
-            'total_orders': total_orders,
+
             'fields': fields_by_owner,
             'all_orders': all_orders
         }
-
-
-
-
         return render(request,
-        'book_stadium/owner.html',
-        fields,
+            'book_stadium/owner.html',
+            fields,
         )
 
 def isAccepted(request, id):
     if request.method == 'POST':
-        user = request.POST.get('username_order')
         order = Order.objects.get(id=id)
         order.is_accepted = True
-
         order.save()
-        #print(order)
         return redirect('owner')
 
 
@@ -246,6 +209,7 @@ class CreateStadium(LoginRequiredMixin, View):
             time_frame = StadiumTimeFrame.objects.create(
                 stadium=stadium,
                 time_frame=i,
+                field_count=stadium.field_count,
                 price=300000,
             )
         return redirect('stadium_detail', pk=stadium.id)
@@ -321,3 +285,75 @@ class UserProfile(View):
 
 
 
+# all_orders = [
+        #     {
+        #         'ngay': '22/2/2020',
+        #         'khung_gio': {
+        #             '6h': {
+        #                 'con_trong': 4,
+        #                 'nguoi_dat':[
+        #                     {
+        #                         'sdt': '0912321312',
+        #                         'ten': 'ong',
+        #                         'da_duyet': False
+        #                     },
+        #                     {
+        #                         'sdt': '01211231',
+        #                         'ten': 's',
+        #                         'da_duyet': False
+        #                     },
+        #                 ]
+        #             },
+        #             '8h30': {
+        #                 'con_trong': 3,
+        #                 'nguoi_dat': [
+        #                     {
+        #                         'sdt': '23423423',
+        #                         'ten': '2aaaaa',
+        #                         'da_duyet': False
+        #                     },
+        #                     {
+        #                         'sdt': '0876756',
+        #                         'ten': 'dd',
+        #                         'da_duyet': False
+        #                     },
+        #                 ]
+        #             },
+        #         }
+        #     },
+        #     {
+        #         'ngay': '23/2/2020',
+        #         'khung_gio': {
+        #         '6h': {
+        #             'con_trong': 3,
+        #             'nguoi_dat':[
+        #                 {
+        #                     'sdt': '0763743',
+        #                     'ten': 'ong2',
+        #                     'da_duyet': False
+        #                 },
+        #                 {
+        #                     'sdt': '04545454',
+        #                     'ten': 's2',
+        #                     'da_duyet': False
+        #                 },
+        #             ]
+        #         },
+        #         '8h30': {
+        #             'con_trong': 3,
+        #             'nguoi_dat': [
+        #                 {
+        #                     'sdt': '0121212',
+        #                     'ten': 'ba',
+        #                     'da_duyet': False
+        #                 },
+        #                 {
+        #                     'sdt': '04456456',
+        #                     'ten': 'da',
+        #                     'da_duyet': False
+        #                 },
+        #             ]
+        #         },
+        #         }
+        #     },
+        # ]

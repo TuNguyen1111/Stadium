@@ -55,9 +55,12 @@ class UserCreationForm(UserCreationForm):
 
     def clean_email_or_phone(self):
         user = self.cleaned_data['email_or_phone']
-        user_data = User.objects.filter(phone_number=user)
+        if '@' in user:
+            user_data = User.objects.filter(email=user)
+        else:
+            user_data = User.objects.filter(phone_number=user)
         if user_data:
-            raise forms.ValidationError('Already have phone number!')
+            raise forms.ValidationError('Tên tài khoản của bạn đã tồn tại!')
         return user
 
 class OrderForm(forms.ModelForm):

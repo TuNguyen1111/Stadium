@@ -84,18 +84,32 @@ class TimeFrame(models.Model):
 class StadiumTimeFrame(models.Model):
     stadium = models.ForeignKey(Stadium, on_delete=models.CASCADE)
     time_frame = models.ForeignKey(TimeFrame, on_delete=models.CASCADE)
+    #field_count = models.PositiveSmallIntegerField(blank=True, null=True)
     price = models.IntegerField()
 
     def __str__(self):
         return f'{self.time_frame}'
 
+# class StadiumDateTimeAndFieldCount(models.Model):
+#     stadium = models.ForeignKey(Stadium, on_delete=models.CASCADE)
+#     order_date = models.DateTimeField(default=timezone.now)
+#     time_frame = models
+#     field_count = models.PositiveIntegerField()
+
 
 class Order(models.Model):
     user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+    # ong nay dat ngay nao
+    order_date = models.DateField(default=timezone.now)
+
+    # dat khung gio nao
     stadium_time_frame = models.ForeignKey(
         StadiumTimeFrame, null=True, on_delete=models.SET_NULL)
     field_number = models.PositiveSmallIntegerField()
+
+    # de xem ong nao dat truoc
     order_datetime = models.DateTimeField(default=timezone.now)
+
     is_accepted = models.BooleanField()
     customer_phone_number = models.CharField(max_length=12, blank=True)
     customer_name = models.CharField(max_length=100, blank=True)
