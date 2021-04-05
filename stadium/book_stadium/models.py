@@ -84,17 +84,10 @@ class TimeFrame(models.Model):
 class StadiumTimeFrame(models.Model):
     stadium = models.ForeignKey(Stadium, on_delete=models.CASCADE)
     time_frame = models.ForeignKey(TimeFrame, on_delete=models.CASCADE)
-    #field_count = models.PositiveSmallIntegerField(blank=True, null=True)
     price = models.IntegerField()
 
     def __str__(self):
         return f'{self.time_frame}'
-
-# class StadiumDateTimeAndFieldCount(models.Model):
-#     stadium = models.ForeignKey(Stadium, on_delete=models.CASCADE)
-#     order_date = models.DateTimeField(default=timezone.now)
-#     time_frame = models
-#     field_count = models.PositiveIntegerField()
 
 
 class Order(models.Model):

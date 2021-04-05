@@ -9,6 +9,8 @@ from django.shortcuts import HttpResponse, redirect, render
 from django.views import View
 from django.views.generic.edit import FormView
 from django.utils import timezone
+from datetime import datetime
+import datetime
 
 from .forms import (OrderForm, StadiumForm, StadiumTimeFrameForm,
                     UserCreationForm, UserProfileForm)
@@ -19,16 +21,16 @@ from .myBackend import CustomBackend
 
 MY_BACKEND = CustomBackend()
 
-def checkRoleOfUser(request, user):
-    if user.role == "owner":
-        fields_by_owner = Stadium.objects.filter(owner=request.user)
-        if len(fields_by_owner) == 0:
-            return redirect('create_stadium')
-        return redirect('owner')
-    else:
-        if user.username == 'User' or user.phone_number == None:
-            return redirect('user_profile', user.id)
-        return redirect('home')
+# def checkRoleOfUser(request, user):
+#     if user.role == "owner":
+#         fields_by_owner = Stadium.objects.filter(owner=request.user)
+#         if len(fields_by_owner) == 0:
+#             return redirect('create_stadium')
+#         return redirect('owner')
+#     else:
+#         if user.username == 'User' or user.phone_number == None:
+#             return redirect('user_profile', user.id)
+#         return redirect('home')
 class Home(View):
     form_class = UserCreationForm
     template_name = 'book_stadium/home.html'
@@ -104,17 +106,16 @@ class OwnerPage(LoginRequiredMixin, View):
     login_url = "home"
     template_name = "book_stadium/owner.html"
 
-    def get(self, request):
+    def get(self, request, id):
         if request.user.role != 'owner':
             logout(request)
             return redirect('home')
-
         fields_by_owner = Stadium.objects.filter(owner=request.user)
-        fields_by_owner2 = fields_by_owner.first()
+        stadium = Stadium.objects.get(id=id)
+        all_time_frames = TimeFrame.objects.all()
         now = timezone.now()
-        orders = Order.objects.filter(stadium_time_frame__stadium=fields_by_owner2)\
-                              .order_by('order_datetime')
-        print(orders)
+        orders = Order.objects.filter(stadium_time_frame__stadium=stadium, order_date__gte=timezone.now())\
+                              .order_by('order_date')
         all_orders = []
 
         for order in orders:
@@ -122,41 +123,48 @@ class OwnerPage(LoginRequiredMixin, View):
             if all_orders:
                 #lay ra order cuoi va check xem co cung ngay hay khong
                 last_order = all_orders[-1]
-                is_same_day = last_order['ngay'] == order.order_datetime.date().strftime('%Y/%m/%d')
+                is_same_day = last_order['ngay'] == order.order_date.strftime('%Y/%m/%d')
 
             if is_same_day:
                 current_order = all_orders[-1]
             else:
                 current_order = {
-                    'ngay': order.order_datetime.date().strftime('%Y/%m/%d'),
+                    'ngay': order.order_date.strftime('%Y/%m/%d'),
                     'khung_gio': {}
                 }
                 all_orders.append(current_order)
 
             time_frames = current_order['khung_gio']
-            time = str(order.stadium_time_frame.time_frame)
+            for time_frame in all_time_frames:
+                time = str(time_frame)
+                is_same_timeframe = time in time_frames
+                if is_same_timeframe:
+                    current_timeframe = time_frames[time]
+                else:
+                    current_timeframe = {
+                        'con_trong': None,
+                        'nguoi_dat': []
+                    }
+                    time_frames[time] = current_timeframe
+                if time == str(order.stadium_time_frame.time_frame):
+                    customer = {
+                        'sdt': order.user.phone_number,
+                        'ten': order.user.username,
+                        'da_duyet': order.is_accepted,
+                        'order_id': order.id
+                    }
+                    current_timeframe['nguoi_dat'].append(customer)
 
-            is_same_timeframe = time in time_frames
-            if is_same_timeframe:
-                current_timeframe = time_frames[time]
-                print("sdfasdfsdafasfas", time_frames[time])
-            else:
-                current_timeframe = {
-                    'con_trong': None,
-                    'nguoi_dat': []
-                }
-                time_frames[time] = current_timeframe
-
-            customer = {
-                'sdt': order.user.phone_number,
-                'ten': order.user.username,
-                'da_duyet': order.is_accepted,
-                'order_id': order.id
-            }
-            current_timeframe['nguoi_dat'].append(customer)
+        for order in all_orders:
+            for key, time_frame in order['khung_gio'].items():
+                count_accept_user = 0
+                for user in time_frame['nguoi_dat']:
+                    if user['da_duyet']:
+                        count_accept_user += 1
+                total_stadium = stadium.field_count - count_accept_user
+                time_frame['con_trong'] = total_stadium
         import json
         print(json.dumps(all_orders, indent=4))
-
 
         fields = {
 
@@ -171,10 +179,16 @@ class OwnerPage(LoginRequiredMixin, View):
 def isAccepted(request, id):
     if request.method == 'POST':
         order = Order.objects.get(id=id)
-        order.is_accepted = True
-        order.save()
-        return redirect('owner')
+        form_type = request.POST.get('form_type')
+        print('form', form_type)
 
+        stadium = order.stadium_time_frame.stadium
+        if form_type == "accept-input":
+            order.is_accepted = True
+            order.save()
+        else:
+            order.delete()
+        return redirect('owner', stadium.id)
 
 class CreateStadium(LoginRequiredMixin, View):
     login_url = 'home'
@@ -209,7 +223,6 @@ class CreateStadium(LoginRequiredMixin, View):
             time_frame = StadiumTimeFrame.objects.create(
                 stadium=stadium,
                 time_frame=i,
-                field_count=stadium.field_count,
                 price=300000,
             )
         return redirect('stadium_detail', pk=stadium.id)
@@ -282,6 +295,33 @@ class UserProfile(View):
         if form.is_valid():
             form.save()
         return redirect('home')
+
+
+class BookStadium(View):
+    def get(self, request):
+        time_frame_from_6h_16h = ['06:00:00 - 07:30:00', '07:30:00 - 09:00:00', '09:00:00 - 10:30:00', '10:30:00 - 12:00:00', '12:00:00 - 13:30:00', '13:30:00 - 15:00:00', '15:00:00 - 16:30:00']
+        stadiums = Stadium.objects.all()
+        # all_stadiums = [
+        #     {
+        #         'ngay': datetime.date.today(),
+        #         'khung_gio': {
+        #             '6h-16h': []
+        #         }
+        #     },
+        #     {
+        #         'ngay': datetime.date.today() + datetime.timedelta(days=1),
+        #         'khung_gio': {
+        #             '6h-16h': []
+        #         }
+        #     }
+        # ]
+
+        # print(datetime.date.today())
+
+        # print('day:', datetime.date.today() + datetime.timedelta(days=1))
+
+        return render(request, 'book_stadium/book_stadium.html')
+
 
 
 

@@ -1,9 +1,4 @@
-form {
-    width: 80%;
-    margin: auto;
-    margin-bottom: 40px;
 
-}
 .form-group {
     width: 100%;
     margin-bottom: 20px;;
@@ -19,11 +14,44 @@ button {
     margin-top: 40px;
 }
 
-.accepted {
-    padding: 2px;
+.accepted-btn {
+    padding: 0.5px;
+    width: 50px;
+
+}
+
+.delete-btn {
+    padding: 0.5px;
+    width: 50px;
+    height: 27px;
 }
 
 .col {
     display: flex;
     flex-direction: column;
+}
+
+.table {
+    width: 90%;
+    margin: auto;
+}
+
+.order-date {
+    margin-top: 40px;
+    margin-left: 20px;
+}
+
+.form {
+    margin-bottom: 10px;
+    margin-right: 10px;
+}
+
+.crud-btn {
+    display: flex;
+}
+.form-confirm {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
 }

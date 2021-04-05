@@ -53,21 +53,21 @@
                 <tbody>
 
                 {% for form in formTimeFrame %}
-                {% for hidden in form.hidden_fields %}
-                {{ hidden }}
-                {% endfor %}
-                <tr class="time-frames">
-                    <td>{{ form.time_frame }}
-                    </td>
-                    <td>
-                    <div class="inputField text-center">
-                        {{form.price}}
-                        <!-- <input type="text" class="form-control" id="{{forloop.counter0}}" name="price" disabled="true" value="{{ form.price.value|intcomma }}"> -->
-                        <i data-name="{{form.price.auto_id }}" class="fas fa-pen-square"></i>
-                    </div>
-                    </td>
+                    {% for hidden in form.hidden_fields %}
+                        {{ hidden }}
+                    {% endfor %}
+                    <tr class="time-frames">
+                        <td>{{ form.time_frame }}
+                        </td>
+                        <td>
+                        <div class="inputField text-center">
+                            {{form.price}}
+                            <!-- <input type="text" class="form-control" id="{{forloop.counter0}}" name="price" disabled="true" value="{{ form.price.value|intcomma }}"> -->
+                            <i data-name="{{form.price.auto_id }}" class="fas fa-pen-square"></i>
+                        </div>
+                        </td>
 
-                </tr>
+                    </tr>
                 {% endfor %}
                 </tbody>
             </table>
