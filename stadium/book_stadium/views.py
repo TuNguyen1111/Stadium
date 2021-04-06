@@ -333,7 +333,16 @@ class UserProfile(View):
 class BookStadium(View):
     def get(self, request):
         time_frame_from_6h_16h = ['06:00:00 - 07:30:00', '07:30:00 - 09:00:00', '09:00:00 - 10:30:00', '10:30:00 - 12:00:00', '12:00:00 - 13:30:00', '13:30:00 - 15:00:00', '15:00:00 - 16:30:00']
-        stadiums = Stadium.objects.all()
+        stadium_timeframes = StadiumTimeFrame.objects.all()
+        count_accepted = 0
+        timeframe_in_order = []
+        for timeframe in stadium_timeframes:
+            orders = Order.objects.filter(stadium_time_frame=timeframe)
+            if orders:
+                for order in orders:
+                    if order.is_accepted:
+                        count_accepted += 1
+        print(stadium_timeframes)
         all_stadiums = []
 
         return render(request, 'book_stadium/book_stadium.html')
