@@ -7,7 +7,6 @@ if (errorRegisterMessage.length) {
     modalRegister.show();
 }
 
-
 if (errorLoginMessage.length) {
     modalLogin.show();
 }
@@ -52,15 +51,4 @@ for (let i = 0; i < dropdown.length; i++) {
 //         this.style.background = 'red';
 //     })
 // }
-function hightLight() {
-    let aTag = document.querySelectorAll('.field-name')
-    console.log(aTag)
-    for (let i = 0; i < aTag.length; i++) {
-        let item = aTag[i]
-        item.addEventListener('click', function() {
-            console.log('clicked')
-        })
-    }
-}
 
-hightLight()

@@ -56,10 +56,7 @@ class Register(View):
             login(request, user, backend='book_stadium.myBackend.CustomBackend')
             #checkRoleOfUser(request, user)
             if user.role == "owner":
-                fields_by_owner = Stadium.objects.filter(owner=request.user)
-                if len(fields_by_owner) == 0:
-                    return redirect('create_stadium')
-                return redirect('owner')
+                return redirect('create_stadium')
 
             else:
                 if user.username == '' or user.phone_number == '':
@@ -84,10 +81,13 @@ class Login(View):
             login(request, user, backend='book_stadium.myBackend.CustomBackend')
             #checkRoleOfUser(request, user)
             if user.role == 'owner':
-                fields_by_owner = Stadium.objects.filter(owner=request.user)
-                if len(fields_by_owner) == 0:
+                stadiums = Stadium.objects.filter(owner=request.user)
+
+                if len(stadiums) == 0:
                     return redirect('create_stadium')
-                return redirect('owner')
+                else:
+                    fisrt_stadium = stadiums.first()
+                    return redirect('owner', fisrt_stadium.id)
             else:
                 if user.username == '' or user.phone_number == '':
                     return redirect('user_profile', user.id)
@@ -113,18 +113,43 @@ class OwnerPage(LoginRequiredMixin, View):
         fields_by_owner = Stadium.objects.filter(owner=request.user)
         stadium = Stadium.objects.get(id=id)
         all_time_frames = TimeFrame.objects.all()
-        now = timezone.now()
+        today = timezone.now()
+        tomorrow = datetime.date.today() + datetime.timedelta(days=1)
         orders = Order.objects.filter(stadium_time_frame__stadium=stadium, order_date__gte=timezone.now())\
                               .order_by('order_date')
+        is_today_in_all_orders = False
         all_orders = []
+        for order in orders:
+            if today.date().strftime('%Y/%m/%d') == order.order_date.strftime('%Y/%m/%d'):
+                is_today_in_all_orders = True
 
+        #tao 1 dict rong neu nhu ngay hien tai khong co order nao
+        if not is_today_in_all_orders:
+            first_order = {
+                'ngay': 'Hôm nay' ,
+                'khung_gio': {}
+            }
+            all_orders.append(first_order)
+            time_frames = all_orders[0]['khung_gio']
+            for time_frame in all_time_frames:
+                time = str(time_frame)
+                is_same_timeframe = time in time_frames
+                if is_same_timeframe:
+                    current_timeframe = time_frames[time]
+                else:
+                    current_timeframe = {
+                        'con_trong': None,
+                        'nguoi_dat': []
+                    }
+                    time_frames[time] = current_timeframe
+
+        #tao dict voi moi ngay co order
         for order in orders:
             is_same_day = False
             if all_orders:
                 #lay ra order cuoi va check xem co cung ngay hay khong
                 last_order = all_orders[-1]
                 is_same_day = last_order['ngay'] == order.order_date.strftime('%Y/%m/%d')
-
             if is_same_day:
                 current_order = all_orders[-1]
             else:
@@ -132,6 +157,10 @@ class OwnerPage(LoginRequiredMixin, View):
                     'ngay': order.order_date.strftime('%Y/%m/%d'),
                     'khung_gio': {}
                 }
+                if order.order_date == today.date():
+                    current_order['ngay'] = 'Hôm nay'
+                if order.order_date == tomorrow:
+                    current_order['ngay'] = 'Ngày mai'
                 all_orders.append(current_order)
 
             time_frames = current_order['khung_gio']
@@ -155,6 +184,7 @@ class OwnerPage(LoginRequiredMixin, View):
                     }
                     current_timeframe['nguoi_dat'].append(customer)
 
+        #dem xem khung gio con bao nhieu san trong dua tren so nguoi da duyet
         for order in all_orders:
             for key, time_frame in order['khung_gio'].items():
                 count_accept_user = 0
@@ -165,7 +195,7 @@ class OwnerPage(LoginRequiredMixin, View):
                 time_frame['con_trong'] = total_stadium
         import json
         print(json.dumps(all_orders, indent=4))
-
+        print(datetime.date.today() + datetime.timedelta(days=1))
         fields = {
 
             'fields': fields_by_owner,
@@ -186,8 +216,10 @@ def isAccepted(request, id):
         if form_type == "accept-input":
             order.is_accepted = True
             order.save()
-        else:
+            messages.success(request, 'Đã duyệt!')
+        elif form_type == "accept-delete":
             order.delete()
+            messages.success(request, 'Xóa thành công!')
         return redirect('owner', stadium.id)
 
 class CreateStadium(LoginRequiredMixin, View):
@@ -225,6 +257,7 @@ class CreateStadium(LoginRequiredMixin, View):
                 time_frame=i,
                 price=300000,
             )
+        messages.info(request, 'Tạo sân thành công!')
         return redirect('stadium_detail', pk=stadium.id)
 
 
@@ -272,7 +305,7 @@ class StadiumDetail(LoginRequiredMixin, View):
                 formTimeFrame.save()
             else:
                 print(formTimeFrame.errors)
-
+        messages.success(request, 'Cập nhật thành công!')
         return redirect('stadium_detail', pk=stadium.id)
 
 
@@ -301,24 +334,7 @@ class BookStadium(View):
     def get(self, request):
         time_frame_from_6h_16h = ['06:00:00 - 07:30:00', '07:30:00 - 09:00:00', '09:00:00 - 10:30:00', '10:30:00 - 12:00:00', '12:00:00 - 13:30:00', '13:30:00 - 15:00:00', '15:00:00 - 16:30:00']
         stadiums = Stadium.objects.all()
-        # all_stadiums = [
-        #     {
-        #         'ngay': datetime.date.today(),
-        #         'khung_gio': {
-        #             '6h-16h': []
-        #         }
-        #     },
-        #     {
-        #         'ngay': datetime.date.today() + datetime.timedelta(days=1),
-        #         'khung_gio': {
-        #             '6h-16h': []
-        #         }
-        #     }
-        # ]
-
-        # print(datetime.date.today())
-
-        # print('day:', datetime.date.today() + datetime.timedelta(days=1))
+        all_stadiums = []
 
         return render(request, 'book_stadium/book_stadium.html')
 

@@ -24,6 +24,7 @@ button {
     padding: 0.5px;
     width: 50px;
     height: 27px;
+    margin-left: 22px;
 }
 
 .col {
@@ -49,9 +50,20 @@ button {
 .crud-btn {
     display: flex;
 }
+
+.accepted input{
+    margin-left: 10px;
+}
+
 .form-confirm {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-around;
 }
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+

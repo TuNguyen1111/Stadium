@@ -61,19 +61,37 @@
             <i class="fa fa-caret-down"></i>
           </button>
           <div class="dropdown-container" style="display: block;">
-            {% for field in fields %}
-            <a class="field-name" href="{% url 'stadium_detail' field.id %}">{{field.name}}</a>
-            {% endfor %}
-            <a class="field-name" href="{% url 'create_stadium' %}">Thêm sân</a>
+            <ul>
+                {% for field in fields %}
+                    {% url 'stadium_detail' field.id as url %}
+                    <li class="nav-item {% if request.path == url %}active{% endif %}">
+                        <a class="field-name" href="{{url}}">{{field.name}}</a>
+                    </li>
+                {% endfor %}
+
+                {% url 'create_stadium' as url %}
+                <li class="nav-item {% if request.path == url %}active{% endif %}">
+                    <a class="field-name" href="{{url}}">Thêm sân</a>
+                </li>
+
+            </ul>
+
+
           </div>
           <button class="dropdown-btn slideIn">
             Trạng thái sân
             <i class="fa fa-caret-down"></i>
           </button>
           <div class="dropdown-container" style="display: block;">
-            {% for field in fields %}
-            <a class="field-name" href="{% url 'owner' field.id %}">{{field.name}}</a>
-            {% endfor %}
+            <ul>
+                {% for field in fields %}
+                {% url 'owner' field.id as url %}
+                    <li class="nav-item {% if request.path == url %}active{% endif %}">
+                        <a class="field-name" href="{{url}}">{{field.name}}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+
           </div>
         </div>
       </div>
@@ -107,7 +125,7 @@
                 <input type="password" name="password" class="form-control" id="exampleInputPassword1">
               </div>
             </div>
-            <button type="submit" class="btn btn-success">Đăng nhập</button>
+            <button type="submit" class="btn btn-success" onclick="">Đăng nhập</button>
             <p>Hoặc đăng nhập với: </p>
             <div class="social-login">
               <a href="#">
@@ -125,11 +143,11 @@
             </div>
           </form>
         </div>
-        {% for message in messages %}
+        <!-- {% for message in messages %}
             <div id="error-message" class="alert alert-danger" role="alert">
                 {{message}}
             </div>
-		{% endfor %}
+		{% endfor %} -->
         <div class="modal-footer">
           <a href="#">Quên mật khẩu</a>
           <a href="#" onclick="turnOnModalRegister()">Tạo tài khoản mới</a>

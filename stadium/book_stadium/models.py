@@ -44,7 +44,7 @@ class Roles(models.TextChoices):
 class User(AbstractUser):
     username = models.CharField(max_length=100, default='')
     name = models.CharField(max_length=100, blank=True)
-    phone_number = models.CharField(max_length=12, unique=True, blank=True)
+    phone_number = models.CharField(max_length=12, blank=True)
     role = models.CharField(max_length=20, choices=Roles.choices, default='player')
     email = models.EmailField(_('email address'), blank=True)
     #image = models.ImageField(upload_to="user_images", default='default.jpg', null=True, blank=True)

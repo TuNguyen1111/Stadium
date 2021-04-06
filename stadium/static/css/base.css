@@ -40,16 +40,16 @@ body{
 .modal-footer {
   display: flex;
   justify-content: space-between;
-
 }
+
 a {
   text-decoration: none;
   color: #5cdf88;
 }
+
 a:hover {
   color: black;
 }
-
 
 .modal-body select {
   margin-bottom: 20px;
@@ -123,7 +123,7 @@ section{
 
 /* Add an active class to the active dropdown button */
 .active {
-  background-color: cyan;
+  background-color: #5cdf88;
   /* color: white; */
 }
 
@@ -133,6 +133,9 @@ section{
   padding-left: 8px;
 }
 
+.dropdown-container ul li {
+    list-style: none;
+}
 /* Optional: Style the caret down icon */
 .fa-caret-down {
   float: right;
@@ -156,3 +159,5 @@ section{
 .field-name:hover {
     background: #5cdf88;
 }
+
+

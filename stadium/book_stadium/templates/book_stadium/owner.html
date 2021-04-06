@@ -6,79 +6,160 @@
 {% endblock %}
 
 {% block content %}
-
-{% for orders in all_orders %}
-    <div class="stadium-infor">
-        <h1 class="order-date">Ngày: {{orders.ngay}}</h1>
-        <hr>
-    <table class="table">
-    <thead>
-        <tr>
-            <th scope="col">Khung giờ</th>
-            <th scope="col">Còn trống</th>
-            <th scope="col">Người đặt</th>
-            <th scope="col"></th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for time, value in orders.khung_gio.items %}
-            <tr>
-                <td>{{time}}</td>
-                <td>{{value.con_trong}}</td>
-                <td>
-                    {% if value.nguoi_dat %}
-                        {% for users in value.nguoi_dat %}
-                            <p>{{users.sdt}}({{users.ten}})</p>
-                        {% endfor %}
-                    {% else %}
-                        <p>Chưa có người đặt</p>
-                    {% endif %}
-                </td>
-                <td>
-                    {% for users in value.nguoi_dat %}
-                        {% if users.da_duyet %}
-                        <p>Đã duyệt</p>
-                        {% else %}
-                        <div class="crud-btn">
-                            <form class="form" method="POST" action="{% url 'accepted' users.order_id %}">
-                                {% csrf_token %}
-                                <input type="hidden" name="form_type" value="accept-input">
-                                <input type="submit" class="btn btn-success accepted-btn" value="Duyệt">
-                            </form>
-
-                            <input type="submit" class="btn btn-danger delete-btn" onclick="turnOnModalDelete()" value="Xóa">
-
-                            <div class="modal fade " id="delete" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-                            aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered">
-                              <div class="modal-content">
-                                <div class="modal-header">
-                                  <h5 class="modal-title" id="staticBackdropLabel">Bạn có chắc là muốn xóa không?</h5>
-                                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <form class="form-confirm" method="POST" action="{% url 'accepted' users.order_id %}">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="form_type" value="delete-input">
-                                        <input type="submit" class="btn btn-danger accepted-btn" value="Xóa">
-                                        <input type="submit" class="btn btn-success accepted-btn" value="Hủy">
-                                    </form>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        {% endif %}
-                    {% endfor %}
-                </td>
-            </tr>
-        {% endfor %}
-    </tbody>
-    </table>
-{% endfor %}
+    {% for message in messages %}
+    <div class="alert alert-success" role="alert">
+        {{message}}
     </div>
+    {% endfor %}
+    {% for orders in all_orders %}
+        <!-- It is {% now "D d M Y" %} -->
 
+        <div class="stadium-infor">
+            <h1 class="order-date">
+                {% if orders.ngay == 'Hôm nay' or orders.ngay == 'Ngày mai' %}
+                    {{orders.ngay}}
+                {% else %}
+                    Ngày: {{orders.ngay}}
+                {% endif %}
+
+            </h1>
+            <hr>
+        <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Khung giờ</th>
+                <th scope="col">Còn trống</th>
+                <th scope="col">Người đặt</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for time, value in orders.khung_gio.items %}
+                <tr>
+                    <td>{{time}}</td>
+                    <td>
+                        {% if value.con_trong %}
+                            {{value.con_trong}}
+                        {% else %}
+                            Hết sân
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if value.nguoi_dat %}
+                            {% for users in value.nguoi_dat %}
+                                <p>{{users.sdt}} ( {{users.ten}} )</p>
+                            {% endfor %}
+                        {% else %}
+                            <p>Chưa có người đặt</p>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% for users in value.nguoi_dat %}
+                            {% if users.da_duyet %}
+                                <div class="crud-btn accepted">
+                                    <p>Đã duyệt</p>
+                                    <input type="submit" class="btn btn-danger delete-btn" onclick="turnOnModalDelete()" value="Xóa">
+                                    <div class="modal fade " id="delete" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+                                        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                            <h5 class="modal-title" id="staticBackdropLabel">Thông báo</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Bạn có chắc là muốn xóa {{users.sdt}} ( {{users.ten}} ) không?</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <form class="form" method="POST" action="{% url 'accepted' users.order_id %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="form_type" value="accept-delete">
+                                                    <input type="submit" class="btn btn-success" value="Xóa">
+                                                </form>
+                                                <form class="form" method="POST" action="{% url 'accepted' users.order_id %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="form_type" value="cancel-delete">
+                                                    <input type="submit" class="btn btn-danger  " value="Hủy">
+                                                </form>
+                                            </div>
+                                        </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% else %}
+
+                            <div class="crud-btn">
+                                {% if value.con_trong %}
+                                    <input type="submit" class="btn btn-success accepted-btn" onclick="turnOnModalAccept()" value="Duyệt">
+                                    <div class="modal fade " id="accept" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+                                    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                        <h5 class="modal-title" id="staticBackdropLabel">Thông báo</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p>Bạn có chắc là muốn duyệt {{users.sdt}} ( {{users.ten}} ) không?</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <form class="form" method="POST" action="{% url 'accepted' users.order_id %}">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="form_type" value="accept-input">
+                                                <input type="submit" class="btn btn-success" value="Có">
+                                            </form>
+                                            <form class="form" method="POST" action="{% url 'accepted' users.order_id %}">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="form_type" value="cancel-delete">
+                                                <input type="submit" class="btn btn-danger" value="Hủy">
+                                            </form>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+                                {% else %}
+                                    <p>Hết sân</p>
+                                {% endif %}
+                                <input type="submit" class="btn btn-danger delete-btn" onclick="turnOnModalDelete()" value="Xóa">
+                                <div class="modal fade " id="delete" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+                                aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                    <h5 class="modal-title" id="staticBackdropLabel">Thông báo</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Bạn có chắc là muốn xóa {{users.sdt}} ( {{users.ten}} ) không?</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <form class="form" method="POST" action="{% url 'accepted' users.order_id %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="form_type" value="accept-delete">
+                                            <input type="submit" class="btn btn-success" value="Xóa">
+                                        </form>
+                                        <form class="form" method="POST" action="{% url 'accepted' users.order_id %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="form_type" value="cancel-delete">
+                                            <input type="submit" class="btn btn-danger" value="Hủy">
+                                        </form>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+                            </div>
+                            {% endif %}
+
+                        {% endfor %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+        </table>
+    {% endfor %}
+        </div>
 {% endblock %}
+
 {% block javascript %}
 <script src="{% static 'js/owner.js' %}" type="text/javascript"></script>
 {% endblock %}

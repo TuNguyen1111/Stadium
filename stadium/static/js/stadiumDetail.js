@@ -68,19 +68,6 @@ function addEventInput() {
 
 addEventInput()
 
-// function changeSelectTag() {
-//     let inputTags = document.querySelectorAll('select')
-//     for (let i = 0; i < inputTags.length; i++) {
-//     let item = inputTags[i]
-//         let pTag = document.createElement('p')
-//         let value = item.options[item.selectedIndex].text;
-//         pTag.innerHTML = value
-//         item.parentNode.replaceChild(pTag, item)
-//     }
-// }
-
-// changeSelectTag()
-
 function hiddenSelect() {
     let selectTags = document.querySelectorAll('select')
     for (let i = 0; i < selectTags.length; i++) {
@@ -93,3 +80,5 @@ function hiddenSelect() {
     }
 }
 hiddenSelect()
+
+
