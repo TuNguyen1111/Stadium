@@ -1,0 +1,41 @@
+.col {
+    display: flex;
+    flex-direction: column;
+}
+
+.day {
+    display: flex;
+    flex-direction: column;
+}
+
+.stadium-timeframe, .list-of-stadium{
+    display: flex;
+
+}
+
+.list-of-stadium {
+    flex-wrap: wrap;
+}
+
+.stadium-timeframe {
+    margin-bottom: 50px;
+}
+
+.stadium-timeframe h3 {
+    margin-right: 80px;
+    height: 35px;
+    border-bottom: 2px solid black;
+}
+
+.stadium-detail {
+    margin-right: 40px;
+}
+
+.style {
+    margin-right: 20px;
+    margin-bottom: 20px;
+}
+
+#title {
+    text-align: center;
+}

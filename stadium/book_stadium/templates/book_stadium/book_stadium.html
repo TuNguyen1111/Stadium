@@ -1,17 +1,61 @@
 {% extends 'book_stadium/base.html' %}
 {% load static %}
-
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/book_stadium.css' %}">
+{% endblock %}
 {% block content %}
-<!-- <div class="btn-group">
-    <button type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      Action
-    </button>
-    <div class="dropdown-menu">
-      <a class="dropdown-item" href="#">Action</a>
-      <a class="dropdown-item" href="#">Another action</a>
-      <a class="dropdown-item" href="#">Something else here</a>
-      <div class="dropdown-divider"></div>
-      <a class="dropdown-item" href="#">Separated link</a>
-    </div>
-</div> -->
+    <h1 id="title">Các sân và khung giờ còn trống</h1>
+    <div class="overview">
+        {% for stadium in page_obj %}
+            <div class="day">
+                <h2>Ngày: {{stadium.ngay}}</h2>
+                <hr>
+                {% for key, stadiumTimeframe in stadium.khung_gio.items %}
+                    <div class="stadium-timeframe">
+                        <h3>{{key}}</h3>
+                        <div class="list-of-stadium">
+                            {% for stadiumInfor in stadiumTimeframe %}
+                                <div class="card shadow style" style="width: 18rem;">
+                                    <img class="card-img-top" src="{{stadiumInfor.anh}}" alt="Card image cap">
+                                    <div class="card-body">
+                                    <p class="card-text">Tên: {{stadiumInfor.ten}}</p>
+                                    <p class="card-text">Địa chỉ: {{stadiumInfor.dia_chi}}</p>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <hr>
+                {% endfor %}
+            </div>
+        {% endfor %}
+        {% if page_obj.has_previous %}
+          <a class="btn btn-outline-info mb-4" href="?page=1" >First</a>
+          <a class="btn btn-outline-info mb-4" href="?page={{page_obj.previous_page_number}}" >Previous</a>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+          <a class="btn btn-info mb-4" href="?page={{num}}" >{{num}}</a>
+
+          {% elif num > page_obj.number|add:'-4' and num < page_obj.number|add:'4' %}
+
+            <a class="btn btn-outline-info mb-4", href="?page={{num}}" >{{num}}</a>
+
+          {% endif %}
+        {% endfor %}
+        {% if page_obj.has_next %}
+          <a class="btn btn-outline-info mb-4" href="?page={{page_obj.next_page_number}}" >Next</a>
+          <a class="btn btn-outline-info mb-4" href="?page={{page_obj.paginator.num_pages}}" >Last</a>
+        {% endif %}
+
+    <!-- <div class="form-submit">
+        <div class="form-1">
+
+        </div>
+
+        <div class="form-2">
+
+        </div>
+    </div> -->
 {% endblock %}

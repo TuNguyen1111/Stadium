@@ -2,6 +2,11 @@ body{
   width: 100%;
 }
 
+.container-1 {
+    width: 90%;
+    margin: auto;
+}
+
 .navbar img {
   width: 60px;
 
@@ -80,7 +85,7 @@ section{
 }
 
 .sidebar {
-
+    width: 220px;
 }
 /* Fixed sidenav, full height */
 .sidenav {

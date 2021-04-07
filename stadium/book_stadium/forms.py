@@ -7,6 +7,7 @@ from .models import User, Stadium, StadiumTimeFrame, TimeFrame, Order
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 
+
 class UserCreationForm(UserCreationForm):
     # đống này để set custom cho Register form nha
     email_or_phone = forms.CharField(label="Email hoặc số điện thoại",max_length=254)
@@ -120,7 +121,6 @@ class StadiumForm(forms.ModelForm):
 
 class StadiumTimeFrameForm(forms.ModelForm):
     time_frame = forms.ModelChoiceField(queryset=TimeFrame.objects.all(), disabled=True)
-
     class Meta:
         model = StadiumTimeFrame
         fields = ['time_frame', 'price']
