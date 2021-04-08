@@ -64,6 +64,7 @@ button {
 
 .modal-footer {
     display: flex;
+    align-items: baseline;
     justify-content: flex-end;
 }
 

@@ -26,7 +26,7 @@
       <div class="navbar">
         <img class='logo' src="https://varunit.com/wp-content/uploads/2018/09/varunit-logo-square-black-bg.png" alt="">
         <ul>
-          <li><a href="#">Đặt sân ngay</a></li>
+          <li><a href="{% url 'book_stadium' %}">Đặt sân ngay</a></li>
           <li><a href="#">Tìm sân</a></li>
           {% if user.is_authenticated %}
           <li>

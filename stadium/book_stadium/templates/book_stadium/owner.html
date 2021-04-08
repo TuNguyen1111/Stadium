@@ -76,11 +76,12 @@
                                                     <input type="hidden" name="form_type" value="accept-delete">
                                                     <input type="submit" class="btn btn-success" value="Xóa">
                                                 </form>
-                                                <form class="form" method="POST" action="{% url 'accepted' users.order_id %}">
+                                                <input type="submit" class="btn btn-danger" data-bs-dismiss="modal" value="Hủy">
+                                                <!-- <form class="form" method="POST" action="{% url 'accepted' users.order_id %}">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="form_type" value="cancel-delete">
                                                     <input type="submit" class="btn btn-danger  " value="Hủy">
-                                                </form>
+                                                </form> -->
                                             </div>
                                         </div>
                                         </div>
@@ -108,11 +109,12 @@
                                                 <input type="hidden" name="form_type" value="accept-input">
                                                 <input type="submit" class="btn btn-success" value="Có">
                                             </form>
-                                            <form class="form" method="POST" action="{% url 'accepted' users.order_id %}">
+                                            <input type="submit" class="btn btn-secondary" data-bs-dismiss="modal" value="Hủy">
+                                            <!-- <form class="form" method="POST" action="{% url 'accepted' users.order_id %}">
                                                 {% csrf_token %}
                                                 <input type="hidden" name="form_type" value="cancel-delete">
                                                 <input type="submit" class="btn btn-danger" value="Hủy">
-                                            </form>
+                                            </form> -->
                                         </div>
                                     </div>
                                     </div>
@@ -138,11 +140,12 @@
                                             <input type="hidden" name="form_type" value="accept-delete">
                                             <input type="submit" class="btn btn-success" value="Xóa">
                                         </form>
-                                        <form class="form" method="POST" action="{% url 'accepted' users.order_id %}">
+                                        <input type="submit" class="btn btn-secondary" value="Hủy">
+                                        <!-- <form class="form" method="POST" action="{% url 'accepted' users.order_id %}">
                                             {% csrf_token %}
                                             <input type="hidden" name="form_type" value="cancel-delete">
                                             <input type="submit" class="btn btn-danger" value="Hủy">
-                                        </form>
+                                        </form> -->
                                     </div>
                                 </div>
                                 </div>

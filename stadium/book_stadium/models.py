@@ -91,7 +91,7 @@ class StadiumTimeFrame(models.Model):
 
 
 class Order(models.Model):
-    user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
+    user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
     # ong nay dat ngay nao
     order_date = models.DateField(default=timezone.now)
 
@@ -103,7 +103,7 @@ class Order(models.Model):
     # de xem ong nao dat truoc
     order_datetime = models.DateTimeField(default=timezone.now)
 
-    is_accepted = models.BooleanField()
+    is_accepted = models.BooleanField(default=False)
     customer_phone_number = models.CharField(max_length=12, blank=True)
     customer_name = models.CharField(max_length=100, blank=True)
 

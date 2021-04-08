@@ -179,8 +179,8 @@ class OwnerPage(LoginRequiredMixin, View):
                     time_frames[time] = current_timeframe
                 if time == str(order.stadium_time_frame.time_frame):
                     customer = {
-                        'sdt': order.user.phone_number,
-                        'ten': order.user.username,
+                        'sdt': order.customer_phone_number,
+                        'ten': order.customer_name,
                         'da_duyet': order.is_accepted,
                         'order_id': order.id
                     }
@@ -333,13 +333,49 @@ class UserProfile(View):
 
 
 class BookStadium(ListView):
-
+    form_class = OrderForm
     def get(self, request):
+        order_form = self.form_class
         stadium_timeframes = StadiumTimeFrame.objects.all().order_by('time_frame__start_time')
-        current_day = datetime.date.today() + datetime.timedelta(days=0)
         all_stadiums = []
+        self.put_out_null_stadiums_and_timesframe(all_stadiums, stadium_timeframes)
+        paginator = Paginator(all_stadiums, 2)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        # import json
+        # print(json.dumps(all_stadiums, indent=4))
+        print(page_number)
+        context = {
+            'stadiums': all_stadiums,
+            'page_obj': page_obj,
+            'order_form': order_form
+        }
+        return render(request, 'book_stadium/book_stadium.html', context)
 
+    def post(self, request):
+        stadium_name = request.POST.get('stadium-name')
+        time_frame = request.POST.get('stadium_time_frame')
+        user_phone_number = request.POST.get('user-phone-number')
+        user_name = request.POST.get('user-name')
+        order_date = request.POST.get('order-date')
+        order_date = order_date.replace('/', '-')
+        stadium_timframe = StadiumTimeFrame.objects.get(time_frame=time_frame, stadium__name=stadium_name)
+        total_field_of_stadium = stadium_timframe.stadium.field_count
+        orders = Order.objects.filter(stadium_time_frame=stadium_timframe)
 
+        new_order = Order.objects.create(order_date=order_date, stadium_time_frame=stadium_timframe, field_number=1, customer_phone_number=user_phone_number, customer_name=user_name)
+        new_order.save()
+
+        if orders:
+            count_order_is_accepted = 0
+            for order in orders:
+                if order.is_accepted:
+                    count_order_is_accepted += 1
+            if count_order_is_accepted >= total_field_of_stadium:
+                pass
+        messages.success(request, 'Đặt sân thành công!')
+        return redirect('book_stadium')
+    def put_out_null_stadiums_and_timesframe(self, all_stadiums, stadium_timeframes):
         for number in range(8):
             current_day = datetime.date.today() + datetime.timedelta(days=number)
             timeframe_fixed = '6:30:00 - 17:00:00'
@@ -354,7 +390,9 @@ class BookStadium(ListView):
             is_have_6_to_17_in_dict = timeframe_fixed in timeframes_of_day
             if not is_have_6_to_17_in_dict:
                 timeframes_of_day[timeframe_fixed] = []
-
+            count_stadium_in_timeframe_6_to_17 = 4
+            count_stadium_in_timeframe = 4
+            total_stadium_in_6_to_17 = len(timeframes_of_day[timeframe_fixed])
             for timeframe in stadium_timeframes:
                 orders = Order.objects.filter(stadium_time_frame=timeframe)
                 is_in_6_to_17 = (
@@ -390,32 +428,22 @@ class BookStadium(ListView):
                             timeframes_of_day[time] = current_timeframe
                     self.check_is_same_stadium(current_timeframe, stadium_of_timeframe)
 
-        paginator = Paginator(all_stadiums, 2)
-        page_number = request.GET.get('page')
-        page_obj = paginator.get_page(page_number)
-        # import json
-        # print(json.dumps(all_stadiums, indent=4))
-        print(page_number)
-        context = {
-            'stadiums': all_stadiums,
-            'page_obj': page_obj
-        }
-        return render(request, 'book_stadium/book_stadium.html', context)
-
     def check_is_same_stadium(self, current_timeframe, stadium_of_timeframe):
-        stadiums = []
-        for single_stadium in current_timeframe:
-            stadium_id = single_stadium['id']
-            stadiums.append(stadium_id)
-        is_same_stadium = stadium_of_timeframe.id in stadiums
-        if not is_same_stadium:
-            stadium_detail = {
-                'anh': stadium_of_timeframe.image.url,
-                'ten': stadium_of_timeframe.name,
-                'dia_chi': stadium_of_timeframe.address,
-                'id': stadium_of_timeframe.id
-            }
-            current_timeframe.append(stadium_detail)
+        if len(current_timeframe) < 4:
+            stadiums = []
+            for single_stadium in current_timeframe:
+                stadium_id = single_stadium['id']
+                stadiums.append(stadium_id)
+            is_same_stadium = stadium_of_timeframe.id in stadiums
+            if not is_same_stadium:
+                stadium_detail = {
+                    'anh': stadium_of_timeframe.image.url,
+                    'ten': stadium_of_timeframe.name,
+                    'dia_chi': stadium_of_timeframe.address,
+                    'sdt': stadium_of_timeframe.owner.phone_number,
+                    'id': stadium_of_timeframe.id
+                }
+                current_timeframe.append(stadium_detail)
 
 
 
@@ -540,3 +568,52 @@ class BookStadium(ListView):
         #                     current_timeframe = []
         #                     current_day_timeframe[time] = current_timeframe
         #                 self.check_is_same_name(stadium_names, current_timeframe, stadium_of_timeframe)
+# for number in range(8):
+        #     current_day = datetime.date.today() + datetime.timedelta(days=number)
+        #     timeframe_fixed = '6:30:00 - 17:00:00'
+        #     day = {
+        #         'ngay': current_day.strftime('%Y/%m/%d'),
+        #         'khung_gio': {}
+        #     }
+        #     all_stadiums.append(day)
+
+        #     stadium = all_stadiums[-1]
+        #     timeframes_of_day = stadium['khung_gio']
+        #     is_have_6_to_17_in_dict = timeframe_fixed in timeframes_of_day
+        #     if not is_have_6_to_17_in_dict:
+        #         timeframes_of_day[timeframe_fixed] = []
+
+        #     for timeframe in stadium_timeframes:
+        #         orders = Order.objects.filter(stadium_time_frame=timeframe)
+        #         is_in_6_to_17 = (
+        #             timeframe.time_frame.start_time >= datetime.time(6) and
+        #             timeframe.time_frame.end_time <= datetime.time(17)
+        #         )
+        #         stadium_of_timeframe = timeframe.stadium
+
+        #         if orders:
+        #             count_order_accepted = 0
+        #             for order in orders:
+        #                 if order.order_date == current_day and order.is_accepted:
+        #                     count_order_accepted += 1
+        #             if count_order_accepted < stadium_of_timeframe.field_count:
+        #                 if is_in_6_to_17:
+        #                     current_timeframe = timeframes_of_day[timeframe_fixed]
+        #                 else:
+        #                     time = str(timeframe.time_frame)
+        #                     current_timeframe = []
+        #                     timeframes_of_day[time] = current_timeframe
+        #                 self.check_is_same_stadium(current_timeframe, stadium_of_timeframe)
+        #         else:
+        #             if is_in_6_to_17:
+        #                 current_timeframe = timeframes_of_day[timeframe_fixed]
+        #             else:
+        #                 time = str(timeframe.time_frame)
+        #                 is_same_timeframe = time in timeframes_of_day
+
+        #                 if is_same_timeframe:
+        #                     current_timeframe = timeframes_of_day[time]
+        #                 else:
+        #                     current_timeframe = []
+        #                     timeframes_of_day[time] = current_timeframe
+        #             self.check_is_same_stadium(current_timeframe, stadium_of_timeframe)
