@@ -11,6 +11,7 @@
 
 .content {
     display: flex;
+    justify-content: space-between;
 }
 
 .day {
@@ -32,7 +33,7 @@
     margin-left: 10px;
 }
 
-.stadium-timeframe h3
+.stadium-timeframe h3 {
     height: 35px;
 
 }
@@ -81,17 +82,17 @@
     width: 100%;
 }
 
-.form-1 {
+.form-search {
     margin-top: 60px;
 }
 
-.form-1 form {
+.form-search form {
     display: flex;
     flex-direction: column;
     align-items: initial;
 }
 
-.form-1 form button {
+.form-search form button {
     width: 30%;
 }
 
@@ -99,7 +100,7 @@
     text-align: center;
 }
 
-.form-2 {
+.form-order {
     margin-top: 270px;
 }
 
@@ -126,6 +127,6 @@
     opacity: 1;
 }
 
-.modal-footer {
+.modal-footer.book_stadium {
     justify-content: flex-end;
 }

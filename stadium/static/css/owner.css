@@ -24,7 +24,7 @@ button {
     padding: 0.5px;
     width: 50px;
     height: 27px;
-    margin-left: 22px;
+    margin-left: 24px;
 }
 
 .col {
@@ -44,8 +44,10 @@ button {
 
 .form {
     margin-bottom: 10px;
-    margin-right: 10px;
+
 }
+
+
 
 .crud-btn {
     display: flex;

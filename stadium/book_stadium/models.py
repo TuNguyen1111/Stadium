@@ -92,7 +92,7 @@ class StadiumTimeFrame(models.Model):
 
 class Order(models.Model):
     user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
-    # ong nay dat ngay nao
+    # ngay dat san cua user
     order_date = models.DateField(default=timezone.now)
 
     # dat khung gio nao
@@ -100,7 +100,7 @@ class Order(models.Model):
         StadiumTimeFrame, null=True, on_delete=models.SET_NULL)
     field_number = models.PositiveSmallIntegerField()
 
-    # de xem ong nao dat truoc
+    # ngay bat dau dat san cua user
     order_datetime = models.DateTimeField(default=timezone.now)
 
     is_accepted = models.BooleanField(default=False)

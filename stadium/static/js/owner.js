@@ -4,13 +4,15 @@
 //     inputs[i].disabled = true
 // }
 
-var modalDelete = new bootstrap.Modal(document.getElementById('delete'));
-var modalAccept = new bootstrap.Modal(document.getElementById('accept'));
 
-function turnOnModalDelete() {
+
+
+function turnOnModalDelete(id) {
+    var modalDelete = new bootstrap.Modal(document.getElementById(id));
     modalDelete.show();
 }
 
-function turnOnModalAccept() {
+function turnOnModalAccept(id) {
+    var modalAccept = new bootstrap.Modal(document.getElementById(id));
     modalAccept.show();
 }

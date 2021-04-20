@@ -65,11 +65,12 @@ class UserCreationForm(UserCreationForm):
         return user
 
 class OrderForm(forms.ModelForm):
-    stadium_name = forms.CharField(label="Tên sân", max_length=100)
-    stadium_time_frame = forms.ModelChoiceField(label="Khung giờ", queryset=TimeFrame.objects.all())
+    stadium_name = forms.CharField(label="Tên sân", max_length=100, widget=forms.TextInput(attrs={'id': 'stadium-name'}))
+    time_frame = forms.ModelChoiceField(label="Khung giờ", queryset=TimeFrame.objects.all())
+
     class Meta:
         model = Order
-        fields = ['stadium_name', 'stadium_time_frame', 'customer_name', 'customer_phone_number']
+        fields = ['stadium_name', 'time_frame', 'customer_name', 'customer_phone_number']
         labels = {
             'order_datetime': 'Ngày đặt',
             'customer_phone_number': 'Số điện thoại',

@@ -58,8 +58,8 @@
                             {% if users.da_duyet %}
                                 <div class="crud-btn accepted">
                                     <p>Đã duyệt</p>
-                                    <input type="submit" class="btn btn-danger delete-btn" onclick="turnOnModalDelete()" value="Xóa">
-                                    <div class="modal fade " id="delete" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+                                    <input type="submit" class="btn btn-danger delete-btn" onclick="turnOnModalDelete({{ users.order_id }})" value="Xóa">
+                                    <div class="modal fade " id="{{ users.order_id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
                                         aria-labelledby="staticBackdropLabel" aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered">
                                         <div class="modal-content">
@@ -71,17 +71,12 @@
                                                 <p>Bạn có chắc là muốn xóa {{users.sdt}} ( {{users.ten}} ) không?</p>
                                             </div>
                                             <div class="modal-footer">
-                                                <form class="form" method="POST" action="{% url 'accepted' users.order_id %}">
+                                                <form class="form-delete" method="POST" action="{% url 'accepted' users.order_id %}">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="form_type" value="accept-delete">
                                                     <input type="submit" class="btn btn-success" value="Xóa">
                                                 </form>
                                                 <input type="submit" class="btn btn-danger" data-bs-dismiss="modal" value="Hủy">
-                                                <!-- <form class="form" method="POST" action="{% url 'accepted' users.order_id %}">
-                                                    {% csrf_token %}
-                                                    <input type="hidden" name="form_type" value="cancel-delete">
-                                                    <input type="submit" class="btn btn-danger  " value="Hủy">
-                                                </form> -->
                                             </div>
                                         </div>
                                         </div>
@@ -91,8 +86,8 @@
 
                             <div class="crud-btn">
                                 {% if value.con_trong %}
-                                    <input type="submit" class="btn btn-success accepted-btn" onclick="turnOnModalAccept()" value="Duyệt">
-                                    <div class="modal fade " id="accept" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+                                    <input type="submit" class="btn btn-success accepted-btn" onclick="turnOnModalAccept({{ users.order_id }})" value="Duyệt">
+                                    <div class="modal fade " id="{{ users.order_id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
                                     aria-labelledby="staticBackdropLabel" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered">
                                     <div class="modal-content">
@@ -104,17 +99,12 @@
                                             <p>Bạn có chắc là muốn duyệt {{users.sdt}} ( {{users.ten}} ) không?</p>
                                         </div>
                                         <div class="modal-footer">
-                                            <form class="form" method="POST" action="{% url 'accepted' users.order_id %}">
+                                            <form class="form-accept" method="POST" action="{% url 'accepted' users.order_id %}">
                                                 {% csrf_token %}
                                                 <input type="hidden" name="form_type" value="accept-input">
                                                 <input type="submit" class="btn btn-success" value="Có">
                                             </form>
                                             <input type="submit" class="btn btn-secondary" data-bs-dismiss="modal" value="Hủy">
-                                            <!-- <form class="form" method="POST" action="{% url 'accepted' users.order_id %}">
-                                                {% csrf_token %}
-                                                <input type="hidden" name="form_type" value="cancel-delete">
-                                                <input type="submit" class="btn btn-danger" value="Hủy">
-                                            </form> -->
                                         </div>
                                     </div>
                                     </div>
@@ -122,34 +112,29 @@
                                 {% else %}
                                     <p>Hết sân</p>
                                 {% endif %}
-                                <input type="submit" class="btn btn-danger delete-btn" onclick="turnOnModalDelete()" value="Xóa">
-                                <div class="modal fade " id="delete" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+                                <input type="submit" class="btn btn-danger delete-btn" onclick="turnOnModalDelete({{ users.order_id }})" value="Xóa">
+                                <div class="modal fade " id="{{ users.order_id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
                                 aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                    <h5 class="modal-title" id="staticBackdropLabel">Thông báo</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <p>Bạn có chắc là muốn xóa {{users.sdt}} ( {{users.ten}} ) không?</p>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <form class="form" method="POST" action="{% url 'accepted' users.order_id %}">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="form_type" value="accept-delete">
-                                            <input type="submit" class="btn btn-success" value="Xóa">
-                                        </form>
-                                        <input type="submit" class="btn btn-secondary" value="Hủy">
-                                        <!-- <form class="form" method="POST" action="{% url 'accepted' users.order_id %}">
-                                            {% csrf_token %}
-                                            <input type="hidden" name="form_type" value="cancel-delete">
-                                            <input type="submit" class="btn btn-danger" value="Hủy">
-                                        </form> -->
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title" id="staticBackdropLabel">Thông báo</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Bạn có chắc là muốn xóa {{users.sdt}} ( {{users.ten}} ) không?</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <form class="form" method="POST" action="{% url 'accepted' users.order_id %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="form_type" value="accept-delete">
+                                                    <input type="submit" class="btn btn-success" value="Xóa">
+                                                </form>
+                                                <input type="submit" class="btn btn-secondary" value="Hủy">
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                </div>
-                            </div>
                             </div>
                             {% endif %}
 

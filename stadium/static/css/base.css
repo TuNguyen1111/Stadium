@@ -37,13 +37,13 @@ body{
   margin-right: 20px;
 }
 
-.modal-header {
+.modal-header.base {
   width: 100%;
   background-color: #5cdf88;
   color: white;
 }
 
-.modal-footer {
+.modal-footer.base{
   display: flex;
   justify-content: space-between;
 }
@@ -57,7 +57,7 @@ a:hover {
   color: black;
 }
 
-.modal-body select {
+.modal-body.base select {
   margin-bottom: 20px;
 }
 
