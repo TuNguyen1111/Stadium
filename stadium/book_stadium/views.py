@@ -12,6 +12,7 @@ from django.views.generic import ListView
 from django.core.paginator import Paginator
 from django.utils import timezone
 from datetime import datetime
+from random import choice
 import datetime
 
 from .forms import (OrderForm, StadiumForm, StadiumTimeFrameForm,
@@ -164,7 +165,10 @@ class OwnerPage(LoginRequiredMixin, View):
                         'sdt': order.customer_phone_number,
                         'ten': order.customer_name,
                         'da_duyet': order.is_accepted,
-                        'order_id': order.id
+                        'order_id': order.id,
+                        'field_number': order.field_number,
+                        'ao_tap': order.pitch_clothes,
+                        'loai_san': order.type_stadium
                     }
                     current_timeframe['nguoi_dat'].append(customer)
 
@@ -217,20 +221,30 @@ class OwnerPage(LoginRequiredMixin, View):
                     }
                     time_frames[time] = current_timeframe
 
-
-
-def isAccepted(request, id):
-    if request.method == 'POST':
-        order = Order.objects.get(id=id)
+class isAccepted(View):
+    def post(self, request, id):
         form_type = request.POST.get('form_type')
-        print('form', form_type)
-
+        order = Order.objects.get(id=id)
+        type_stadium = order.type_stadium
+        order_date = order.order_date
+        stadium_timeframe = order.stadium_time_frame
         stadium = order.stadium_time_frame.stadium
-        if form_type == "accept-input":
+        list_field_number = list(range(1, stadium.field_count + 1))
+        if form_type == 'accept-input':
+            orders_filter = Order.objects.filter(stadium_time_frame=stadium_timeframe, order_date=order_date, is_accepted=True)
+            for order_filter in orders_filter:
+                order_field_number = order_filter.field_number
+                if order_field_number in list_field_number:
+                    list_field_number.remove(order_field_number)
+            if type_stadium == '7players':
+                order.field_number = list_field_number[0]
+            else:
+                if len(list_field_number) >= 3:
+                    pass
             order.is_accepted = True
             order.save()
             messages.success(request, 'Đã duyệt!')
-        elif form_type == "accept-delete":
+        elif form_type == 'accept-delete':
             order.delete()
             messages.success(request, 'Xóa thành công!')
         return redirect('owner', stadium.id)
@@ -364,7 +378,7 @@ class BookStadium(ListView):
         self.search_stadium(stadium_search_result, day_search, time_frame_search, address_search, stadium_name_search)
 
         import json
-        print(json.dumps(stadium_search_result, indent=4))
+        # print(json.dumps(all_stadiums, indent=4))
 
         context = {
             'stadiums': all_stadiums,
@@ -375,30 +389,14 @@ class BookStadium(ListView):
         }
         return render(request, 'book_stadium/book_stadium.html', context)
 
-
-
     def post(self, request):
-        stadium_name = request.POST.get('stadium_name')
-        time_frame = request.POST.get('time_frame')
-        user_phone_number = request.POST.get('user-phone-number')
-        user_name = request.POST.get('user-name')
-        order_date = request.POST.get('order-date')
-        order_date = order_date.replace('/', '-')
-        stadium_timframe = StadiumTimeFrame.objects.get(time_frame=time_frame, stadium__name=stadium_name)
-        total_field_of_stadium = stadium_timframe.stadium.field_count
-        orders = Order.objects.filter(stadium_time_frame=stadium_timframe)
-
-        new_order = Order.objects.create(order_date=order_date, stadium_time_frame=stadium_timframe, field_number=1, customer_phone_number=user_phone_number, customer_name=user_name)
-        new_order.save()
-
-        if orders:
-            count_order_is_accepted = 0
-            for order in orders:
-                if order.is_accepted:
-                    count_order_is_accepted += 1
-            if count_order_is_accepted >= total_field_of_stadium:
-                pass
-        messages.success(request, 'Đặt sân thành công!')
+        order_form = self.form_class(request.POST)
+        type_stadium = request.POST.get('type_stadium')
+        if order_form.is_valid():
+            order_form.save()
+            messages.success(request, 'Đặt sân thành công!')
+        else:
+            messages.error(request, 'Đặt sân thất bại!')
         return redirect('book_stadium')
 
     def put_out_null_stadiums_and_timesframe(self, all_stadiums, stadium_timeframes):
@@ -439,7 +437,7 @@ class BookStadium(ListView):
                             time = str(timeframe.time_frame)
                             current_timeframe = []
                             timeframes_of_day[time] = current_timeframe
-                        self.check_is_same_stadium(current_timeframe, stadium_of_timeframe)
+                        self.check_is_same_stadium(current_timeframe, stadium_of_timeframe, timeframe)
                 else:
                     if is_in_6_to_17:
                         current_timeframe = timeframes_of_day[timeframe_fixed]
@@ -452,9 +450,9 @@ class BookStadium(ListView):
                         else:
                             current_timeframe = []
                             timeframes_of_day[time] = current_timeframe
-                    self.check_is_same_stadium(current_timeframe, stadium_of_timeframe)
+                    self.check_is_same_stadium(current_timeframe, stadium_of_timeframe, timeframe)
 
-    def check_is_same_stadium(self, current_timeframe, stadium_of_timeframe):
+    def check_is_same_stadium(self, current_timeframe, stadium_of_timeframe, timeframe):
         if len(current_timeframe) < 4:
             stadiums = []
             for single_stadium in current_timeframe:
@@ -467,7 +465,8 @@ class BookStadium(ListView):
                     'ten': stadium_of_timeframe.name,
                     'dia_chi': stadium_of_timeframe.address,
                     'sdt': stadium_of_timeframe.owner.phone_number,
-                    'id': stadium_of_timeframe.id
+                    'id': stadium_of_timeframe.id,
+                    'khung_gio_dat': timeframe.time_frame.id
                 }
                 current_timeframe.append(stadium_detail)
 

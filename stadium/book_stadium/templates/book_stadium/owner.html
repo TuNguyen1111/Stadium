@@ -30,7 +30,11 @@
                 <th scope="col">Khung giờ</th>
                 <th scope="col">Còn trống</th>
                 <th scope="col">Người đặt</th>
+                <th scope="col">Đặt áo tập</th>
+                <th scope="cole">Vị trí sân</th>
+                <th scope="col">Loại sân</th>
                 <th scope="col"></th>
+
             </tr>
         </thead>
         <tbody>
@@ -55,11 +59,34 @@
                     </td>
                     <td>
                         {% for users in value.nguoi_dat %}
+                            {% if users.ao_tap %}
+                                <p>Có đặt</p>
+                            {% else %}
+                                <p>Không đặt</p>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% for users in value.nguoi_dat %}
+                            {% if users.da_duyet %}
+                                <p>Sân số {{users.field_number}}</p>
+                            {% else %}
+                                <p>Chưa duyệt</p>
+                            {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% for users in value.nguoi_dat %}
+                        <p>{{users.loai_san}}</p>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% for users in value.nguoi_dat %}
                             {% if users.da_duyet %}
                                 <div class="crud-btn accepted">
                                     <p>Đã duyệt</p>
                                     <input type="submit" class="btn btn-danger delete-btn" onclick="turnOnModalDelete({{ users.order_id }})" value="Xóa">
-                                    <div class="modal fade " id="{{ users.order_id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+                                    <div class="modal fade " id="delete {{ users.order_id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
                                         aria-labelledby="staticBackdropLabel" aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered">
                                         <div class="modal-content">
@@ -87,7 +114,7 @@
                             <div class="crud-btn">
                                 {% if value.con_trong %}
                                     <input type="submit" class="btn btn-success accepted-btn" onclick="turnOnModalAccept({{ users.order_id }})" value="Duyệt">
-                                    <div class="modal fade " id="{{ users.order_id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+                                    <div class="modal fade " id="accept {{ users.order_id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
                                     aria-labelledby="staticBackdropLabel" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered">
                                     <div class="modal-content">
@@ -96,7 +123,7 @@
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body">
-                                            <p>Bạn có chắc là muốn duyệt {{users.sdt}} ( {{users.ten}} ) không?</p>
+                                            <p>Bạn có chắc là muốn duyệt {{ users.sdt }} ( {{ users.ten }} ) không?</p>
                                         </div>
                                         <div class="modal-footer">
                                             <form class="form-accept" method="POST" action="{% url 'accepted' users.order_id %}">
@@ -113,7 +140,7 @@
                                     <p>Hết sân</p>
                                 {% endif %}
                                 <input type="submit" class="btn btn-danger delete-btn" onclick="turnOnModalDelete({{ users.order_id }})" value="Xóa">
-                                <div class="modal fade " id="{{ users.order_id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+                                <div class="modal fade " id="delete {{ users.order_id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
                                 aria-labelledby="staticBackdropLabel" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered">
                                         <div class="modal-content">

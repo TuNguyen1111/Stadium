@@ -7,6 +7,10 @@ class Roles(models.TextChoices):
     OWNER = 'owner', 'Chủ sân'
     PLAYER = 'player', 'Người đặt'
 
+class TypeOfStadium(models.TextChoices):
+    SMALL = '7players', 'Sân 7'
+    BIG = '11players', 'Sân 11'
+
 # Create your models here.
 
 
@@ -98,7 +102,9 @@ class Order(models.Model):
     # dat khung gio nao
     stadium_time_frame = models.ForeignKey(
         StadiumTimeFrame, null=True, on_delete=models.SET_NULL)
-    field_number = models.PositiveSmallIntegerField()
+    field_number = models.PositiveSmallIntegerField(blank=True, null=True)
+    pitch_clothes = models.BooleanField(default=False, blank=True)
+    type_stadium = models.CharField(max_length=30, choices=TypeOfStadium.choices, default=TypeOfStadium.SMALL)
 
     # ngay bat dau dat san cua user
     order_datetime = models.DateTimeField(default=timezone.now)
@@ -108,4 +114,4 @@ class Order(models.Model):
     customer_name = models.CharField(max_length=100, blank=True)
 
     def __str__(self):
-        return f'Booked by {self.user}'
+        return f'Booked by {self.customer_name}'

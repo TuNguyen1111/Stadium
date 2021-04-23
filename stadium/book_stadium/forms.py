@@ -6,7 +6,7 @@ from django.contrib.auth.hashers import make_password
 from .models import User, Stadium, StadiumTimeFrame, TimeFrame, Order
 from django.contrib import messages
 from django.core.exceptions import ValidationError
-
+from random import choice
 
 class UserCreationForm(UserCreationForm):
     # đống này để set custom cho Register form nha
@@ -65,19 +65,56 @@ class UserCreationForm(UserCreationForm):
         return user
 
 class OrderForm(forms.ModelForm):
-    stadium_name = forms.CharField(label="Tên sân", max_length=100, widget=forms.TextInput(attrs={'id': 'stadium-name'}))
-    time_frame = forms.ModelChoiceField(label="Khung giờ", queryset=TimeFrame.objects.all())
+    stadium_name = forms.CharField(label="Tên sân", max_length=100, widget=forms.TextInput(attrs={'id': 'stadium-name', 'readonly': True}))
+    time_frame = forms.ModelChoiceField(label="Khung giờ", queryset=TimeFrame.objects.all(), widget=forms.Select(attrs={'id': 'time_frame'}))
 
     class Meta:
         model = Order
-        fields = ['stadium_name', 'time_frame', 'customer_name', 'customer_phone_number']
+        fields = ['stadium_name','order_date', 'time_frame', 'pitch_clothes', 'type_stadium', 'customer_name', 'customer_phone_number']
         labels = {
-            'order_datetime': 'Ngày đặt',
+            'order_date': 'Ngày đặt',
             'customer_phone_number': 'Số điện thoại',
-            'customer_name': 'Tên người đặt'
+            'customer_name': 'Tên người đặt',
+            'pitch_clothes': 'Áo pitch',
+            'type_stadium': 'Loại sân'
         }
 
 
+    def save(self, commit=True):
+        order = super().save(commit=False)
+        if commit:
+            stadium_name = self.cleaned_data.get('stadium_name')
+            order_date = self.cleaned_data.get('order_date')
+            time_frame = self.cleaned_data.get('time_frame')
+            pitch_clothes = self.cleaned_data.get('pitch_clothes')
+            type_stadium = self.cleaned_data.get('type_stadium')
+            customer_name = self.cleaned_data.get('customer_name')
+            customer_phone_number = self.cleaned_data.get('customer_phone_number')
+            stadium_timeframe = StadiumTimeFrame.objects.get(time_frame=time_frame, stadium__name=stadium_name)
+            order = Order.objects.create(order_date=order_date, stadium_time_frame=stadium_timeframe, pitch_clothes=pitch_clothes, type_stadium=type_stadium,customer_phone_number=customer_phone_number, customer_name=customer_name)
+            order.save()
+        return order
+
+    def clean(self):
+        time_frame = self.cleaned_data.get('time_frame')
+        stadium_name = self.cleaned_data.get('stadium_name')
+        order_date = self.cleaned_data.get('order_date')
+        type_stadium = self.cleaned_data.get('type_stadium')
+        stadium_timeframe = StadiumTimeFrame.objects.get(time_frame=time_frame, stadium__name=stadium_name)
+        stadium_of_timeframe_field_count = stadium_timeframe.stadium.field_count
+        orders = Order.objects.filter(stadium_time_frame=stadium_timeframe, order_date=order_date, is_accepted=True)
+        all_fields = list(range(1, stadium_of_timeframe_field_count + 1))
+        for order in orders:
+            field_number_accepted = order.field_number
+            if field_number_accepted in all_fields:
+                all_fields.remove(field_number_accepted)
+        if type_stadium == '11players':
+            if len(all_fields) < 3:
+                raise forms.ValidationError('Khung giờ của này không đủ để chuẩn bị sân 11! Vui lòng chọn khung giờ khác!')
+        else:
+            if not all_fields:
+                raise forms.ValidationError('Khung giờ của này đã hết sân! Vui lòng chọn khung giờ khác!')
+        return self.cleaned_data
 class StadiumForm(forms.ModelForm):
     # sửa lại class form theo kiểu t quen. M thích thì sửa lại như cũ cũng đc
     # viết thế này để t check có instance truyền vào không. Do dùng chung form để add với edit

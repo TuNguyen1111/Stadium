@@ -6,9 +6,15 @@
 {% endblock %}
 {% block content %}
     {% for message in messages %}
-    <div id="message" class="alert alert-success" role="alert">
-        {{message}}
-    </div>
+        {% if message.tags == 'error' %}
+            <div id="error" class="alert alert-danger" role="alert">
+                {{ message }}
+            </div>
+        {% else %}
+            <div id="success" class="alert alert-success" role="alert">
+                {{ message }}
+            </div>
+        {% endif %}
     {% endfor %}
 
     <div class="content">
@@ -61,24 +67,26 @@
                 <h1 id="title">Các sân và khung giờ còn trống</h1>
                 {% for stadium in page_obj %}
                     <div class="day">
-                        <h2>Ngày: {{stadium.ngay}}</h2>
+                        <h2>Ngày: {{ stadium.ngay }}</h2>
                         <hr>
                         {% for key, stadiumTimeframe in stadium.khung_gio.items %}
                             <div class="stadium-timeframe">
-                                <h3>{{key}}</h3>
+                                <h3>{{ key }}</h3>
                                 <div class="list-of-stadium">
                                     {% for stadiumInfor in stadiumTimeframe %}
                                         <div class="card shadow style" style="width: 18rem;">
                                             <div class="hover-img">
-                                                <img class="card-img-top" src="{{stadiumInfor.anh}}" alt="Card image cap">
+                                                <img class="card-img-top" src="{{ stadiumInfor.anh }}" alt="Card image cap">
                                                 <div class="book-stadium-btn">
                                                     <div class="card-body">
-                                                        <p class="card-text">Tên: {{stadiumInfor.ten}}</p>
+                                                        <p class="card-text">Tên: {{ stadiumInfor.ten }}</p>
                                                         <hr>
-                                                        <p class="card-text">Địa chỉ: {{stadiumInfor.dia_chi}}</p>
+                                                        <p class="card-text">Địa chỉ: {{ stadiumInfor.dia_chi }}</p>
                                                         <hr>
                                                     </div>
-                                                    <button stadium-name="{{stadiumInfor.ten}}" onclick="focusForm(event)">Đặt sân</button>
+
+                                                    <button stadium-name="{{ stadiumInfor.ten }}" user-name="{{ user.username }}" user-phone-number="{{ user.phone_number }}" time-frame="{{ stadiumInfor.khung_gio_dat }}" onclick="focusForm(event)">Đặt sân</button>
+
                                                 </div>
                                             </div>
                                             <div class="card-body">
@@ -172,45 +180,10 @@
                         <form method="POST" action="">
                             {% csrf_token %}
                             <div class="form-style">
-                                <div class="form-style">
-                                    <div class="form-group">
-                                        {{order_form.stadium_name|as_crispy_field}}
-                                    </div>
-
-                                    <div class="form-group">
-                                        {{order_form.time_frame|as_crispy_field}}
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="order-date">Ngày</label>
-                                        <input type="text" name="order-date" class="form-control" id="order-date" placeholder="Nhập tên sân" value="{{page_obj.0.ngay}}">
-                                    </div>
-
-                                    {% if user.is_authenticated %}
-                                        <div class="form-group">
-                                            <label for="user-phone-number">Số điện thoại người đặt</label>
-                                            <input type="text" name="user-phone-number" class="form-control" id="user-phone-number" placeholder="Nhập số điện thoại" value="{{user.phone_number}}" required>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="user-name">Tên người đặt</label>
-                                            <input type="text" name="user-name" class="form-control" id="user-name" placeholder="Nhập tên" value="{{user.username}}" required >
-                                        </div>
-                                    {% else %}
-                                        <div class="form-group">
-                                            <label for="user-phone-number">Số điện thoại người đặt</label>
-                                            <input type="text" name="user-phone-number"  class="form-control" id="user-phone-number" placeholder="Nhập số điện thoại" value="" required>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="user-name">Tên người đặt</label>
-                                            <input type="text" name="user-name" class="form-control" id="user-name" placeholder="Nhập tên" value="" >
-                                        </div>
-                                    {% endif %}
-
-
+                                {{order_form|crispy}}
                                     <div class="submit-btn">
                                         <button type="submit" class="btn btn-primary mt-3">Đặt</button>
                                     </div>
-                                </div>
                             </div>
                         </form>
                     </div>
@@ -219,7 +192,7 @@
         </div>
     </div>
 
-    <div class="modal fade " id="notification" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    <div class="modal fade " id="notification-success" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -233,7 +206,26 @@
                <p>Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!</p>
             </div>
             <div class="modal-footer book_stadium">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <div class="modal fade " id="notification-failed" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel">Thông báo</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+               <p>Khung giờ bạn chọn đã hết sân!</p>
+               <p>Vui lòng chọn khung giờ khác!</p>
+            </div>
+            <div class="modal-footer book_stadium">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
             </div>
         </div>
         </div>
