@@ -1,0 +1,120 @@
+{% extends 'book_stadium/base.html' %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% block css %}
+    <link rel="stylesheet" href="{% static  'css/historyBookedOfUser.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="overview">
+        <h1>Lịch sử đặt sân</h1>
+        <div class="history-booked">
+            <div class="history-table">
+                <table class="table table-bordered">
+                    <thead>
+                      <tr>
+                        <th scope="col">Ngày</th>
+                        <th scope="col">Khung giờ</th>
+                        <th scope="col">Sân</th>
+                        <th scope="col">Trạng thái</th>
+                        <th scope="col">Hủy đặt sân</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in all_orders_of_user %}
+                      <tr>
+                        <td scope="row">{{ order.ngay }}</td>
+
+                        <td>
+                            {% for timeframe, stadium_obj in order.khung_gio.items %}
+                                {% for stadium in stadium_obj %}
+                                    <p>{{ timeframe }}</p>
+                                    <hr>
+                                {% endfor %}
+                            {% endfor %}
+                        </td>
+
+                        <td>
+                            {% for timeframe, stadium_obj in order.khung_gio.items %}
+                                {% for stadium in stadium_obj %}
+                                    <p>{{ stadium.san }}</p>
+                                    <hr>
+                                {% endfor %}
+                            {% endfor %}
+                        </td>
+
+                        <td>
+                            {% for timeframe, stadium_obj in order.khung_gio.items %}
+                                {% for stadium in stadium_obj %}
+                                    {% if stadium.trang_thai %}
+                                        <p>Đã duyệt</p>
+                                    {% else %}
+                                        <p>Đang đợi duyệt</p>
+                                    {% endif %}
+                                    <hr>
+                                {% endfor %}
+                            {% endfor %}
+                        </td>
+
+                        <td class="last-td">
+                            {% for timeframe, stadium_obj in order.khung_gio.items %}
+                                {% for stadium in stadium_obj %}
+                                    <button class="btn btn-danger" onclick="turnOnDeleteModal()">Hủy</button>
+                                    <hr>
+                                    <div class="modal fade " id="delete-order" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+                                    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="staticBackdropLabel">Thông báo</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p>Bạn có chắc là muốn xóa không?</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <form class="form-accept" method="POST" action="{% url 'history_booked' stadium.order_id %}">
+                                                        {% csrf_token %}
+                                                        <!-- <input type="hidden" name="form_type" value="accept-input"> -->
+                                                        <input type="submit" class="btn btn-success" value="Có">
+                                                    </form>
+                                                    <input type="submit" class="btn btn-secondary" data-bs-dismiss="modal" value="Hủy">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% endfor %}
+                        </td>
+
+                      </tr>
+                      {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="history-filter shadow">
+                <h2>Lọc</h2>
+                <hr>
+                <form action="" method="GET">
+                    <div class="mb-3">
+                      <label for="start-day" class="form-label">Từ ngày: </label>
+                      <input type="text" class="form-control" id="start-day" name="start-day">
+                    </div>
+                    <div class="mb-3">
+                      <label for="end-day" class="form-label">Đến ngày: </label>
+                      <input type="text" class="form-control" id="end-day" name="end-day">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Lọc kết quả</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block javascript %}
+    <script src="{% static 'js/historyBookedOfUser.js'%}" type="text/javascript"></script>
+{% endblock %}

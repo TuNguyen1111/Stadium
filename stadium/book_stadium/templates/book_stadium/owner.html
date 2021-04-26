@@ -43,9 +43,9 @@
                     <td>{{time}}</td>
                     <td>
                         {% if value.con_trong %}
-                            {{value.con_trong}}
+                            <p>{{value.con_trong}}</p>
                         {% else %}
-                            Hết sân
+                           <p>Hết sân</p>
                         {% endif %}
                     </td>
                     <td>
@@ -77,7 +77,13 @@
                     </td>
                     <td>
                         {% for users in value.nguoi_dat %}
-                        <p>{{users.loai_san}}</p>
+
+                            {% if users.loai_san == '7players' %}
+                                <p>Sân 7</p>
+                            {% else %}
+                                <p>Sân 11</p>
+                            {% endif %}
+
                         {% endfor %}
                     </td>
                     <td>
@@ -113,29 +119,35 @@
 
                             <div class="crud-btn">
                                 {% if value.con_trong %}
-                                    <input type="submit" class="btn btn-success accepted-btn" onclick="turnOnModalAccept({{ users.order_id }})" value="Duyệt">
+                                    {% if users.loai_san == "11players" and value.con_trong > 3 or users.loai_san == "7players" %}
+                                        <input type="submit" class="btn btn-success accepted-btn" onclick="turnOnModalAccept({{ users.order_id }})" value="Duyệt">
+                                    {% elif users.loai_san == "11players" and value.con_trong < 3 %}
+                                        <p>Không đủ sân để duyệt</p>
+                                    {% endif %}
+
+
                                     <div class="modal fade " id="accept {{ users.order_id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
                                     aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                                    <div class="modal-dialog modal-dialog-centered">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                        <h5 class="modal-title" id="staticBackdropLabel">Thông báo</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <p>Bạn có chắc là muốn duyệt {{ users.sdt }} ( {{ users.ten }} ) không?</p>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <form class="form-accept" method="POST" action="{% url 'accepted' users.order_id %}">
-                                                {% csrf_token %}
-                                                <input type="hidden" name="form_type" value="accept-input">
-                                                <input type="submit" class="btn btn-success" value="Có">
-                                            </form>
-                                            <input type="submit" class="btn btn-secondary" data-bs-dismiss="modal" value="Hủy">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="staticBackdropLabel">Thông báo</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p>Bạn có chắc là muốn duyệt {{ users.sdt }} ( {{ users.ten }} ) không?</p>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <form class="form-accept" method="POST" action="{% url 'accepted' users.order_id %}">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="form_type" value="accept-input">
+                                                        <input type="submit" class="btn btn-success" value="Có">
+                                                    </form>
+                                                    <input type="submit" class="btn btn-secondary" data-bs-dismiss="modal" value="Hủy">
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                    </div>
-                                </div>
                                 {% else %}
                                     <p>Hết sân</p>
                                 {% endif %}

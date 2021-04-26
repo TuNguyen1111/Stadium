@@ -1,0 +1,37 @@
+.overview {
+    width: 100%;
+    padding: 2%;
+}
+
+.overview h1 {
+    text-align: center;
+    margin-bottom: 3%;
+}
+
+.history-table {
+    width: 40%;
+}
+
+.history-filter {
+    width: 20%;
+    height: 60%;
+    padding: 1% 5%;
+}
+
+.history-filter h2 {
+    text-align: center;
+}
+
+.history-booked {
+    display: flex;
+    justify-content: space-around;
+}
+
+.history-table button {
+    padding: 1% 8%;
+    margin-bottom: -7px;
+}
+
+.history-table td.last-td {
+    text-align: center;
+}

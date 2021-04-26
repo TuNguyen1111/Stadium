@@ -39,5 +39,18 @@ h1{
     height: 25%;
 }
 
+.save-or-delete-form {
+    position: relative;
+}
+
+.stadium-form-delete {
+    position: absolute;
+    top: 91%;
+    right: 43%;
+}
+
+.stadium-form-detail button{
+    margin-right: 15%;
+}
 
 

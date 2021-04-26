@@ -81,4 +81,8 @@ function hiddenSelect() {
 }
 hiddenSelect()
 
+function turnOnDeleteModal() {
+    let modalDelete = new bootstrap.Modal(document.getElementById('delete-form-modal'));
+    modalDelete.show()
+}
 

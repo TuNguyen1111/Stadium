@@ -39,7 +39,7 @@
               <a href="#" class="dropdown-item" type="button">Sân bóng của tôi</a>
               <a href="#" class="dropdown-item" type="button">Trạng thái đặt sân</a>
               {% else %}
-              <a href="#" class="dropdown-item" type="button">Lịch sử đặt sân</a>
+              <a href="{% url 'history_booked' user.id %}" class="dropdown-item" type="button">Lịch sử đặt sân</a>
               {% endif %}
               <a class="dropdown-item" href="{% url 'logout' %}">Đăng xuất</a>
             </div>

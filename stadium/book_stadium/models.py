@@ -102,12 +102,14 @@ class Order(models.Model):
     # dat khung gio nao
     stadium_time_frame = models.ForeignKey(
         StadiumTimeFrame, null=True, on_delete=models.SET_NULL)
-    field_number = models.PositiveSmallIntegerField(blank=True, null=True)
+    field_numbers = models.JSONField(blank=True, null=True)
     pitch_clothes = models.BooleanField(default=False, blank=True)
     type_stadium = models.CharField(max_length=30, choices=TypeOfStadium.choices, default=TypeOfStadium.SMALL)
 
     # ngay bat dau dat san cua user
     order_datetime = models.DateTimeField(default=timezone.now)
+
+    # three_field_merge = models.JSONField(default={}, blank=True, null=True)
 
     is_accepted = models.BooleanField(default=False)
     customer_phone_number = models.CharField(max_length=12, blank=True)

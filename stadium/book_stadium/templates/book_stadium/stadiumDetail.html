@@ -19,21 +19,24 @@
     </h2>
     <img class="stadium-img" src="{{stadium.image.url}}" alt="stadium-image">
     <div class="form-info">
-        <form action="" method="POST" class="stadium-form-detail" enctype="multipart/form-data">
-            {% csrf_token %}
-            {% for input in formDetail.visible_fields %}
-            <div class="form-group mt-4">
-                <label for="exampleInputEmail1">{{input.label}} </label>
-                <div class="inputField">
-                    {{input}}
-                    <i data-name="{{input.auto_id }}" class="fas fa-pen-square"></i>
-                </div>
-            </div>
-            {% endfor %}
-            <input type="hidden" name="form_type" value="form_detail">
-            <button type="submit" id="saveDetailBtn" class="btn btn-success mt-5" disabled="true">Lưu thông tin</button>
-        </form>
+        <div class="save-or-delete-form">
+            <form action="" method="POST" class="stadium-form-detail" enctype="multipart/form-data">
+                {% csrf_token %}
+                {% for input in formDetail.visible_fields %}
+                    <div class="form-group mt-4">
+                        <label for="exampleInputEmail1">{{input.label}} </label>
+                        <div class="inputField">
+                            {{input}}
+                            <i data-name="{{input.auto_id }}" class="fas fa-pen-square"></i>
+                        </div>
+                    </div>
+                {% endfor %}
+                <input type="hidden" name="form_type" value="form_detail">
 
+                <button type="submit" id="saveDetailBtn" class="btn btn-success mt-5" disabled="true">Lưu thông tin</button>
+            </form>
+            <button class="stadium-form-delete btn btn-danger" onclick="turnOnDeleteModal()">Xóa</button>
+        </div>
         <div class="form-timeframe">
             <h2>
             Các khung giờ
@@ -75,7 +78,29 @@
             </form>
         </div>
     </div>
+</div>
 
+<div class="modal fade " id="delete-form-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Lưu ý</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc là muốn xóa sân không?</p>
+            </div>
+            <div class="modal-footer">
+                <form class="form-accept" method="POST" action="">
+                    {% csrf_token %}
+                    <input type="hidden" name="form_type" value="accept-input">
+                    <input type="submit" class="btn btn-success" value="Có">
+                </form>
+                <input type="submit" class="btn btn-secondary" data-bs-dismiss="modal" value="Hủy">
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
 {% block javascript %}

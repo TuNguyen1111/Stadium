@@ -105,9 +105,14 @@ class OrderForm(forms.ModelForm):
         orders = Order.objects.filter(stadium_time_frame=stadium_timeframe, order_date=order_date, is_accepted=True)
         all_fields = list(range(1, stadium_of_timeframe_field_count + 1))
         for order in orders:
-            field_number_accepted = order.field_number
-            if field_number_accepted in all_fields:
-                all_fields.remove(field_number_accepted)
+            if order.type_stadium == '7players':
+                field_number_accepted = order.field_numbers
+                if field_number_accepted in all_fields:
+                    all_fields.remove(field_number_accepted)
+            else:
+                for number_of_field in order.field_numbers:
+                    if number_of_field in all_fields:
+                        all_fields.remove(number_of_field)
         if type_stadium == '11players':
             if len(all_fields) < 3:
                 raise forms.ValidationError('Khung giờ của này không đủ để chuẩn bị sân 11! Vui lòng chọn khung giờ khác!')

@@ -130,3 +130,7 @@
 .modal-footer.book_stadium {
     justify-content: flex-end;
 }
+
+.view-all-stadium {
+    text-align: end;
+}

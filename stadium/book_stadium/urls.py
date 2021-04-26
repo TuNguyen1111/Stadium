@@ -16,6 +16,7 @@ urlpatterns = [
     path('accepted/<int:id>', views.isAccepted.as_view(), name='accepted'),
     path('trang-ca-nhan/<int:id>', views.UserProfile.as_view(), name='user_profile'),
     path('dat-san/', views.BookStadium.as_view(), name='book_stadium'),
+    path('lich-su-dat-san/<int:id>', views.HistoryBookedOfUser.as_view(), name="history_booked")
 ]
 
 urlpatterns += staticfiles_urlpatterns()

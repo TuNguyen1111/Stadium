@@ -24,16 +24,6 @@ from .myBackend import CustomBackend
 
 MY_BACKEND = CustomBackend()
 
-# def checkRoleOfUser(request, user):
-#     if user.role == "owner":
-#         fields_by_owner = Stadium.objects.filter(owner=request.user)
-#         if len(fields_by_owner) == 0:
-#             return redirect('create_stadium')
-#         return redirect('owner')
-#     else:
-#         if user.username == 'User' or user.phone_number == None:
-#             return redirect('user_profile', user.id)
-#         return redirect('home')
 class Home(View):
     form_class = UserCreationForm
     template_name = 'book_stadium/home.html'
@@ -166,9 +156,9 @@ class OwnerPage(LoginRequiredMixin, View):
                         'ten': order.customer_name,
                         'da_duyet': order.is_accepted,
                         'order_id': order.id,
-                        'field_number': order.field_number,
+                        'field_number': order.field_numbers,
                         'ao_tap': order.pitch_clothes,
-                        'loai_san': order.type_stadium
+                        'loai_san': order.type_stadium,
                     }
                     current_timeframe['nguoi_dat'].append(customer)
 
@@ -178,7 +168,10 @@ class OwnerPage(LoginRequiredMixin, View):
                 count_accept_user = 0
                 for user in time_frame['nguoi_dat']:
                     if user['da_duyet']:
-                        count_accept_user += 1
+                        if user['loai_san'] == "7players":
+                            count_accept_user += 1
+                        else:
+                            count_accept_user += 3
                 total_stadium = stadium.field_count - count_accept_user
                 time_frame['con_trong'] = total_stadium
         import json
@@ -232,15 +225,27 @@ class isAccepted(View):
         list_field_number = list(range(1, stadium.field_count + 1))
         if form_type == 'accept-input':
             orders_filter = Order.objects.filter(stadium_time_frame=stadium_timeframe, order_date=order_date, is_accepted=True)
+
             for order_filter in orders_filter:
-                order_field_number = order_filter.field_number
-                if order_field_number in list_field_number:
-                    list_field_number.remove(order_field_number)
+                if order_filter.type_stadium == "7players":
+                    order_field_number = order_filter.field_numbers
+                    if order_field_number in list_field_number:
+                        list_field_number.remove(order_field_number)
+                else:
+                    for number_of_field in order_filter.field_numbers:
+                        if number_of_field in list_field_number:
+                            list_field_number.remove(number_of_field)
+
             if type_stadium == '7players':
-                order.field_number = list_field_number[0]
+                order.field_numbers = list_field_number[0]
             else:
                 if len(list_field_number) >= 3:
-                    pass
+                    three_field_merge = list()
+                    for number in list_field_number:
+                        if len(three_field_merge) < 3:
+                            three_field_merge.append(number)
+                    order.field_numbers = three_field_merge
+
             order.is_accepted = True
             order.save()
             messages.success(request, 'Đã duyệt!')
@@ -326,12 +331,15 @@ class StadiumDetail(LoginRequiredMixin, View):
                 instance.save()
             else:
                 print(form_detail.errors)
-        else:
+        elif formname == 'form-time':
             formTimeFrame = self.formset(request.POST, instance=stadium)
             if formTimeFrame.is_valid():
                 formTimeFrame.save()
             else:
                 print(formTimeFrame.errors)
+        else:
+            stadium.delete()
+            return redirect('book_stadium')
         messages.success(request, 'Cập nhật thành công!')
         return redirect('stadium_detail', pk=stadium.id)
 
@@ -393,7 +401,11 @@ class BookStadium(ListView):
         order_form = self.form_class(request.POST)
         type_stadium = request.POST.get('type_stadium')
         if order_form.is_valid():
-            order_form.save()
+            order = order_form.save()
+            user = request.user
+            if user.is_authenticated:
+                order.user = user
+                order.save()
             messages.success(request, 'Đặt sân thành công!')
         else:
             messages.error(request, 'Đặt sân thất bại!')
@@ -551,3 +563,69 @@ class BookStadium(ListView):
         stadium_obj['id'] = stadium_of_timeframe.id
         search_obj['khung_gio'][time].append(stadium_obj)
 
+
+class HistoryBookedOfUser(View):
+    def get(self, request, id):
+        user = User.objects.get(id=id)
+        user_orders = Order.objects.filter(user=user)
+
+        all_orders_of_user = []
+        start_day = request.GET.get('start-day')
+        end_day = request.GET.get('end-day')
+
+        conditions = {}
+
+        if start_day:
+            start_day = start_day.replace('/', '-')
+            conditions['order_date__gte'] = start_day
+        if end_day:
+            end_day = end_day.replace('/', '-')
+            conditions['order_date__lte'] = end_day
+
+        user_orders = user_orders.filter(**conditions).order_by('order_date')
+
+        self.general_order_of_user(user_orders, all_orders_of_user)
+
+        context = {
+            'all_orders_of_user': all_orders_of_user
+        }
+        return render(request, 'book_stadium/historyBookedOfUser.html', context)
+
+
+    def post(self, request, id):
+        user = request.user
+        order = Order.objects.get(id=id)
+        order.delete()
+        return redirect('history_booked',user.id)
+
+    def general_order_of_user(self,  user_orders, all_orders_of_user):
+        for order in user_orders:
+            is_same_day = False
+            if all_orders_of_user:
+                last_order = all_orders_of_user[-1]
+                is_same_day = last_order['ngay'] == order.order_date.strftime('%Y/%m/%d')
+            if is_same_day:
+                current_order = all_orders_of_user[-1]
+            else:
+                current_order = {
+                    'ngay':  order.order_date.strftime('%Y/%m/%d'),
+                    'khung_gio': {}
+                }
+                all_orders_of_user.append(current_order)
+
+            timeframe_of_order = order.stadium_time_frame.time_frame
+            stadium_of_timeframe = order.stadium_time_frame.stadium
+            time = str(timeframe_of_order)
+            timeframes = current_order['khung_gio']
+            is_same_timeframe = time in timeframes
+            if is_same_timeframe:
+                current_timeframe = timeframes[time]
+            else:
+                current_timeframe = []
+                timeframes[time] = current_timeframe
+            stadium_obj = {
+                'san': stadium_of_timeframe.name,
+                'trang_thai': order.is_accepted,
+                'order_id': order.id
+            }
+            current_timeframe.append(stadium_obj)
