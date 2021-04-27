@@ -27,7 +27,7 @@
         <img class='logo' src="https://varunit.com/wp-content/uploads/2018/09/varunit-logo-square-black-bg.png" alt="">
         <ul>
           <li><a href="{% url 'book_stadium' %}">Đặt sân ngay</a></li>
-          <li><a href="#">Tìm sân</a></li>
+          <li><a href="{% url 'search_stadium' %}">Tìm sân</a></li>
           {% if user.is_authenticated %}
           <li>
             <a class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -37,7 +37,7 @@
               <a href="{% url 'user_profile' user.id %}" class="dropdown-item" type="button">Thông tin tài khoản</a>
               {% if user.role == "owner" %}
               <a href="#" class="dropdown-item" type="button">Sân bóng của tôi</a>
-              <a href="#" class="dropdown-item" type="button">Trạng thái đặt sân</a>
+              <a href="" class="dropdown-item" type="button">Trạng thái đặt sân</a>
               {% else %}
               <a href="{% url 'history_booked' user.id %}" class="dropdown-item" type="button">Lịch sử đặt sân</a>
               {% endif %}
@@ -65,13 +65,13 @@
                 {% for field in fields %}
                     {% url 'stadium_detail' field.id as url %}
                     <li class="nav-item {% if request.path == url %}active{% endif %}">
-                        <a class="field-name" href="{{url}}">{{field.name}}</a>
+                        <a class="field-name" href="{{ url }}">{{ field.name }}</a>
                     </li>
                 {% endfor %}
 
                 {% url 'create_stadium' as url %}
                 <li class="nav-item {% if request.path == url %}active{% endif %}">
-                    <a class="field-name" href="{{url}}">Thêm sân</a>
+                    <a class="field-name" href="{{ url }}">Thêm sân</a>
                 </li>
 
             </ul>
@@ -85,10 +85,10 @@
           <div class="dropdown-container" style="display: block;">
             <ul>
                 {% for field in fields %}
-                {% url 'owner' field.id as url %}
-                    <li class="nav-item {% if request.path == url %}active{% endif %}">
-                        <a class="field-name" href="{{url}}">{{field.name}}</a>
-                    </li>
+                    {% url 'owner' field.id as url %}
+                        <li class="nav-item {% if request.path == url %}active{% endif %}">
+                            <a class="field-name" href="{{ url }}">{{ field.name }}</a>
+                        </li>
                 {% endfor %}
             </ul>
 

@@ -120,6 +120,7 @@ class OrderForm(forms.ModelForm):
             if not all_fields:
                 raise forms.ValidationError('Khung giờ của này đã hết sân! Vui lòng chọn khung giờ khác!')
         return self.cleaned_data
+
 class StadiumForm(forms.ModelForm):
     # sửa lại class form theo kiểu t quen. M thích thì sửa lại như cũ cũng đc
     # viết thế này để t check có instance truyền vào không. Do dùng chung form để add với edit
@@ -161,6 +162,33 @@ class StadiumForm(forms.ModelForm):
             'owner': ''
         }
 
+class StadiumFormForUser(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(StadiumFormForUser, self).__init__(*args, **kwargs)
+        self._newly_created = kwargs.get('instance')
+        if self._newly_created:
+            for name in self.fields.keys():
+                self.fields[name].widget.attrs.update({
+                    'class': 'form-control',
+                    'disabled': True
+                })
+        else:
+            for name in self.fields.keys():
+                self.fields[name].widget.attrs.update({
+                    'class': 'form-control',
+                })
+        # ẩn trường owner trong form đi.
+        self.fields['owner'].required = False
+        self.fields['owner'].widget = forms.HiddenInput()
+    class Meta:
+        model = Stadium
+        fields = ['name', 'address', 'field_count', 'owner']
+        labels = {
+            'name': 'Tên sân',
+            'address': 'Địa chỉ',
+            'field_count': 'Số sân có thể đặt',
+            'owner': ''
+        }
 
 class StadiumTimeFrameForm(forms.ModelForm):
     time_frame = forms.ModelChoiceField(queryset=TimeFrame.objects.all(), disabled=True)
@@ -177,3 +205,36 @@ class UserProfileForm(forms.ModelForm):
             'phone_number': 'Số điện thoại',
             'email': 'Email'
         }
+
+class ChangeNumberOfStaidum7Form(forms.Form):
+    order_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
+    field_number = forms.IntegerField(label='Nhập vị trí sân: ', widget=forms.NumberInput(attrs={'class': 'field_number'}))
+
+    def save(self):
+        order_id = self.cleaned_data.get('order_id')
+        field_number = self.cleaned_data.get('field_number')
+
+        order = Order.objects.get(id=order_id)
+        order.field_numbers = field_number
+        order.save()
+        return order
+
+    def clean_field_number(self):
+        field_number = self.cleaned_data.get('field_number')
+        order_id = self.cleaned_data.get('order_id')
+        order = Order.objects.get(id=order_id)
+        timeframe = order.stadium_time_frame
+        list_field_number = list()
+
+        orders_accepted = Order.objects.filter(stadium_time_frame=timeframe, is_accepted=True)
+
+        for order in orders_accepted:
+            if order.type_stadium == "7players":
+                list_field_number.append(order.field_numbers)
+            else:
+                for field in order.field_numbers:
+                    list_field_number.append(field)
+
+        if field_number in list_field_number:
+            raise forms.ValidationError('San nay da duoc dat, vui long chon san khac!')
+        return field_number

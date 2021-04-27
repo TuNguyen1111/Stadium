@@ -22,20 +22,33 @@
         <div class="save-or-delete-form">
             <form action="" method="POST" class="stadium-form-detail" enctype="multipart/form-data">
                 {% csrf_token %}
-                {% for input in formDetail.visible_fields %}
-                    <div class="form-group mt-4">
-                        <label for="exampleInputEmail1">{{input.label}} </label>
-                        <div class="inputField">
-                            {{input}}
-                            <i data-name="{{input.auto_id }}" class="fas fa-pen-square"></i>
-                        </div>
-                    </div>
-                {% endfor %}
-                <input type="hidden" name="form_type" value="form_detail">
 
-                <button type="submit" id="saveDetailBtn" class="btn btn-success mt-5" disabled="true">Lưu thông tin</button>
+                {% if stadium.owner == user %}
+                    {% for input in formDetail.visible_fields %}
+                        <div class="form-group mt-4">
+                            <label for="exampleInputEmail1">{{input.label}} </label>
+                            <div class="inputField">
+                                {{ input }}
+                                <i data-name="{{input.auto_id }}" class="fas fa-pen-square"></i>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <input type="hidden" name="form_type" value="form_detail">
+                    <button type="submit" id="saveDetailBtn" class="btn btn-success mt-5" disabled="true">Lưu thông tin</button>
+                {% else %}
+                    {% for input in form_detail_for_user.visible_fields %}
+                        <div class="form-group mt-4">
+                            <label for="exampleInputEmail1">{{input.label}} </label>
+                            <div class="inputField">
+                                {{ input }}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
             </form>
-            <button class="stadium-form-delete btn btn-danger" onclick="turnOnDeleteModal()">Xóa</button>
+            {% if stadium.owner == user %}
+                <button class="stadium-form-delete btn btn-danger" onclick="turnOnDeleteModal()">Xóa</button>
+            {% endif %}
         </div>
         <div class="form-timeframe">
             <h2>
@@ -63,9 +76,11 @@
                         </td>
                         <td>
                         <div class="inputField text-center">
-                            {{form.price}}
+                            {{ form.price }}
                             <!-- <input type="text" class="form-control" id="{{forloop.counter0}}" name="price" disabled="true" value="{{ form.price.value|intcomma }}"> -->
-                            <i data-name="{{form.price.auto_id }}" class="fas fa-pen-square"></i>
+                            {% if stadium.owner == user %}
+                                <i data-name="{{form.price.auto_id }}" class="fas fa-pen-square"></i>
+                            {% endif %}
                         </div>
                         </td>
 
@@ -74,10 +89,17 @@
                 </tbody>
             </table>
             <input type="hidden" name="form_type" value="form_time">
-            <button type="submit" id="saveTimeFramesBtn" class="btn btn-success mt-5 mb-5" disabled="true">Lưu khung giờ</button>
+            {% if stadium.owner == user %}
+                <button type="submit" id="saveTimeFramesBtn" class="btn btn-success mt-5 mb-5" disabled="true">Lưu khung giờ</button>
+            {% endif %}
             </form>
         </div>
     </div>
+    {% if stadium.owner != user %}
+        <div class="back-btn">
+            <a class="btn btn-secondary" href="{% url 'book_stadium' %}">Quay lại</a>
+        </div>
+    {% endif %}
 </div>
 
 <div class="modal fade " id="delete-form-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
@@ -94,7 +116,7 @@ aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-footer">
                 <form class="form-accept" method="POST" action="">
                     {% csrf_token %}
-                    <input type="hidden" name="form_type" value="accept-input">
+                    <input type="hidden" name="form_type" value="delete-input">
                     <input type="submit" class="btn btn-success" value="Có">
                 </form>
                 <input type="submit" class="btn btn-secondary" data-bs-dismiss="modal" value="Hủy">

@@ -27,7 +27,10 @@ function focusForm(e) {
     timeframeInput = document.querySelectorAll('#time_frame')
     console.log(timeframeInput[1].value)
     stadiumInput.value = stadiumName
-    timeframeInput[1].value = timeframe
+
+    if ( timeframe ) {
+        timeframeInput[1].value = timeframe
+    }
 
     if ( userName ) {
         userNameInput.value = userName

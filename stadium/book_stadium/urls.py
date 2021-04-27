@@ -1,12 +1,12 @@
 from django.urls import path, include
-
 from django.conf import settings
 from django.contrib.staticfiles.urls import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.contrib.auth import views as auth_views
 from . import views
 urlpatterns = [
     path('', views.Home.as_view(), name='home'),
-     path('social-auth/', include('social_django.urls', namespace="social")),
+    path('social-auth/', include('social_django.urls', namespace="social")),
     path('login/', views.Login.as_view(), name='login'),
     path('logout/', views.Logout.as_view(), name='logout'),
     path('owner/<int:id>', views.OwnerPage.as_view(), name='owner'),
@@ -16,7 +16,11 @@ urlpatterns = [
     path('accepted/<int:id>', views.isAccepted.as_view(), name='accepted'),
     path('trang-ca-nhan/<int:id>', views.UserProfile.as_view(), name='user_profile'),
     path('dat-san/', views.BookStadium.as_view(), name='book_stadium'),
-    path('lich-su-dat-san/<int:id>', views.HistoryBookedOfUser.as_view(), name="history_booked")
+    path('lich-su-dat-san/<int:id>', views.HistoryBookedOfUser.as_view(), name="history_booked"),
+    path('tim-kiem-san/', views.SearchStadium.as_view(), name="search_stadium"),
+    path('thay-doi-mat-khau/', views.PasswordChange.as_view(), name='password_change'),
+    path('thay-doi-vi-tri-san/<int:id>', views.ChangeNumberOfField.as_view(), name='field_number_change'),
+
 ]
 
 urlpatterns += staticfiles_urlpatterns()

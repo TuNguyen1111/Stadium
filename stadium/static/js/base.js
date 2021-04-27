@@ -33,7 +33,7 @@ for (let i = 0; i < dropdown.length; i++) {
       arrow.classList.remove("fa-caret-up")
       arrow.classList.add("fa-caret-down")
     }
-    //this.classList.toggle("active");
+
     var dropdownContent = this.nextElementSibling;
     if (dropdownContent.style.display === "block") {
       dropdownContent.style.display = "none";
@@ -44,11 +44,4 @@ for (let i = 0; i < dropdown.length; i++) {
   });
 }
 
-// var sidebarContent = document.querySelectorAll('.field-name')
-// for (let i = 0; i < sidebarContent.length; i++) {
-//     let item = sidebarContent[i]
-//     item.addEventListener('click', function(){
-//         this.style.background = 'red';
-//     })
-// }
 

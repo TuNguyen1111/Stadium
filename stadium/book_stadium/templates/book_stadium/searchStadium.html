@@ -1,10 +1,14 @@
 {% extends 'book_stadium/base.html' %}
 {% load crispy_forms_tags %}
 {% load static %}
+
 {% block css %}
     <link rel="stylesheet" href="{% static 'css/book_stadium.css' %}">
+    <link rel="stylesheet" href="{% static 'css/searchStadium.css' %}">
 {% endblock %}
+
 {% block content %}
+
     {% for message in messages %}
         {% if message.tags == 'error' %}
             <div id="error" class="alert alert-danger" role="alert">
@@ -32,7 +36,7 @@
                                     {% for stadiumInfor in stadiumTimeframe %}
                                         <div class="card shadow style" style="width: 18rem;">
                                             <div class="hover-img">
-                                                <img class="card-img-top" src="{{stadiumInfor.anh}}" alt="Card image cap">
+                                                <img class="card-img-top" src="{{ stadiumInfor.anh }}" alt="Card image cap">
                                                 <div class="book-stadium-btn">
                                                     <div class="card-body">
                                                         <p class="card-text">Tên: {{ stadiumInfor.ten }}</p>
@@ -64,52 +68,39 @@
                     </div>
                 {% endfor %}
             {% else %}
-                <h1 id="title">Các sân và khung giờ còn trống</h1>
-                {% for stadium in page_obj %}
-                    <div class="day">
-                        <h2>Ngày: {{ stadium.ngay }}</h2>
-                        <hr>
-                        {% for key, stadiumTimeframe in stadium.khung_gio.items %}
-                            <div class="stadium-timeframe">
-                                <h3>{{ key }}</h3>
-                                <div class="list-of-stadium">
-                                    {% for stadiumInfor in stadiumTimeframe %}
-                                        <div class="card shadow style" style="width: 18rem;">
-                                            <div class="hover-img">
-                                                <img class="card-img-top" src="{{ stadiumInfor.anh }}" alt="Card image cap">
-                                                <div class="book-stadium-btn">
-                                                    <div class="card-body">
-                                                        <p class="card-text">Tên: {{ stadiumInfor.ten }}</p>
-                                                        <hr>
-                                                        <p class="card-text">Địa chỉ: {{ stadiumInfor.dia_chi }}</p>
-                                                        <hr>
-                                                    </div>
+                <h1 id="title">Tìm kiếm sân</h1>
 
-                                                    <button stadium-name="{{ stadiumInfor.ten }}" user-name="{{ user.username }}" user-phone-number="{{ user.phone_number }}" time-frame="{{ stadiumInfor.khung_gio_dat }}" onclick="focusForm(event)">Đặt sân</button>
-
-                                                </div>
-                                            </div>
-                                            <div class="card-body">
-                                            <p class="card-text">Tên: {{ stadiumInfor.ten }}</p>
+                    <div class="stadiums">
+                        {% for stadium in page_obj %}
+                            <div class="card shadow style" style="width: 18rem;">
+                                <div class="hover-img">
+                                    <img class="card-img-top" src="{{ stadium.image.url }}" alt="Card image cap">
+                                    <div class="book-stadium-btn">
+                                        <div class="card-body">
+                                            <p class="card-text">Tên: {{ stadium.name }}</p>
                                             <hr>
-                                            <p class="card-text">Địa chỉ: {{ stadiumInfor.dia_chi }}</p>
+                                            <p class="card-text">Địa chỉ: {{ stadium.address }}</p>
                                             <hr>
-                                            <p class="card-text">Số điện thoại: {{ stadiumInfor.sdt }}</p>
-                                            <hr>
-                                            </div>
-                                            <button>
-                                                <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
-                                                <a href="{% url 'stadium_detail' stadiumInfor.id %}">Chi tiết</a>
-                                            </button>
+                                            <button stadium-name="{{ stadium.name }}" user-name="{{ user.username }}" user-phone-number="{{ user.phone_number }}" onclick="focusForm(event)">Đặt sân</button>
                                         </div>
-                                    {% endfor %}
+                                    </div>
                                 </div>
+                                <div class="card-body">
+                                <p class="card-text">Tên: {{ stadium.name }}</p>
+                                <hr>
+                                <p class="card-text">Địa chỉ: {{ stadium.address }}</p>
+                                <hr>
+                                <p class="card-text">Số điện thoại: {{ stadium.owner.phone_number }}</p>
+                                <hr>
+                                </div>
+                                <button>
+                                    <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+                                    <a href="{% url 'stadium_detail' stadium.id %}">Chi tiết</a>
+                                </button>
                             </div>
-                            <a class="view-all-stadium" href="{% url 'search_stadium' %}">Xem tất cả...</a>
-                            <hr>
                         {% endfor %}
                     </div>
-                {% endfor %}
+
 
                 <div class="pagination">
                     <div class="number-of-page">
@@ -119,7 +110,7 @@
                         {% endif %}
                         {% for num in page_obj.paginator.page_range %}
                             {% if page_obj.number == num %}
-                                <a class="btn btn-info mb-4" href="?page={{num}}" >{{ num }}</a>
+                                <a class="btn btn-info mb-4" href="?page={{ num }}" >{{ num }}</a>
                             {% else %}
                                 <a class="btn btn-outline-info mb-4", href="?page={{ num }}" >{{ num }}</a>
                             {% endif %}
@@ -156,7 +147,7 @@
 
                                 <div class="form-group">
                                     <label for="day">Ngày</label>
-                                    <input type="text" name="day-search" class="form-control" id="day" placeholder="Nhập ngày" value="{{page_obj.0.ngay}}">
+                                    <input type="text" name="day-search" class="form-control" id="day" placeholder="Nhập ngày" value="{{ page_obj.0.ngay }}">
                                 </div>
 
                                 <div class="form-group">
@@ -175,13 +166,13 @@
             <div class="form-order">
                 <div id="dropdown-btn" class="dropdown search dropdown-style">
                     <button class="btn btn-secondary dropdown-toggle style-btn" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      Đặt sân
+                        Đặt sân
                     </button>
                     <div id="dropdown-form" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         <form method="POST" action="">
                             {% csrf_token %}
                             <div class="form-style">
-                                {{order_form|crispy}}
+                                {{ order_form|crispy }}
                                     <div class="submit-btn">
                                         <button type="submit" class="btn btn-primary mt-3">Đặt</button>
                                     </div>
@@ -202,9 +193,9 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-               <p>Đặt sân thành công, vui lòng chờ chủ sân duyệt!</p>
-               <p>Hãy gọi điện đến chủ sân để đảm bảo lịch đặt của bạn đã được tiếp nhận và được duyệt nhanh hơn!</p>
-               <p>Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!</p>
+                <p>Đặt sân thành công, vui lòng chờ chủ sân duyệt!</p>
+                <p>Hãy gọi điện đến chủ sân để đảm bảo lịch đặt của bạn đã được tiếp nhận và được duyệt nhanh hơn!</p>
+                <p>Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!</p>
             </div>
             <div class="modal-footer book_stadium">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
@@ -222,8 +213,8 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-               <p>Khung giờ bạn chọn đã hết sân!</p>
-               <p>Vui lòng chọn khung giờ khác!</p>
+                <p>Khung giờ bạn chọn đã hết sân!</p>
+                <p>Vui lòng chọn khung giờ khác!</p>
             </div>
             <div class="modal-footer book_stadium">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
@@ -231,7 +222,10 @@
         </div>
         </div>
     </div>
+
 {% endblock %}
+
 {% block javascript %}
+    <script src="{% static 'js/searchStadium.js' %}" type="text/javascript"></script>
     <script src="{% static 'js/bookStadium.js' %}" type="text/javascript"></script>
 {% endblock %}

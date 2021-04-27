@@ -7,10 +7,17 @@
 
 {% block content %}
     {% for message in messages %}
-    <div class="alert alert-success" role="alert">
-        {{message}}
-    </div>
+        {% if message.tags == 'error' %}
+            <div id="error" class="alert alert-danger" role="alert">
+                {{ message }}
+            </div>
+        {% else %}
+            <div id="success" class="alert alert-success" role="alert">
+                {{ message }}
+            </div>
+        {% endif %}
     {% endfor %}
+
     {% for orders in all_orders %}
         <!-- It is {% now "D d M Y" %} -->
 
@@ -68,11 +75,37 @@
                     </td>
                     <td>
                         {% for users in value.nguoi_dat %}
+
                             {% if users.da_duyet %}
-                                <p>Sân số {{users.field_number}}</p>
+                            <div class="crud-btn">
+                                <p>Sân số {{users.vi_tri}}</p>
+                                <input type="submit" class="btn btn-warning delete-btn" onclick="turnOnModalUpdate(event, {{ users.order_id }})" order-id="{{ users.order_id}}" max-number="{{ users.tong_san }}" value="Sửa">
+                                <div class="modal fade " id="update {{ users.order_id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+                                    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                        <h5 class="modal-title" id="staticBackdropLabel">Sửa vị trí sân</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form class="form-delete" method="POST" action="{% url 'field_number_change' users.order_id %}">
+                                                {% csrf_token %}
+                                                {{ update_form|crispy }}
+                                                <div class="update-btn">
+                                                    <input type="submit" class="btn btn-success" value="Sửa">
+                                                    <input type="submit" class="btn btn-danger" data-bs-dismiss="modal" value="Hủy">
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </div>
+                            </div>
                             {% else %}
                                 <p>Chưa duyệt</p>
                             {% endif %}
+
                         {% endfor %}
                     </td>
                     <td>
@@ -119,7 +152,7 @@
 
                             <div class="crud-btn">
                                 {% if value.con_trong %}
-                                    {% if users.loai_san == "11players" and value.con_trong > 3 or users.loai_san == "7players" %}
+                                    {% if users.loai_san == "11players" and value.con_trong >= 3 or users.loai_san == "7players" %}
                                         <input type="submit" class="btn btn-success accepted-btn" onclick="turnOnModalAccept({{ users.order_id }})" value="Duyệt">
                                     {% elif users.loai_san == "11players" and value.con_trong < 3 %}
                                         <p>Không đủ sân để duyệt</p>
