@@ -14,11 +14,15 @@ from django.views.generic import ListView
 from django.core.paginator import Paginator
 from django.utils import timezone
 from datetime import datetime
+
+from notifications.signals import notify
+from swapper import load_model
+
 from random import choice
 import datetime
 
 from .forms import (OrderForm, StadiumForm, StadiumTimeFrameForm, StadiumFormForUser,
-                    UserCreationForm, UserProfileForm, ChangeNumberOfStaidum7Form)
+                    UserCreationForm, UserProfileForm, ChangeNumberOfStadium7Form, ChangeNumberOfStadium11Form)
 from .models import Order, Stadium, StadiumTimeFrame, TimeFrame, User
 from .myBackend import CustomBackend
 
@@ -26,6 +30,7 @@ from .myBackend import CustomBackend
 
 MY_BACKEND = CustomBackend()
 
+Notification = load_model('notifications', 'Notification')
 class Home(View):
     form_class = UserCreationForm
     template_name = 'book_stadium/home.html'
@@ -110,7 +115,11 @@ class OwnerPage(LoginRequiredMixin, View):
         orders = Order.objects.filter(stadium_time_frame__stadium=stadium, order_date__gte=timezone.now())\
                               .order_by('order_date')
         all_orders = []
-        update_number_field_form = ChangeNumberOfStaidum7Form()
+        update_stadium_7players_form = ChangeNumberOfStadium7Form()
+        update_stadium_11players_form = ChangeNumberOfStadium11Form()
+
+
+
         self.general_orders(all_orders, orders, stadium)
         #tao dict voi moi ngay co order
         for order in orders:
@@ -187,13 +196,14 @@ class OwnerPage(LoginRequiredMixin, View):
                             count_accept_user += 3
                 total_stadium = stadium.field_count - count_accept_user
                 time_frame['con_trong'] = total_stadium
-        import json
-        print(json.dumps(all_orders, indent=4))
+        # import json
+        # print(json.dumps(all_orders, indent=4))
         fields = {
 
             'fields': fields_by_owner,
             'all_orders': all_orders,
-            'update_form': update_number_field_form
+            'update_stadium_7players_form': update_stadium_7players_form,
+            'update_stadium_11players_form': update_stadium_11players_form
         }
         return render(request,
             'book_stadium/owner.html',
@@ -294,7 +304,6 @@ class StadiumDetail(LoginRequiredMixin, View):
 
     def post(self, request, pk):
         formname = request.POST.get('form_type')
-        current_stadium = Stadium.objects.get(id=pk)
         stadium = Stadium.objects.get(id=pk)
         owner = request.user
         if formname == 'form_detail':
@@ -310,9 +319,8 @@ class StadiumDetail(LoginRequiredMixin, View):
             formTimeFrame = self.formset(request.POST, instance=stadium)
             if formTimeFrame.is_valid():
                 formTimeFrame.save()
-            else:
-                print(formTimeFrame.errors)
-        else:
+
+        elif formname == 'delete-input':
             stadium.delete()
             return redirect('book_stadium')
         messages.success(request, 'Cập nhật thành công!')
@@ -358,10 +366,15 @@ class BookStadium(ListView):
 
         self.search_stadium(stadium_search_result, day_search, time_frame_search, address_search, stadium_name_search)
 
+        if request.user.is_authenticated:
+            fields_by_owner = Stadium.objects.filter(owner=request.user)
+        else:
+            fields_by_owner = ''
         import json
         # print(json.dumps(all_stadiums, indent=4))
 
         context = {
+            'fields':fields_by_owner,
             'stadiums': all_stadiums,
             'page_obj': page_obj,
             'order_form': order_form,
@@ -373,12 +386,16 @@ class BookStadium(ListView):
     def post(self, request):
         order_form = self.form_class(request.POST)
         type_stadium = request.POST.get('type_stadium')
+
         if order_form.is_valid():
             order = order_form.save()
+            receiver = order.stadium_time_frame.stadium.owner
+            sender = request.user
             user = request.user
             if user.is_authenticated:
                 order.user = user
                 order.save()
+            notify.send(sender, recipient=receiver, verb=f'Thông báo từ {sender}', description=f'Bạn có một người đặt mới')
             messages.success(request, 'Đặt sân thành công!')
         else:
             messages.error(request, 'Đặt sân thất bại!')
@@ -672,6 +689,10 @@ class isAccepted(View):
         stadium_timeframe = order.stadium_time_frame
         stadium = order.stadium_time_frame.stadium
         list_field_number = list(range(1, stadium.field_count + 1))
+        receiver = order.user
+        if receiver:
+            sender = request.user
+
         if form_type == 'accept-input':
             orders_filter = Order.objects.filter(stadium_time_frame=stadium_timeframe, order_date=order_date, is_accepted=True)
 
@@ -687,17 +708,34 @@ class isAccepted(View):
 
             if type_stadium == '7players':
                 order.field_numbers = list_field_number[0]
+                list_field_number.remove(list_field_number[0])
             else:
                 if len(list_field_number) >= 3:
                     three_field_merge = list()
                     for number in list_field_number:
                         if len(three_field_merge) < 3:
                             three_field_merge.append(number)
+                            list_field_number.remove(number)
                     order.field_numbers = three_field_merge
 
             order.is_accepted = True
             order.save()
+            notify.send(sender, recipient=receiver, verb=f'Thông báo từ {sender}',
+                description=f'Sân {order.stadium_time_frame.stadium.name} bạn đặt vào ngày {order.order_date}, khung giờ {order.stadium_time_frame.time_frame} đã được duyệt! ')
+
+            if not list_field_number:
+                users_list = list()
+                orders_not_accepted = Order.objects.filter(stadium_time_frame=stadium_timeframe, order_date=order_date, is_accepted=False)
+                for order in orders_not_accepted:
+                    user_order = order.user
+                    if user_order:
+                        users_list.append(user_order)
+                receiver = users_list
+                notify.send(sender, recipient=receiver, verb=f'Thông báo từ {sender}',
+                    description=f'Sân {order.stadium_time_frame.stadium.name} bạn đặt vào ngày {order.order_date}, khung giờ {order.stadium_time_frame.time_frame} đã hết sân! Vui lòng chọn khung giờ khác! ')
             messages.success(request, 'Đã duyệt!')
+
+
         elif form_type == 'accept-delete':
             order.delete()
             messages.success(request, 'Xóa thành công!')
@@ -706,15 +744,42 @@ class isAccepted(View):
 class ChangeNumberOfField(View):
     def post(self, request, id):
         order = Order.objects.get(id=id)
-        form = ChangeNumberOfStaidum7Form(request.POST)
+        stadium_type = request.POST.get('stadium_type')
+        if stadium_type == '7players':
+            form = ChangeNumberOfStadium7Form(request.POST)
+        else:
+            form = ChangeNumberOfStadium11Form(request.POST)
+
         if form.is_valid():
             form.save()
             messages.success(request, 'Cập nhật vị trí thành công!')
         else:
             messages.error(request, 'Vị trí này đã được duyệt! Vui lòng chọn vị trí khác!')
-            # context = {
-            #     'form': form
-            # }
-            # return render(request, 'book_stadium/owner.html', context)
+
         return redirect('owner', id=order.stadium_time_frame.stadium.id)
 
+
+class Notifications(View):
+    def get(self, request):
+        user = request.user
+        notifications = user.notifications.all()
+        for notification in notifications:
+            if notification.unread:
+                notification.unread = False
+                notification.save()
+        context = {
+            'notifications': notifications
+        }
+        return render(request, 'book_stadium/notifications.html', context)
+
+class NotificationDetail(View):
+    def get(self, request, id):
+        notify = Notification.objects.get(id=id)
+        if notify.unread:
+            notify.unread = False
+            notify.save()
+        context = {
+            'notify': notify
+        }
+
+        return render(request, 'book_stadium/notificationDetail.html', context)

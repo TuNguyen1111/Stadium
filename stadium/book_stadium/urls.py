@@ -3,6 +3,7 @@ from django.conf import settings
 from django.contrib.staticfiles.urls import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.contrib.auth import views as auth_views
+
 from . import views
 urlpatterns = [
     path('', views.Home.as_view(), name='home'),
@@ -18,8 +19,18 @@ urlpatterns = [
     path('dat-san/', views.BookStadium.as_view(), name='book_stadium'),
     path('lich-su-dat-san/<int:id>', views.HistoryBookedOfUser.as_view(), name="history_booked"),
     path('tim-kiem-san/', views.SearchStadium.as_view(), name="search_stadium"),
-    path('thay-doi-mat-khau/', views.PasswordChange.as_view(), name='password_change'),
     path('thay-doi-vi-tri-san/<int:id>', views.ChangeNumberOfField.as_view(), name='field_number_change'),
+
+    path('thay-doi-mat-khau/', views.PasswordChange.as_view(), name='password_change'),
+
+    path('reset-mat-khau/', auth_views.PasswordResetView.as_view(template_name='password_reset/password_reset.html'), name='reset_password'),
+    path('reset-mat-khau-tin-nhan/', auth_views.PasswordResetDoneView.as_view(template_name='password_reset/password_reset_sent.html'), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='password_reset/password_reset_confirm.html'), name='password_reset_confirm'),
+    path('reset-mat-khau-thanh-cong/', auth_views.PasswordResetCompleteView.as_view(template_name='password_reset/password_reset_done.html'), name='password_reset_complete'),
+
+    path('thong-bao/', views.Notifications.as_view(), name='notifications'),
+    path('chi-tiet-thong-bao/<int:id>', views.NotificationDetail.as_view(), name='notification_detail')
+
 
 ]
 

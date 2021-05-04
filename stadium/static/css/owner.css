@@ -30,6 +30,7 @@ button {
 .col {
     display: flex;
     flex-direction: column;
+    height: 100vh;
 }
 
 .table {
@@ -51,6 +52,7 @@ button {
 
 .crud-btn {
     display: flex;
+    justify-content: space-between;
 }
 
 .accepted input{
@@ -70,3 +72,14 @@ button {
     justify-content: flex-end;
 }
 
+.fa-check {
+    color: green;
+}
+
+.fa-times {
+    color: red;
+}
+
+p#accepted {
+    background-color: bisque;
+}

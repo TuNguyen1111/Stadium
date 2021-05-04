@@ -31,7 +31,7 @@
 
             </h1>
             <hr>
-        <table class="table">
+        <table class="table table-bordered">
         <thead>
             <tr>
                 <th scope="col">Khung giờ</th>
@@ -91,7 +91,13 @@
                                         <div class="modal-body">
                                             <form class="form-delete" method="POST" action="{% url 'field_number_change' users.order_id %}">
                                                 {% csrf_token %}
-                                                {{ update_form|crispy }}
+
+                                                {% if users.loai_san == '7players' %}
+                                                    {{  update_stadium_7players_form|crispy }}
+                                                {% else %}
+                                                    {{  update_stadium_11players_form|crispy }}
+                                                {% endif %}
+
                                                 <div class="update-btn">
                                                     <input type="submit" class="btn btn-success" value="Sửa">
                                                     <input type="submit" class="btn btn-danger" data-bs-dismiss="modal" value="Hủy">
@@ -123,8 +129,8 @@
                         {% for users in value.nguoi_dat %}
                             {% if users.da_duyet %}
                                 <div class="crud-btn accepted">
-                                    <p>Đã duyệt</p>
-                                    <input type="submit" class="btn btn-danger delete-btn" onclick="turnOnModalDelete({{ users.order_id }})" value="Xóa">
+                                    <p id="accepted">Đã duyệt</p>
+                                    <p><i class="fas fa-times" onclick="turnOnModalDelete({{ users.order_id }})"></i></p>
                                     <div class="modal fade " id="delete {{ users.order_id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
                                         aria-labelledby="staticBackdropLabel" aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered">
@@ -153,7 +159,7 @@
                             <div class="crud-btn">
                                 {% if value.con_trong %}
                                     {% if users.loai_san == "11players" and value.con_trong >= 3 or users.loai_san == "7players" %}
-                                        <input type="submit" class="btn btn-success accepted-btn" onclick="turnOnModalAccept({{ users.order_id }})" value="Duyệt">
+                                        <p><i class="fas fa-check" onclick="turnOnModalAccept({{ users.order_id }})"></i></p>
                                     {% elif users.loai_san == "11players" and value.con_trong < 3 %}
                                         <p>Không đủ sân để duyệt</p>
                                     {% endif %}
@@ -184,7 +190,7 @@
                                 {% else %}
                                     <p>Hết sân</p>
                                 {% endif %}
-                                <input type="submit" class="btn btn-danger delete-btn" onclick="turnOnModalDelete({{ users.order_id }})" value="Xóa">
+                                <p><i class="fas fa-times" onclick="turnOnModalDelete({{ users.order_id }})"></i></p>
                                 <div class="modal fade " id="delete {{ users.order_id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
                                 aria-labelledby="staticBackdropLabel" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered">

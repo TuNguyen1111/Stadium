@@ -7,6 +7,11 @@
 .col {
     display: flex;
     flex-direction: column;
+    height: auto;
+}
+
+.overview {
+    padding: 2%;
 }
 
 .content {
@@ -19,13 +24,14 @@
     flex-direction: column;
 }
 
-.stadium-timeframe, .list-of-stadium{
+.list-of-stadium{
     display: flex;
 
 }
 
 .list-of-stadium {
-    flex-wrap: wrap;
+    /* flex-wrap: wrap; */
+    padding-left: 1%;
 }
 
 .stadium-timeframe {
@@ -35,7 +41,8 @@
 
 .stadium-timeframe h3 {
     height: 35px;
-
+    text-align: center;
+    background-color: #00b9f2;
 }
 
 .stadium-detail {
@@ -68,6 +75,11 @@
 
 .form-submit {
     width: 30%;
+    position: fixed;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
 }
 
 .btn.style-btn {
@@ -82,6 +94,11 @@
     width: 100%;
 }
 
+.form-search, .form-order {
+    width: 75%;
+    margin-bottom: 2%;
+}
+
 .form-search {
     margin-top: 60px;
 }
@@ -92,6 +109,13 @@
     align-items: initial;
 }
 
+.form-search .search-btn-dropdown, .form-order .order-btn-dropdown {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
 .form-search form button {
     width: 30%;
 }
@@ -100,14 +124,17 @@
     text-align: center;
 }
 
-.form-order {
-    margin-top: 270px;
-}
-
 .form-style {
     width: 80%;
     margin: auto;
 }
+
+.form-search .search-show, .form-order .order-show {
+    padding: 5%;
+    margin-bottom: 5%;
+    display: none;
+}
+
 
 .book-stadium-btn {
     position: absolute;
@@ -134,3 +161,5 @@
 .view-all-stadium {
     text-align: end;
 }
+
+

@@ -40,7 +40,7 @@
                                                         <p class="card-text">Địa chỉ: {{ stadiumInfor.dia_chi }}</p>
                                                         <hr>
                                                     </div>
-                                                    <button stadium-name="{{stadiumInfor.ten}}" onclick="focusForm(event)">Đặt sân</button>
+                                                    <button  class="order-btn" stadium-name="{{stadiumInfor.ten}}" onclick="">Đặt sân</button>
                                                 </div>
                                             </div>
                                             <div class="card-body">
@@ -85,7 +85,7 @@
                                                         <hr>
                                                     </div>
 
-                                                    <button stadium-name="{{ stadiumInfor.ten }}" user-name="{{ user.username }}" user-phone-number="{{ user.phone_number }}" time-frame="{{ stadiumInfor.khung_gio_dat }}" onclick="focusForm(event)">Đặt sân</button>
+                                                    <button class="order-btn" stadium-name="{{ stadiumInfor.ten }}" user-name="{{ user.username }}" user-phone-number="{{ user.phone_number }}" time-frame="{{ stadiumInfor.khung_gio_dat }}" onclick="">Đặt sân</button>
 
                                                 </div>
                                             </div>
@@ -114,8 +114,8 @@
                 <div class="pagination">
                     <div class="number-of-page">
                         {% if page_obj.has_previous %}
-                        <a class="btn btn-outline-info mb-4" href="?page=1" >First</a>
-                        <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.previous_page_number }}" >Previous</a>
+                        <a class="btn btn-outline-info mb-4" href="?page=1" >Trang đầu</a>
+                        <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.previous_page_number }}" >Trang trước</a>
                         {% endif %}
                         {% for num in page_obj.paginator.page_range %}
                             {% if page_obj.number == num %}
@@ -125,8 +125,8 @@
                             {% endif %}
                         {% endfor %}
                         {% if page_obj.has_next %}
-                            <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.next_page_number }}" >Next</a>
-                            <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.paginator.num_pages }}" >Last</a>
+                            <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.next_page_number }}" >Trang sau</a>
+                            <a class="btn btn-outline-info mb-4" href="?page={{ page_obj.paginator.num_pages }}" >Trang cuối</a>
                         {% endif %}
                     </div>
 
@@ -137,10 +137,11 @@
         <div class="form-submit">
             <div class="form-search">
                 <div class="dropdown search dropdown-style">
-                    <button class="btn btn-secondary dropdown-toggle style-btn" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Tìm kiếm
+                    <button class="btn btn-secondary search-btn-dropdown" type="button" id="dropdownMenuButton">
+                        <a>Tìm kiếm</a>
+                        <span class="fas fa-caret-down first"></span>
                     </button>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <div class="search-show shadow" aria-labelledby="dropdownMenuButton">
                         <form method="GET" action="">
                             <div class="form-style">
 
@@ -164,7 +165,7 @@
                                 </div>
 
                                 <div class="submit-btn">
-                                    <button type="submit" class="btn btn-primary mt-3" onclick="checkInputField(event)">Tìm kiếm</button>
+                                    <button type="submit" class="btn btn-secondary mt-3">Tìm kiếm</button>
                                 </div>
                             </div>
                         </form>
@@ -174,16 +175,17 @@
 
             <div class="form-order">
                 <div id="dropdown-btn" class="dropdown search dropdown-style">
-                    <button class="btn btn-secondary dropdown-toggle style-btn" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                      Đặt sân
+                    <button class="btn btn-secondary order-btn-dropdown" type="button" id="dropdownMenuButton">
+                        <a>Đặt sân</a>
+                        <span class="fas fa-caret-down first"></span>
                     </button>
-                    <div id="dropdown-form" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <div id="dropdown-form" class="order-show shadow" >
                         <form method="POST" action="">
                             {% csrf_token %}
                             <div class="form-style">
                                 {{order_form|crispy}}
                                     <div class="submit-btn">
-                                        <button type="submit" class="btn btn-primary mt-3">Đặt</button>
+                                        <button type="submit" class="btn btn-secondary mt-3">Đặt</button>
                                     </div>
                             </div>
                         </form>

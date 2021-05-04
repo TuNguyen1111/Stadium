@@ -206,8 +206,9 @@ class UserProfileForm(forms.ModelForm):
             'email': 'Email'
         }
 
-class ChangeNumberOfStaidum7Form(forms.Form):
+class ChangeNumberOfStadium7Form(forms.Form):
     order_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
+    stadium_type = forms.CharField(widget=forms.HiddenInput(attrs={'value': '7players'}), required=False)
     field_number = forms.IntegerField(label='Nhập vị trí sân: ', widget=forms.NumberInput(attrs={'class': 'field_number'}))
 
     def save(self):
@@ -219,22 +220,64 @@ class ChangeNumberOfStaidum7Form(forms.Form):
         order.save()
         return order
 
-    def clean_field_number(self):
-        field_number = self.cleaned_data.get('field_number')
+    # def clean_field_number(self):
+    #     field_number = self.cleaned_data.get('field_number')
+    #     order_id = self.cleaned_data.get('order_id')
+    #     order = Order.objects.get(id=order_id)
+    #     timeframe = order.stadium_time_frame
+    #     list_field_number = list()
+
+    #     orders_accepted = Order.objects.filter(stadium_time_frame=timeframe, is_accepted=True)
+
+    #     for order in orders_accepted:
+    #         if order.type_stadium == "7players":
+    #             list_field_number.append(order.field_numbers)
+    #         else:
+    #             for field in order.field_numbers:
+    #                 list_field_number.append(field)
+
+    #     if field_number in list_field_number:
+    #         raise forms.ValidationError('San nay da duoc dat, vui long chon san khac!')
+    #     return field_number
+
+class ChangeNumberOfStadium11Form(forms.Form):
+    order_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
+    stadium_type = forms.CharField(widget=forms.HiddenInput(attrs={'value': '11players'}), required=False)
+    field_1 = forms.IntegerField(label='Nhập vị trí sân thứ nhất: ', widget=forms.NumberInput(attrs={'class': 'field_number'}))
+    field_2 = forms.IntegerField(label='Nhập vị trí sân thứ hai: ', widget=forms.NumberInput(attrs={'class': 'field_number'}))
+    field_3 = forms.IntegerField(label='Nhập vị trí sân thứ ba: ', widget=forms.NumberInput(attrs={'class': 'field_number'}))
+
+    def save(self):
         order_id = self.cleaned_data.get('order_id')
+        field_1 = self.cleaned_data.get('field_1')
+        field_2 = self.cleaned_data.get('field_2')
+        field_3 = self.cleaned_data.get('field_3')
+
         order = Order.objects.get(id=order_id)
-        timeframe = order.stadium_time_frame
-        list_field_number = list()
+        field = [field_1, field_2, field_3]
+        order.field_numbers = field
+        order.save()
+        return order
 
-        orders_accepted = Order.objects.filter(stadium_time_frame=timeframe, is_accepted=True)
+    # def clean(self):
+    #     order_id = self.cleaned_data.get('order_id')
+    #     field_1 = self.cleaned_data.get('field_1')
+    #     field_2 = self.cleaned_data.get('field_2')
+    #     field_3 = self.cleaned_data.get('field_3')
 
-        for order in orders_accepted:
-            if order.type_stadium == "7players":
-                list_field_number.append(order.field_numbers)
-            else:
-                for field in order.field_numbers:
-                    list_field_number.append(field)
+    #     order = Order.objects.get(id=order_id)
+    #     timeframe = order.stadium_time_frame
+    #     orders_accepted = Order.objects.filter(stadium_time_frame=timeframe, is_accepted=True)
+    #     list_field_number = list()
 
-        if field_number in list_field_number:
-            raise forms.ValidationError('San nay da duoc dat, vui long chon san khac!')
-        return field_number
+    #     for order in orders_accepted:
+    #         if order.type_stadium == "7players":
+    #             list_field_number.append(order.field_numbers)
+    #         else:
+    #             for field in order.field_numbers:
+    #                 list_field_number.append(field)
+    #     if field_1 in list_field_number or field_2 in list_field_number or field_3 in list_field_number:
+    #         raise forms.ValidationError('San nay da duoc dat, vui long chon san khac!')
+    #     return self.cleaned_data
+
+

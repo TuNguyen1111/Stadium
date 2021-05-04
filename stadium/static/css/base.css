@@ -1,169 +1,162 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body{
-  width: 100%;
-  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    width: 100%;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 }
 
 .container-1 {
-    width: 90%;
+    width: 100%;
     margin: auto;
 }
 
 .navbar img {
-  width: 60px;
-
+    width: 60px;
+    margin-left: 5%;
 }
 
 .navbar {
-  background-color: #5cdf88;
+    background-image: linear-gradient(to right, rgb(121, 119, 119), rgb(163, 163, 163), rgb(163, 163, 163), rgb(121, 119, 119));
 
 }
 
-.navbar ul {
-  display: flex;
-  align-items: center;
+.navbar > ul {
+    display: flex;
+    align-items: center;
+    margin-right: 5%;
 }
 
 .navbar ul li {
-  list-style: none;
+    list-style: none;
 }
 
-/* .menu {
-  display: flex;
-} */
-
 .navbar a {
-  text-decoration: none;
-  color: white;
-  margin-right: 20px;
+    text-decoration: none;
+    color: white;
+    margin-right: 20px;
 }
 
 .modal-header.base {
-  width: 100%;
-  background-color: #5cdf88;
-  color: white;
-}
+    width: 100%;
+    background-color: #555;
+    color: white;
+    }
 
 .modal-footer.base{
-  display: flex;
-  justify-content: space-between;
+    display: flex;
+    justify-content: space-between;
 }
 
 a {
-  text-decoration: none;
-  color: #5cdf88;
+    text-decoration: none;
+    color: #6c757d;
 }
 
 a:hover {
-  color: black;
+    color: black;
 }
 
 .modal-body.base select {
-  margin-bottom: 20px;
+    margin-bottom: 20px;
 }
 
 form {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .inputs {
-  width: 100%;
+    width: 100%;
 }
 
 .modal button {
-  margin-top: 20px;
+    margin-top: 20px;
 }
 .modal i {
-  margin-left: 5px;
-  margin-right: 5px;
+    margin-left: 5px;
+    margin-right: 5px;
 }
 
 section{
-  display: flex;
-
-  height: auto;
+    display: flex;
+    height: auto;
 }
 
 .sidebar {
-    width: 220px;
-}
-/* Fixed sidenav, full height */
-.sidenav {
-  height: 100vh;
-  width: 200px;
-  z-index: 1;
-  top: 0;
-  left: 0;
-  /* background-color: #111; */
-  overflow-x: hidden;
-  padding-top: 20px;
+    /* position: fixed; */
+
+    width: 300px;
+    background: #555;
+    color: rgb(255, 255, 255);
 }
 
-/* Style the sidenav links and the dropdown button */
-.sidenav a, .dropdown-btn {
-  padding: 6px 8px 6px 16px;
-  text-decoration: none;
-  font-size: 20px;
-  color: #818181;
-  display: block;
-  border: none;
-  background: none;
-  width:100%;
-  text-align: left;
-  cursor: pointer;
-  outline: none;
+.sidebar ul {
+    width: 100%;
+    height: 100%;
+    padding: 0;
 }
 
-/* On mouse-over */
-.sidenav a:hover, .dropdown-btn:hover {
-  color: black;
-}
-
-/* Main content */
-.main {
-  margin-left: 200px; /* Same as the width of the sidenav */
-  font-size: 20px; /* Increased text to enable scrolling */
-  padding: 0px 10px;
-}
-
-/* Add an active class to the active dropdown button */
-.active {
-  background-color: #5cdf88;
-  /* color: white; */
-}
-
-/* Dropdown container (hidden by default). Optional: add a lighter background color and some left padding to change the design of the dropdown content */
-.dropdown-container {
-  /* background-color: #262626; */
-  padding-left: 8px;
-}
-
-.dropdown-container ul li {
+.sidebar ul.parent li {
     list-style: none;
-}
-/* Optional: Style the caret down icon */
-.fa-caret-down {
-  float: right;
-  padding-right: 8px;
+    padding: 0;
+    /* border-bottom: 1px solid rgb(151, 151, 151); */
+
 }
 
-.fa-caret-up {
-  float: right;
-  padding-right: 8px;
+.sidebar ul li a {
+    text-decoration: none;
+    color: rgb(255, 255, 255);
+    padding-left: 40px;
+    display: block;
+    width: 100%;
+    font-size: 30px;
+    line-height: 60px;
+    position: relative;
 }
 
-.dropdown-menu a {
-  color: black;
+.sidebar ul ul {
+    /* display: none; */
+}
+
+.sidebar ul ul li a {
+    font-size: 25px;
+    padding-left: 60px;
+}
+
+.sidebar ul li a span {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    transition: transform 0.5s;
+}
+
+.sidebar ul li a span.rotate {
+    transform: translateY(-50%) rotate(-180deg)
+}
+
+.sidebar ul li a:hover {
+    background-color: rgb(135, 134, 134);
+    border-left: 3px solid rgb(167, 167, 167);
 }
 
 .col {
-  display: flex;
-
+    display: flex;
+    /* height: 100vh; */
 }
 
-.field-name:hover {
-    background: #5cdf88;
-}
+/* .stadium-manage {
+    display: none;
+} */
 
+
+.active {
+    background-color: rgb(135, 134, 134);
+    border-left: 3px solid rgb(167, 167, 167);
+}
 

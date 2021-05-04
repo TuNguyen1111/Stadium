@@ -1,16 +1,24 @@
 {% extends 'book_stadium/base.html' %}
+{% load crispy_forms_tags %}
 {% load static %}
 {% block content %}
-{% if user.is_authenticated %}
-<p>Cái này sửa sau nhé. Ném vào để phân biệt cho dễ thôi</p>
-{% if user.username != 'User' %}
-<h1>Chào {{user.username}}</h1>
-{% elif user.phone_number %}
-<h1>Chào bạn. Số điện thoại của bạn là {{user.phone_number}}</h1>
-{% else %}
-<h1>Chào bạn. Email của bạn là {{user.email}}</h1>
-{% endif %}
-{% else %}
-<h1>Chào, Khách</h1>
-{% endif %}
-{% endblock content%}
+    {% if user.is_authenticated %}
+        <p>Cái này sửa sau nhé. Ném vào để phân biệt cho dễ thôi</p>
+    {% if user.username != 'User' %}
+        <h1>Chào {{user.username}}</h1>
+    {% elif user.phone_number %}
+        <h1>Chào bạn. Số điện thoại của bạn là {{user.phone_number}}</h1>
+    {% else %}
+        <h1>Chào bạn. Email của bạn là {{user.email}}</h1>
+    {% endif %}
+    {% else %}
+        <h1>Chào, Khách</h1>
+    {% endif %}
+
+
+
+{% endblock %}
+
+{% block javascript %}
+    <script src="{% static 'js/home.js' %}" type="text/javascript"></script>
+{% endblock %}

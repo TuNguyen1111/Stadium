@@ -68,18 +68,18 @@ function addEventInput() {
 
 addEventInput()
 
-function hiddenSelect() {
-    let selectTags = document.querySelectorAll('select')
-    for (let i = 0; i < selectTags.length; i++) {
-        let item = selectTags[i]
-        item.style.display = 'none'
-        let pTag = document.createElement('span')
-        let value = item.options[item.selectedIndex].text;
-        pTag.innerHTML = value
-        item.parentNode.insertBefore(pTag, item.nextSibling)
-    }
-}
-hiddenSelect()
+// function hiddenSelect() {
+//     let selectTags = document.querySelectorAll('select')
+//     for (let i = 0; i < selectTags.length; i++) {
+//         let item = selectTags[i]
+//         item.style.display = 'none'
+//         let pTag = document.createElement('span')
+//         let value = item.options[item.selectedIndex].text;
+//         pTag.innerHTML = value
+//         item.parentNode.insertBefore(pTag, item.nextSibling)
+//     }
+// }
+// hiddenSelect()
 
 function turnOnDeleteModal() {
     let modalDelete = new bootstrap.Modal(document.getElementById('delete-form-modal'));

@@ -1,5 +1,6 @@
 {% load static %}
 {% load crispy_forms_tags %}
+{% load notifications_tags %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -24,78 +25,100 @@
   <div class="container-1">
     <header>
       <div class="navbar">
-        <img class='logo' src="https://varunit.com/wp-content/uploads/2018/09/varunit-logo-square-black-bg.png" alt="">
+        <img class='logo' src="{% static 'images/ball.png' %}" alt="">
         <ul>
-          <li><a href="{% url 'book_stadium' %}">Đặt sân ngay</a></li>
-          <li><a href="{% url 'search_stadium' %}">Tìm sân</a></li>
-          {% if user.is_authenticated %}
-          <li>
-            <a class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              {{user.username}}
-            </a>
-            <div class="dropdown-menu dropdown-menu-right">
-              <a href="{% url 'user_profile' user.id %}" class="dropdown-item" type="button">Thông tin tài khoản</a>
-              {% if user.role == "owner" %}
-              <a href="#" class="dropdown-item" type="button">Sân bóng của tôi</a>
-              <a href="" class="dropdown-item" type="button">Trạng thái đặt sân</a>
-              {% else %}
-              <a href="{% url 'history_booked' user.id %}" class="dropdown-item" type="button">Lịch sử đặt sân</a>
-              {% endif %}
-              <a class="dropdown-item" href="{% url 'logout' %}">Đăng xuất</a>
-            </div>
+            <li><a href="{% url 'book_stadium' %}">Đặt sân ngay</a></li>
+            <li><a href="{% url 'search_stadium' %}">Tìm sân</a></li>
+            {% if user.is_authenticated %}
+            <li>
+                <div class="dropdown">
+                    <a href="#" class="notification dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true">
+                      <i class="fa fa-bell" style="font-size:24px"></i>
+                      <span class="badge">{% live_notify_badge %}</span>
+                    </a>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+                            {% for notification in user.notifications.all %}
 
-          </li>
-          {% else %}
-          <li><button type="button" class="btn btn-success" onclick="turnOnModalLogin()">Đăng nhập</button></li>
-          {% endif %}
+                                <div>
+                                    Message from <b>{{ notification.actor }}</b>
+                                    <a href="{% url 'notification_detail' notification.id %}" class="dropdown-item" type="button">{{ notification.verb }}</a>
+                                </div>
+                                <div class="dropdown-divider"></div>
+
+                            {% endfor %}
+                            <a href="{% url 'notifications' %}">Xem tat ca</a>
+                        </div>
+
+                </div>
+                    {% live_notify_list list_class="dropdown-menu" %}
+            </li>
+            <li>
+                <a class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                {{user.username}}
+                </a>
+                <div class="dropdown-menu dropdown-menu-right">
+                    <a href="{% url 'user_profile' user.id %}" class="dropdown-item" type="button">Thông tin tài khoản</a>
+                    {% if user.role == "owner" %}
+                    <a href="#" class="dropdown-item" type="button">Sân bóng của tôi</a>
+                    <a href="" class="dropdown-item" type="button">Trạng thái đặt sân</a>
+                    {% else %}
+                    <a href="{% url 'history_booked' user.id %}" class="dropdown-item" type="button">Lịch sử đặt sân</a>
+                    {% endif %}
+                    <a class="dropdown-item" href="{% url 'logout' %}">Đăng xuất</a>
+                </div>
+
+            </li>
+
+            {% else %}
+            <li><button type="button" class="btn btn-secondary toggle-login-modal" onclick="">Đăng nhập</button></li>
+            {% endif %}
         </ul>
     </div>
 
     </header>
     <section class="shadow">
-      {% if user.role == "owner" %}
-      <div class="col-2 sidebar shadow">
-        <div class="sidenav">
-          <button class="dropdown-btn slideIn">
-            Quản lý sân
-            <i class="fa fa-caret-down"></i>
-          </button>
-          <div class="dropdown-container" style="display: block;">
-            <ul>
-                {% for field in fields %}
-                    {% url 'stadium_detail' field.id as url %}
-                    <li class="nav-item {% if request.path == url %}active{% endif %}">
-                        <a class="field-name" href="{{ url }}">{{ field.name }}</a>
+        {% if user.role == "owner" %}
+            <nav class="sidebar">
+                <ul>
+                    <li>
+                        <a href="#" class="manage-btn">
+                            Quản lý sân
+                            <span class="fas fa-caret-up first"></span>
+                        </a>
+
+                        <ul class="stadium-manage">
+                            {% for field in fields %}
+                                {% url 'stadium_detail' field.id as url %}
+                                <li class="nav-item {% if request.path == url %}active{% endif %}">
+                                    <a class="field-name" href="{{ url }}">{{ field.name }}</a>
+                                </li>
+                            {% endfor %}
+
+                                {% url 'create_stadium' as url %}
+                                <li class="nav-item {% if request.path == url %}active{% endif %}">
+                                    <a class="field-name" href="{{ url }}">Thêm sân</a>
+                                </li>
+                        </ul>
                     </li>
-                {% endfor %}
 
-                {% url 'create_stadium' as url %}
-                <li class="nav-item {% if request.path == url %}active{% endif %}">
-                    <a class="field-name" href="{{ url }}">Thêm sân</a>
-                </li>
+                    <li>
+                        <a href="#" class="state-btn">
+                            Trạng thái sân
+                            <span class="fas fa-caret-up second"></span>
+                        </a>
 
-            </ul>
-
-
-          </div>
-          <button class="dropdown-btn slideIn">
-            Trạng thái sân
-            <i class="fa fa-caret-down"></i>
-          </button>
-          <div class="dropdown-container" style="display: block;">
-            <ul>
-                {% for field in fields %}
-                    {% url 'owner' field.id as url %}
-                        <li class="nav-item {% if request.path == url %}active{% endif %}">
-                            <a class="field-name" href="{{ url }}">{{ field.name }}</a>
-                        </li>
-                {% endfor %}
-            </ul>
-
-          </div>
-        </div>
-      </div>
-      {% endif %}
+                        <ul class="stadium-state">
+                            {% for field in fields %}
+                                {% url 'owner' field.id as url %}
+                                    <li class="nav-item {% if request.path == url %}active{% endif %}">
+                                        <a class="field-name" href="{{ url }}">{{ field.name }}</a>
+                                    </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        {% endif %}
       <div class="col">
         {%block content%}
         {% endblock %}
@@ -103,7 +126,7 @@
     </section>
   </div>
 
-  <div class="modal fade " id="login" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  <div class="modal fade " id="login-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
     aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
@@ -118,14 +141,13 @@
               <div class="mb-3">
                 <label for="exampleInputEmail1" class="form-label">Email hoặc số điện thoại</label>
                 <input type="text" class="form-control" name="email" aria-describedby="emailHelp">
-                <div id="emailHelp" class="form-text">ĐM các bạn</div>
               </div>
               <div class="mb-3">
                 <label for="exampleInputPassword1" class="form-label">Mật khẩu</label>
                 <input type="password" name="password" class="form-control" id="exampleInputPassword1">
               </div>
             </div>
-            <button type="submit" class="btn btn-success" onclick="">Đăng nhập</button>
+            <button type="submit" class="btn btn-secondary" onclick="">Đăng nhập</button>
             <p>Hoặc đăng nhập với: </p>
             <div class="social-login">
               <a href="#">
@@ -149,14 +171,14 @@
             </div>
 		{% endfor %} -->
         <div class="modal-footer base">
-          <a href="#">Quên mật khẩu</a>
-          <a href="#" onclick="turnOnModalRegister()">Tạo tài khoản mới</a>
+          <a href="{% url 'reset_password' %}">Quên mật khẩu</a>
+          <a href="#" class="toggle-register-modal" onclick="">Tạo tài khoản mới</a>
         </div>
       </div>
     </div>
   </div>
 
-    <div class="modal fade " id="register" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    <div class="modal fade " id="register-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
     aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
@@ -175,7 +197,7 @@
               </div>
               {% endfor %}
               <div class="social-login text-center">
-                <button type="submit" class="btn btn-success">Đăng ký</button>
+                <button type="submit" class="btn btn-secondary">Đăng ký</button>
                 <p>Hoặc đăng nhập với: </p>
                 <a href="#" class="text-center">
                   <i class="fa fa-facebook-official fa-2x" aria-hidden="true"></i>
@@ -196,9 +218,7 @@
       </div>
     </div>
   </div>
-  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-    integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
-    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
     integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
     crossorigin="anonymous"></script>
@@ -209,6 +229,9 @@
     integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0"
     crossorigin="anonymous"></script>
   <script src="{% static 'js/base.js' %}" type="text/javascript"></script>
+  <script src="{% static 'notifications/notify.js' %}" type="text/javascript"></script>
+  <script src="slideToggle.min.js"></script>
+    {% register_notify_callbacks callbacks='fill_notification_list,fill_notification_badge' %}
   {% block javascript %}
   {% endblock %}
 </body>

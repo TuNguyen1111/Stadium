@@ -1,3 +1,14 @@
+$(document).ready(function() {
+    function turnOnModalDelete(id) {
+        $(`delete ${id}`).modal('show')
+    }
+
+    function turnOnModalAccept(id) {
+        $(`accept ${id}`).modal('show')
+    }
+})
+
+
 function turnOnModalDelete(id) {
     var modalDelete = new bootstrap.Modal(document.getElementById(`delete ${id}`));
     modalDelete.show();
