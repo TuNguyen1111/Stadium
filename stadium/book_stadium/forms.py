@@ -3,7 +3,7 @@ from django.contrib.auth.forms import UserCreationForm
 from .models import User, Order, Stadium, StadiumTimeFrame
 from crispy_forms.helper import FormHelper
 from django.contrib.auth.hashers import make_password
-from .models import User, Stadium, StadiumTimeFrame, TimeFrame, Order
+from .models import User, Stadium, StadiumTimeFrame, TimeFrame, Order, Comment
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from random import choice
@@ -194,7 +194,7 @@ class StadiumTimeFrameForm(forms.ModelForm):
     time_frame = forms.ModelChoiceField(queryset=TimeFrame.objects.all(), disabled=True)
     class Meta:
         model = StadiumTimeFrame
-        fields = ['time_frame', 'price']
+        fields = ['time_frame', 'price', 'is_open']
 
 class UserProfileForm(forms.ModelForm):
     class Meta:
@@ -280,4 +280,14 @@ class ChangeNumberOfStadium11Form(forms.Form):
     #         raise forms.ValidationError('San nay da duoc dat, vui long chon san khac!')
     #     return self.cleaned_data
 
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['comment']
+        labels = {
+            'comment': 'Bình luận'
+        }
+        widgets = {
+                   "comment":forms.TextInput(attrs={'id':'comment-input'}),
+                }
 

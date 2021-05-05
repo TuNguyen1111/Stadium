@@ -36,17 +36,18 @@
                       <i class="fa fa-bell" style="font-size:24px"></i>
                       <span class="badge">{% live_notify_badge %}</span>
                     </a>
-                        <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
-                            {% for notification in user.notifications.all %}
+                        <div class="dropdown-menu notification-dropdown" aria-labelledby="dropdownMenu2">
+                            <div class="notification">
+                                {% for notification in user.notifications.all %}
+                                    <div>
+                                        <a href="{% url 'notification_detail' notification.id %}" class="dropdown-item" type="button">{{ notification.verb }}</a>
+                                    </div>
+                                    <div class="dropdown-divider"></div>
+                                {% endfor %}
 
-                                <div>
-                                    Message from <b>{{ notification.actor }}</b>
-                                    <a href="{% url 'notification_detail' notification.id %}" class="dropdown-item" type="button">{{ notification.verb }}</a>
-                                </div>
-                                <div class="dropdown-divider"></div>
+                            </div>
 
-                            {% endfor %}
-                            <a href="{% url 'notifications' %}">Xem tat ca</a>
+                            <a id="all-notification-link" href="{% url 'notifications' %}">Xem tất cả</a>
                         </div>
 
                 </div>
@@ -56,7 +57,7 @@
                 <a class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 {{user.username}}
                 </a>
-                <div class="dropdown-menu dropdown-menu-right">
+                <div class="dropdown-menu dropdown-menu-right username-dropdown">
                     <a href="{% url 'user_profile' user.id %}" class="dropdown-item" type="button">Thông tin tài khoản</a>
                     {% if user.role == "owner" %}
                     <a href="#" class="dropdown-item" type="button">Sân bóng của tôi</a>
@@ -165,11 +166,13 @@
             </div>
           </form>
         </div>
-        <!-- {% for message in messages %}
-            <div id="error-message" class="alert alert-danger" role="alert">
+
+
+        {% for message in messages %}
+            <div id="message-{{ message.tags }}" class="alert alert-danger" role="alert">
                 {{message}}
             </div>
-		{% endfor %} -->
+        {% endfor %}
         <div class="modal-footer base">
           <a href="{% url 'reset_password' %}">Quên mật khẩu</a>
           <a href="#" class="toggle-register-modal" onclick="">Tạo tài khoản mới</a>

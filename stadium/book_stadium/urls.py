@@ -29,7 +29,8 @@ urlpatterns = [
     path('reset-mat-khau-thanh-cong/', auth_views.PasswordResetCompleteView.as_view(template_name='password_reset/password_reset_done.html'), name='password_reset_complete'),
 
     path('thong-bao/', views.Notifications.as_view(), name='notifications'),
-    path('chi-tiet-thong-bao/<int:id>', views.NotificationDetail.as_view(), name='notification_detail')
+    path('chi-tiet-thong-bao/<int:id>', views.NotificationDetail.as_view(), name='notification_detail'),
+    path('xoa-khung-gio/<int:id>', views.DeleteTimeframe.as_view(), name='delete_timeframe')
 
 
 ]

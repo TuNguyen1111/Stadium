@@ -2,24 +2,44 @@
 var pencils = document.querySelectorAll('i')
 var stadiumFormDetail = document.querySelector('.stadium-form-detail').querySelectorAll('input')
 var stadiumFormTimeFrames = document.querySelector('.stadium-form-time-frames').querySelectorAll('input')
+console.log(stadiumFormTimeFrames)
+
 var oldValuesDetail = {}
 var oldValuesTimeFrames = {}
+
+const commentInput = document.getElementById('comment-input')
 
 for (let i = 1; i < stadiumFormDetail.length; i++) {
     oldValuesDetail[stadiumFormDetail[i].id] = stadiumFormDetail[i].value
 }
-console.log(oldValuesDetail)
+
 for (let i = 1; i < stadiumFormTimeFrames.length; i++) {
-    oldValuesTimeFrames[stadiumFormTimeFrames[i].id] = stadiumFormTimeFrames[i].value
+    if ( stadiumFormTimeFrames[i].checked || !stadiumFormTimeFrames[i].checked ) {
+        oldValuesTimeFrames[stadiumFormTimeFrames[i].id] = stadiumFormTimeFrames[i].checked
+    }else{
+        oldValuesTimeFrames[stadiumFormTimeFrames[i].id] = stadiumFormTimeFrames[i].value
+    }
+
 }
 
 function getInput() {
     let getData = this.getAttribute('data-name')
+    let dataCheck = this.getAttribute('data-check')
+    let checkBox = document.getElementById(dataCheck)
+
     let input = document.getElementById(getData)
     if (input.disabled) {
         input.disabled = false
     }else {
         input.disabled = true
+    }
+
+    if ( checkBox ) {
+        if ( checkBox.disabled ) {
+            checkBox.disabled = false
+        }else {
+            checkBox.disabled = true
+        }
 
     }
 }
@@ -32,6 +52,7 @@ for (let i = 0; i < pencils.length;i++) {
 function checkValueOfDetailInput() {
     let current = this.value
     let saveBtn = document.getElementById('saveDetailBtn')
+
     if (current != oldValuesDetail[this.id]) {
         saveBtn.disabled = false
         for (let i = 0; i < stadiumFormDetail.length; i++){
@@ -39,12 +60,15 @@ function checkValueOfDetailInput() {
         }
     }else {
         saveBtn.disabled = true
-
     }
 }
 
 function checkValueOfTimeFrameInput() {
     let current = this.value
+    if (this.checked) {
+        current = this.checked
+    }
+
     let saveBtn = document.getElementById('saveTimeFramesBtn')
     if (current != oldValuesTimeFrames[this.id]) {
         saveBtn.disabled = false
@@ -68,21 +92,12 @@ function addEventInput() {
 
 addEventInput()
 
-// function hiddenSelect() {
-//     let selectTags = document.querySelectorAll('select')
-//     for (let i = 0; i < selectTags.length; i++) {
-//         let item = selectTags[i]
-//         item.style.display = 'none'
-//         let pTag = document.createElement('span')
-//         let value = item.options[item.selectedIndex].text;
-//         pTag.innerHTML = value
-//         item.parentNode.insertBefore(pTag, item.nextSibling)
-//     }
-// }
-// hiddenSelect()
-
 function turnOnDeleteModal() {
     let modalDelete = new bootstrap.Modal(document.getElementById('delete-form-modal'));
     modalDelete.show()
 }
 
+function tunrOndeleteTimeFrameModal(id) {
+    let timeframeDeleteModal = new bootstrap.Modal(document.getElementById(`delete-timeframe-${id}`))
+    timeframeDeleteModal.show()
+}

@@ -17,5 +17,14 @@ $(document).ready(function(){
         $('#login-modal').modal('hide');
         $('#register-modal').modal('show');
     });
+
+    if ( $('#error_1_id_email_or_phone').length ) {
+        $('#register-modal').modal('show');
+        console.log($('#error_1_id_email_or_phone'))
+    }
+
+    if ( $(`#message-info`).length ) {
+        $('#login-modal').modal('show');
+    }
 })
 

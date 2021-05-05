@@ -31,6 +31,8 @@ admin.site.register(Stadium)
 admin.site.register(TimeFrame)
 admin.site.register(StadiumTimeFrame, AdminTimeFrame)
 admin.site.register(Order)
+admin.site.register(Comment)
+admin.site.register(StadiumComment)
 
 # class UserCreationForm(forms.ModelForm):
 #     class Meta:

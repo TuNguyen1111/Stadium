@@ -91,7 +91,7 @@ section{
     /* position: fixed; */
 
     width: 300px;
-    background: #555;
+    background: rgb(104, 103, 103);
     color: rgb(255, 255, 255);
 }
 
@@ -147,7 +147,7 @@ section{
 
 .col {
     display: flex;
-    /* height: 100vh; */
+    height: 100vh;
 }
 
 /* .stadium-manage {
@@ -160,3 +160,24 @@ section{
     border-left: 3px solid rgb(167, 167, 167);
 }
 
+.username-dropdown a {
+    color: black;
+}
+
+
+.notification-dropdown a {
+    color: black;
+}
+
+.dropdown .notification-dropdown.show .notification {
+    height: 300px;
+    overflow-y: scroll;
+    color: black
+}
+
+a#all-notification-link {
+    display: block;
+    width: 100%;
+    text-align: center;
+    background-color: rgb(245, 229, 209);
+}

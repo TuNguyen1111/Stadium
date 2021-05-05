@@ -6,7 +6,7 @@ from django.contrib.auth.hashers import make_password
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import update_session_auth_hash
 from django.forms import inlineformset_factory
-from django.shortcuts import HttpResponse, redirect, render
+from django.shortcuts import HttpResponse, redirect, render, get_object_or_404
 from django.contrib.auth.forms import PasswordChangeForm
 from django.views import View
 from django.views.generic.edit import FormView
@@ -22,8 +22,8 @@ from random import choice
 import datetime
 
 from .forms import (OrderForm, StadiumForm, StadiumTimeFrameForm, StadiumFormForUser,
-                    UserCreationForm, UserProfileForm, ChangeNumberOfStadium7Form, ChangeNumberOfStadium11Form)
-from .models import Order, Stadium, StadiumTimeFrame, TimeFrame, User
+                    UserCreationForm, UserProfileForm, ChangeNumberOfStadium7Form, ChangeNumberOfStadium11Form, CommentForm)
+from .models import Order, Stadium, StadiumTimeFrame, TimeFrame, User, Comment, StadiumComment
 from .myBackend import CustomBackend
 
 # Create your views here.
@@ -91,7 +91,7 @@ class Login(View):
                 if user.username == '' or user.phone_number == '':
                     return redirect('user_profile', user.id)
         else:
-            messages.info(request, 'Tên đăng nhập hoặc mật khẩu không đúng! Thử lại hộ cái bạn êiiiiii')
+            messages.info(request, 'Tên đăng nhập hoặc mật khẩu không đúng!')
         return redirect('home')
 
 class Logout(View):
@@ -273,7 +273,7 @@ class CreateStadium(LoginRequiredMixin, View):
                 time_frame=i,
                 price=300000,
             )
-        messages.info(request, 'Tạo sân thành công!')
+        messages.success(request, 'Tạo sân thành công!')
         return redirect('stadium_detail', pk=stadium.id)
 
 class StadiumDetail(LoginRequiredMixin, View):
@@ -288,13 +288,21 @@ class StadiumDetail(LoginRequiredMixin, View):
         formDetail = StadiumForm(instance=current_stadium)
         formTimeFrame = self.formset(instance=current_stadium)
         form_detail_for_user = StadiumFormForUser(instance=current_stadium)
+        comment_form = CommentForm()
+
+        comments_of_stadium, created = StadiumComment.objects.get_or_create(stadium=current_stadium)
+        if created == True:
+            comments_of_stadium = StadiumComment.objects.get(stadium=current_stadium)
+
         page_info = {
             'fields':fields_by_owner,
             'stadium': current_stadium,
             'times_and_prices': times_and_prices,
             'formDetail': formDetail,
             'formTimeFrame': formTimeFrame,
-            'form_detail_for_user': form_detail_for_user
+            'form_detail_for_user': form_detail_for_user,
+            'comments_of_stadium': comments_of_stadium,
+            'comment_form': comment_form
         }
         return render(
             request,
@@ -323,6 +331,17 @@ class StadiumDetail(LoginRequiredMixin, View):
         elif formname == 'delete-input':
             stadium.delete()
             return redirect('book_stadium')
+        elif formname == "form-comment":
+            comment = request.POST.get('comment')
+            new_comment = Comment.objects.create(user=request.user, comment=comment)
+            new_comment.save()
+
+            stadium_comments = StadiumComment.objects.get(stadium=stadium)
+            stadium_comments.comment.add(new_comment)
+            stadium_comments.save()
+        elif formname == 'accept-delete-timeframe':
+            pass
+
         messages.success(request, 'Cập nhật thành công!')
         return redirect('stadium_detail', pk=stadium.id)
 
@@ -351,7 +370,7 @@ class BookStadium(ListView):
     def get(self, request):
         register_form = UserCreationForm
         order_form = self.form_class
-        stadium_timeframes = StadiumTimeFrame.objects.all().order_by('time_frame__start_time')
+        stadium_timeframes = StadiumTimeFrame.objects.filter(is_open=True).order_by('time_frame__start_time')
         all_stadiums = []
         stadium_search_result = []
         self.put_out_null_stadiums_and_timesframe(all_stadiums, stadium_timeframes)
@@ -385,17 +404,23 @@ class BookStadium(ListView):
 
     def post(self, request):
         order_form = self.form_class(request.POST)
-        type_stadium = request.POST.get('type_stadium')
 
         if order_form.is_valid():
             order = order_form.save()
+            stadium_name_notification = order.stadium_time_frame.stadium.name
+            timeframe_notification = order.stadium_time_frame.time_frame
+            date_notification = order.order_date
             receiver = order.stadium_time_frame.stadium.owner
-            sender = request.user
+            sender_name = order.customer_name
             user = request.user
             if user.is_authenticated:
                 order.user = user
                 order.save()
-            notify.send(sender, recipient=receiver, verb=f'Thông báo từ {sender}', description=f'Bạn có một người đặt mới')
+                sender = request.user
+            else:
+                sender = User.objects.get(id=10)
+            notify.send(sender, recipient=receiver, verb=f'Thông báo từ {sender_name}', description=f'{sender_name} đã đặt sân {stadium_name_notification} của bạn vào ngày {date_notification}, khung giờ {timeframe_notification}')
+
             messages.success(request, 'Đặt sân thành công!')
         else:
             messages.error(request, 'Đặt sân thất bại!')
@@ -620,6 +645,8 @@ class HistoryBookedOfUser(View):
 class SearchStadium(BookStadium):
     def get(self, request):
         order_form = self.form_class
+        user = request.user
+
         all_stadiums = Stadium.objects.all()
         stadium_search_result = []
 
@@ -634,16 +661,22 @@ class SearchStadium(BookStadium):
 
         self.search_stadium(stadium_search_result, day_search, time_frame_search, address_search, stadium_name_search)
 
-        import json
-        # print(json.dumps(all_stadiums, indent=4))
+
+        # import json
+        # # print(json.dumps(all_stadiums, indent=4))
 
         context = {
+            # 'fields': fields_by_owner,
             'stadiums': all_stadiums,
             'page_obj': page_obj,
             'order_form': order_form,
             'stadium_search_result': stadium_search_result,
 
         }
+
+        if user.is_authenticated:
+            fields_by_owner = Stadium.objects.filter(owner=user)
+            context['fields'] = fields_by_owner
         return render(request, 'book_stadium/searchStadium.html', context)
 
     def check_is_same_stadium(self, current_timeframe, stadium_of_timeframe, timeframe):
@@ -715,7 +748,7 @@ class isAccepted(View):
                     for number in list_field_number:
                         if len(three_field_merge) < 3:
                             three_field_merge.append(number)
-                            list_field_number.remove(number)
+                            # list_field_number.remove(number)
                     order.field_numbers = three_field_merge
 
             order.is_accepted = True
@@ -723,6 +756,7 @@ class isAccepted(View):
             notify.send(sender, recipient=receiver, verb=f'Thông báo từ {sender}',
                 description=f'Sân {order.stadium_time_frame.stadium.name} bạn đặt vào ngày {order.order_date}, khung giờ {order.stadium_time_frame.time_frame} đã được duyệt! ')
 
+            #Gui thong bao "het san" cho nhung nguoi khac
             if not list_field_number:
                 users_list = list()
                 orders_not_accepted = Order.objects.filter(stadium_time_frame=stadium_timeframe, order_date=order_date, is_accepted=False)
@@ -734,7 +768,6 @@ class isAccepted(View):
                 notify.send(sender, recipient=receiver, verb=f'Thông báo từ {sender}',
                     description=f'Sân {order.stadium_time_frame.stadium.name} bạn đặt vào ngày {order.order_date}, khung giờ {order.stadium_time_frame.time_frame} đã hết sân! Vui lòng chọn khung giờ khác! ')
             messages.success(request, 'Đã duyệt!')
-
 
         elif form_type == 'accept-delete':
             order.delete()
@@ -758,16 +791,17 @@ class ChangeNumberOfField(View):
 
         return redirect('owner', id=order.stadium_time_frame.stadium.id)
 
-
 class Notifications(View):
     def get(self, request):
         user = request.user
         notifications = user.notifications.all()
+        fields_by_owner = Stadium.objects.filter(owner=request.user)
         for notification in notifications:
             if notification.unread:
                 notification.unread = False
                 notification.save()
         context = {
+            'fields': fields_by_owner,
             'notifications': notifications
         }
         return render(request, 'book_stadium/notifications.html', context)
@@ -775,11 +809,21 @@ class Notifications(View):
 class NotificationDetail(View):
     def get(self, request, id):
         notify = Notification.objects.get(id=id)
+        fields_by_owner = Stadium.objects.filter(owner=request.user)
         if notify.unread:
             notify.unread = False
             notify.save()
         context = {
+            'fields': fields_by_owner,
             'notify': notify
         }
 
         return render(request, 'book_stadium/notificationDetail.html', context)
+
+class DeleteTimeframe(View):
+    def post(self, request, id):
+        stadium_timeframe = StadiumTimeFrame.objects.get(id=id)
+        print(stadium_timeframe)
+        stadium = stadium_timeframe.stadium
+        stadium_timeframe.delete()
+        return redirect('stadium_detail', stadium.id)

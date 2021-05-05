@@ -21,7 +21,7 @@
         {% endif %}
     {% endfor %}
 
-    <div class="content">
+    <div class="container content">
         <div class="overview">
             {% if stadium_search_result %}
                 <h1 id="title">Kết quả tìm kiếm</h1>
@@ -81,7 +81,7 @@
                                             <hr>
                                             <p class="card-text">Địa chỉ: {{ stadium.address }}</p>
                                             <hr>
-                                            <button stadium-name="{{ stadium.name }}" user-name="{{ user.username }}" user-phone-number="{{ user.phone_number }}" onclick="focusForm(event)">Đặt sân</button>
+                                            <button class="order-btn" stadium-name="{{ stadium.name }}" user-name="{{ user.username }}" user-phone-number="{{ user.phone_number }}" onclick="focusForm(event)">Đặt sân</button>
                                         </div>
                                     </div>
                                 </div>
@@ -128,10 +128,11 @@
         <div class="form-submit">
             <div class="form-search">
                 <div class="dropdown search dropdown-style">
-                    <button class="btn btn-secondary dropdown-toggle style-btn" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Tìm kiếm
+                    <button class="btn btn-secondary search-btn-dropdown" type="button" id="dropdownMenuButton">
+                        <a>Tìm kiếm</a>
+                        <span class="fas fa-caret-down first"></span>
                     </button>
-                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <div class="search-show shadow" aria-labelledby="dropdownMenuButton">
                         <form method="GET" action="">
                             <div class="form-style">
 
@@ -147,7 +148,7 @@
 
                                 <div class="form-group">
                                     <label for="day">Ngày</label>
-                                    <input type="text" name="day-search" class="form-control" id="day" placeholder="Nhập ngày" value="{{ page_obj.0.ngay }}">
+                                    <input type="text" name="day-search" class="form-control" id="day" placeholder="Nhập ngày" value="{{page_obj.0.ngay}}">
                                 </div>
 
                                 <div class="form-group">
@@ -155,7 +156,7 @@
                                 </div>
 
                                 <div class="submit-btn">
-                                    <button type="submit" class="btn btn-primary mt-3" onclick="checkInputField(event)">Tìm kiếm</button>
+                                    <button type="submit" class="btn btn-secondary mt-3">Tìm kiếm</button>
                                 </div>
                             </div>
                         </form>
@@ -165,16 +166,17 @@
 
             <div class="form-order">
                 <div id="dropdown-btn" class="dropdown search dropdown-style">
-                    <button class="btn btn-secondary dropdown-toggle style-btn" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Đặt sân
+                    <button class="btn btn-secondary order-btn-dropdown" type="button" id="dropdownMenuButton">
+                        <a>Đặt sân</a>
+                        <span class="fas fa-caret-down first"></span>
                     </button>
-                    <div id="dropdown-form" class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <div id="dropdown-form" class="order-show shadow" >
                         <form method="POST" action="">
                             {% csrf_token %}
                             <div class="form-style">
-                                {{ order_form|crispy }}
+                                {{order_form|crispy}}
                                     <div class="submit-btn">
-                                        <button type="submit" class="btn btn-primary mt-3">Đặt</button>
+                                        <button type="submit" class="btn btn-secondary mt-3">Đặt</button>
                                     </div>
                             </div>
                         </form>

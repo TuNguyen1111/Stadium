@@ -58,7 +58,7 @@
                     <td>
                         {% if value.nguoi_dat %}
                             {% for users in value.nguoi_dat %}
-                                <p>{{users.sdt}} ( {{users.ten}} )</p>
+                                <p>{{ users.ten }}: {{ users.sdt }}</p>
                             {% endfor %}
                         {% else %}
                             <p>Chưa có người đặt</p>
@@ -208,7 +208,7 @@
                                                     <input type="hidden" name="form_type" value="accept-delete">
                                                     <input type="submit" class="btn btn-success" value="Xóa">
                                                 </form>
-                                                <input type="submit" class="btn btn-secondary" value="Hủy">
+                                                <input type="submit" class="btn btn-secondary" data-bs-dismiss="modal" value="Hủy">
                                             </div>
                                         </div>
                                     </div>

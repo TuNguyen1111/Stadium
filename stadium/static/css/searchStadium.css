@@ -1,3 +1,7 @@
 .stadiums {
     display: flex;
 }
+
+.col {
+    height: 100vh;
+}
