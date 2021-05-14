@@ -6,7 +6,7 @@ from django.contrib.auth import views as auth_views
 
 from . import views
 urlpatterns = [
-    path('', views.Home.as_view(), name='home'),
+    path('home/', views.Home.as_view(), name='home'),
     path('social-auth/', include('social_django.urls', namespace="social")),
     path('login/', views.Login.as_view(), name='login'),
     path('logout/', views.Logout.as_view(), name='logout'),
@@ -14,9 +14,9 @@ urlpatterns = [
     path('register/', views.Register.as_view(), name='register'),
     path('them-san/', views.CreateStadium.as_view(), name='create_stadium'),
     path('chi-tiet-san/<int:pk>', views.StadiumDetail.as_view(), name='stadium_detail'),
-    path('accepted/<int:id>', views.isAccepted.as_view(), name='accepted'),
+    path('accepted/<int:id>', views.AcceptOrderView.as_view(), name='accepted'),
     path('trang-ca-nhan/<int:id>', views.UserProfile.as_view(), name='user_profile'),
-    path('dat-san/', views.BookStadium.as_view(), name='book_stadium'),
+    path('', views.BookStadium.as_view(), name='book_stadium'),
     path('lich-su-dat-san/<int:id>', views.HistoryBookedOfUser.as_view(), name="history_booked"),
     path('tim-kiem-san/', views.SearchStadium.as_view(), name="search_stadium"),
     path('thay-doi-vi-tri-san/<int:id>', views.ChangeNumberOfField.as_view(), name='field_number_change'),
@@ -30,9 +30,7 @@ urlpatterns = [
 
     path('thong-bao/', views.Notifications.as_view(), name='notifications'),
     path('chi-tiet-thong-bao/<int:id>', views.NotificationDetail.as_view(), name='notification_detail'),
-    path('xoa-khung-gio/<int:id>', views.DeleteTimeframe.as_view(), name='delete_timeframe')
-
-
+    path('doanh-thu/', views.OwnerProfit.as_view(), name='owner_profit'),
 ]
 
 urlpatterns += staticfiles_urlpatterns()

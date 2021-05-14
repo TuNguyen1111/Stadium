@@ -22,7 +22,7 @@
             {% if stadium_search_result %}
                 <h1 id="title">Kết quả tìm kiếm</h1>
                 {% for stadium in stadium_search_result %}
-                    <div class="day">
+                    <div class="day shadow">
                         <h2>Ngày: {{ stadium.ngay }}</h2>
                         <hr>
                         {% for key, stadiumTimeframe in stadium.khung_gio.items %}
@@ -66,7 +66,7 @@
             {% else %}
                 <h1 id="title">Các sân và khung giờ còn trống</h1>
                 {% for stadium in page_obj %}
-                    <div class="day">
+                    <div class="day shadow">
                         <h2>Ngày: {{ stadium.ngay }}</h2>
                         <hr>
                         {% for key, stadiumTimeframe in stadium.khung_gio.items %}

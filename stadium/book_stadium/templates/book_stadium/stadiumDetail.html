@@ -1,7 +1,6 @@
 {% extends 'book_stadium/base.html' %}
 {% load static %}
 {% load crispy_forms_tags %}
-
 {% load humanize %}
 {% block css %}
 <link rel="stylesheet" href="{% static 'css/stadiumDetail.css' %}">
@@ -34,7 +33,7 @@
                             </div>
                         {% endfor %}
                         <input type="hidden" name="form_type" value="form_detail">
-                        <button type="submit" id="saveDetailBtn" class="btn btn-success mt-5" disabled="true">Lưu thông tin</button>
+                        <button type="submit" id="saveDetailBtn" class="btn btn-primary mt-5" disabled="true">Lưu thông tin</button>
                     {% else %}
                         {% for input in form_detail_for_user.visible_fields %}
                             <div class="form-group mt-4">
@@ -105,7 +104,7 @@
                 </table>
                 <input type="hidden" name="form_type" value="form_time">
                 {% if stadium.owner == user %}
-                    <button type="submit" id="saveTimeFramesBtn" class="btn btn-success mt-5 mb-5" disabled="true">Lưu khung giờ</button>
+                    <button type="submit" id="saveTimeFramesBtn" class="btn btn-primary mt-5 mb-5" disabled="true">Lưu khung giờ</button>
                 {% endif %}
                 </form>
             </div>
@@ -120,7 +119,7 @@
     <hr>
     <div class="comments-section">
         <div class="all-comments">
-            {% for comment in comments_of_stadium.comment.all %}
+            {% for comment in comments_of_stadium %}
                 <a class="mr-2" href="#">{{ comment.user.username}}</a>
                 <h4>{{comment.comment}}</h4>
                 <hr>
@@ -132,7 +131,7 @@
               {% csrf_token %}
               {{comment_form.comment|as_crispy_field}}
               <input type="hidden" name="form_type" value="form-comment">
-              <button class="btn btn-secondary" type="submit">Bình luận</button>
+              <button id="comment-btn" class="btn btn-primary" type="submit">Bình luận</button>
             </form>
         </div>
     </div>
@@ -153,7 +152,7 @@
                     <form class="form-accept" method="POST" action="">
                         {% csrf_token %}
                         <input type="hidden" name="form_type" value="delete-input">
-                        <input type="submit" class="btn btn-success" value="Có">
+                        <input type="submit" class="btn btn-danger" value="Có">
                     </form>
                     <input type="submit" class="btn btn-secondary" data-bs-dismiss="modal" value="Hủy">
                 </div>
@@ -162,5 +161,5 @@
     </div>
 {% endblock %}
 {% block javascript %}
-<script src="{% static 'js/stadiumDetail.js' %}"></script>
+    <script src="{% static 'js/stadiumDetail.js' %}"></script>
 {% endblock %}

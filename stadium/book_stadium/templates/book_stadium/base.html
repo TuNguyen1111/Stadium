@@ -54,8 +54,8 @@
                     {% live_notify_list list_class="dropdown-menu" %}
             </li>
             <li>
-                <a class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                {{user.username}}
+                <a href="" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {{user.username}}
                 </a>
                 <div class="dropdown-menu dropdown-menu-right username-dropdown">
                     <a href="{% url 'user_profile' user.id %}" class="dropdown-item" type="button">Thông tin tài khoản</a>
@@ -65,6 +65,7 @@
                     {% else %}
                     <a href="{% url 'history_booked' user.id %}" class="dropdown-item" type="button">Lịch sử đặt sân</a>
                     {% endif %}
+                    <a class="dropdown-item" href="{% url 'password_change' %}">Đổi mật khẩu</a>
                     <a class="dropdown-item" href="{% url 'logout' %}">Đăng xuất</a>
                 </div>
 

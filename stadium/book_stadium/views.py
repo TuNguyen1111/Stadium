@@ -7,9 +7,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import update_session_auth_hash
 from django.forms import inlineformset_factory
 from django.shortcuts import HttpResponse, redirect, render, get_object_or_404
+from django.http import JsonResponse
 from django.contrib.auth.forms import PasswordChangeForm
 from django.views import View
-from django.views.generic.edit import FormView
+from django.views.generic.edit import FormView, CreateView
 from django.views.generic import ListView
 from django.core.paginator import Paginator
 from django.utils import timezone
@@ -23,9 +24,10 @@ import datetime
 
 from .forms import (OrderForm, StadiumForm, StadiumTimeFrameForm, StadiumFormForUser,
                     UserCreationForm, UserProfileForm, ChangeNumberOfStadium7Form, ChangeNumberOfStadium11Form, CommentForm)
-from .models import Order, Stadium, StadiumTimeFrame, TimeFrame, User, Comment, StadiumComment
+from .models import Order, Stadium, StadiumTimeFrame, TimeFrame, User, Comment
 from .myBackend import CustomBackend
 
+import json
 # Create your views here.
 
 MY_BACKEND = CustomBackend()
@@ -262,9 +264,6 @@ class CreateStadium(LoginRequiredMixin, View):
             instance = create_stadium_form.save(commit=False)
             instance.owner = owner
             instance.save()
-        else:
-            # tương tự, nhớ đẩy error về cho HTML
-            print(create_stadium_form.errors)
         stadium = Stadium.objects.get(name=request.POST.get("name"))
         time_frames = TimeFrame.objects.all()
         for i in time_frames:
@@ -288,11 +287,8 @@ class StadiumDetail(LoginRequiredMixin, View):
         formDetail = StadiumForm(instance=current_stadium)
         formTimeFrame = self.formset(instance=current_stadium)
         form_detail_for_user = StadiumFormForUser(instance=current_stadium)
+        comments_of_stadium = Comment.objects.filter(stadium=current_stadium)
         comment_form = CommentForm()
-
-        comments_of_stadium, created = StadiumComment.objects.get_or_create(stadium=current_stadium)
-        if created == True:
-            comments_of_stadium = StadiumComment.objects.get(stadium=current_stadium)
 
         page_info = {
             'fields':fields_by_owner,
@@ -331,16 +327,11 @@ class StadiumDetail(LoginRequiredMixin, View):
         elif formname == 'delete-input':
             stadium.delete()
             return redirect('book_stadium')
+
         elif formname == "form-comment":
             comment = request.POST.get('comment')
-            new_comment = Comment.objects.create(user=request.user, comment=comment)
+            new_comment = Comment.objects.create(user=request.user, stadium=stadium, comment=comment)
             new_comment.save()
-
-            stadium_comments = StadiumComment.objects.get(stadium=stadium)
-            stadium_comments.comment.add(new_comment)
-            stadium_comments.save()
-        elif formname == 'accept-delete-timeframe':
-            pass
 
         messages.success(request, 'Cập nhật thành công!')
         return redirect('stadium_detail', pk=stadium.id)
@@ -363,7 +354,8 @@ class UserProfile(View):
         form = self.form_class(request.POST, instance=user)
         if form.is_valid():
             form.save()
-        return redirect('home')
+        messages.success(request, 'Cập nhật thông tin thành công!')
+        return redirect('user_profile', user.id)
 
 class BookStadium(ListView):
     form_class = OrderForm
@@ -713,7 +705,7 @@ class PasswordChange(View):
             messages.success(request, 'Thay đổi mật khẩu thành công!')
         return redirect('password_change')
 
-class isAccepted(View):
+class AcceptOrderView(View):
     def post(self, request, id):
         form_type = request.POST.get('form_type')
         order = Order.objects.get(id=id)
@@ -820,10 +812,162 @@ class NotificationDetail(View):
 
         return render(request, 'book_stadium/notificationDetail.html', context)
 
-class DeleteTimeframe(View):
-    def post(self, request, id):
-        stadium_timeframe = StadiumTimeFrame.objects.get(id=id)
-        print(stadium_timeframe)
-        stadium = stadium_timeframe.stadium
-        stadium_timeframe.delete()
-        return redirect('stadium_detail', stadium.id)
+class OwnerProfit(View):
+    def get(self, request):
+
+        user = request.user
+        fields_by_owner = Stadium.objects.filter(owner=user)
+        stadium_sales_of_two_recent_months = self.get_stadium_sales_of_two_recent_months(fields_by_owner)
+        stadiums_sales_information_in_lastest_12_months = self.general_stadium_sales_in_lastest_12_months(fields_by_owner)
+
+        if request.is_ajax():
+            data = request.GET.get('datasend')
+            return JsonResponse({'sales': stadiums_sales_information_in_lastest_12_months})
+
+        context = {
+            'fields': fields_by_owner,
+            'stadium_sales_of_two_recent_months': stadium_sales_of_two_recent_months,
+        }
+        print(stadium_sales_of_two_recent_months)
+        return render(request, 'book_stadium/ownerProfit.html', context)
+
+
+    def get_stadium_sales_of_two_recent_months(self, fields_by_owner):
+        current_date = date.today()
+        current_month = current_date.month
+        last_month = current_date.month - 1
+        sales_of_current_month = 0
+        sales_of_last_month = 0
+        sales = {}
+
+        for stadium in fields_by_owner:
+            orders = Order.objects.filter(stadium_time_frame__stadium=stadium, is_accepted=True)
+            is_same_current_month = False
+            is_same_last_month = False
+
+            for order in orders:
+                order_month = self.get_order_month(order)
+                is_same_current_month = order_month == current_month
+                is_same_last_month = order_month == last_month
+
+                if is_same_current_month:
+                    sales_of_current_month += order.stadium_time_frame.price
+                if is_same_last_month:
+                    sales_of_last_month += order.stadium_time_frame.price
+
+        sales['current_month_sales'] = sales_of_current_month
+        sales['last_month_sales'] = sales_of_last_month
+
+        return sales
+
+    def get_stadium_sales_in_lastest_12_months(self, stadium):
+        stadium_sales = dict()
+        remaining_months = 12
+        current_month = 1
+        current_year = date.today().year
+        oldest_month_in_profit = 0
+        oldest_year_in_profit = 0
+        is_same_month = False
+        is_same_year = False
+        orders = Order.objects.filter(stadium_time_frame__stadium=stadium).order_by('-order_date')
+
+        if orders:
+            for order in orders:
+                if remaining_months > 0:
+                    order_month, order_year = self.get_order_month_and_year(order)
+                    is_same_month = order_month == current_month
+                    is_same_year = order_year == current_year
+                    money = order.stadium_time_frame.price
+                    if not is_same_month or not is_same_year:
+                        remaining_months -= 1
+                        current_month = order_month
+                        current_year = order_year
+                        stadium_sales = self.set_stadium_name_in_stadium_sales(stadium_sales, stadium)
+                        if 'months_and_year' not in stadium_sales:
+                            months_and_year = list()
+                            stadium_sales['months_and_year'] = months_and_year
+                        else:
+                            months_and_year = stadium_sales['months_and_year']
+
+                        if 'sales' not in stadium_sales:
+                            sales = list()
+                            stadium_sales['sales'] = sales
+                        else:
+                            sales = stadium_sales['sales']
+
+                        months_and_year.append(f'{order_month}-{order_year}')
+                        sales.append(money)
+                    elif is_same_month and is_same_year:
+                        stadium_sales['sales'][-1] += money
+
+            if remaining_months:
+                while remaining_months > 0:
+                    current_month -= 1
+                    if current_month == 0:
+                        current_month = 12
+                        current_year -= 1
+
+                    stadium_sales['months_and_year'].append(f'{current_month}-{current_year}')
+                    stadium_sales['sales'].append(0)
+                    remaining_months -= 1
+
+        else:
+            stadium_sales = self.get_stadium_with_no_sales_in_lastest_12_months(stadium_sales, stadium, current_year)
+        return stadium_sales
+
+    def get_stadium_with_no_sales_in_lastest_12_months(self, stadium_sales, stadium, current_year):
+        stadium_sales = self.set_stadium_name_in_stadium_sales(stadium_sales, stadium)
+        months_and_year = list()
+        sales = list()
+
+        for month in range(1, 13):
+            months_and_year.append(f'{month}-{current_year}')
+            sales.append(0)
+        stadium_sales['months_and_year'] = months_and_year
+        stadium_sales['sales'] = sales
+
+        return stadium_sales
+
+    def general_stadium_sales_in_lastest_12_months(self, fields_by_owner):
+        stadiums_sales_information = list()
+        all_stadiums_total_sales = self.get_all_stadiums_total_sales_in_lastest_12_months()
+
+        for stadium in fields_by_owner:
+            stadium_sales = self.get_stadium_sales_in_lastest_12_months(stadium)
+            stadium_name, total_stadium_sales = self.general_stadium_total_sales_in_lastest_12_months(stadium_sales)
+
+            all_stadiums_total_sales['stadiums_name'].append(stadium_name)
+            all_stadiums_total_sales['sales'].append(total_stadium_sales)
+
+            stadiums_sales_information.append(stadium_sales)
+        stadiums_sales_information.append(all_stadiums_total_sales)
+        print(json.dumps(stadiums_sales_information, indent=4))
+        return stadiums_sales_information
+
+    def set_stadium_name_in_stadium_sales(self, stadium_sales, stadium):
+        stadium_sales['stadium_name'] = stadium.name
+        return stadium_sales
+
+    def get_order_month_and_year(self, order):
+        order_date = order.order_date
+        order_month = order_date.month
+        order_year = order_date.year
+        return [order_month, order_year]
+
+    def general_stadium_total_sales_in_lastest_12_months(self, stadium_sales):
+        stadium_name = stadium_sales['stadium_name']
+        stadium_sales = stadium_sales['sales']
+        total_stadium_sales = 0
+        for sales in stadium_sales:
+            total_stadium_sales += sales
+        return [stadium_name, total_stadium_sales]
+
+    def get_all_stadiums_total_sales_in_lastest_12_months(self):
+        all_stadiums_total_sales = dict()
+        all_stadiums_name = list()
+        all_stadiums_sales = list()
+
+        all_stadiums_total_sales['stadiums_name'] = all_stadiums_name
+        all_stadiums_total_sales['sales'] = all_stadiums_sales
+
+        return all_stadiums_total_sales

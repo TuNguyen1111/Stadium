@@ -101,3 +101,45 @@ function tunrOndeleteTimeFrameModal(id) {
     let timeframeDeleteModal = new bootstrap.Modal(document.getElementById(`delete-timeframe-${id}`))
     timeframeDeleteModal.show()
 }
+
+
+function changeSelectTag() {
+    let inputTags = document.querySelectorAll('select')
+    for (let i = 0; i < inputTags.length; i++) {
+    let item = inputTags[i]
+        let pTag = document.createElement('p')
+        let value = item.options[item.selectedIndex].text;
+        pTag.innerHTML = value
+        item.parentNode.replaceChild(pTag, item)
+    }
+}
+
+changeSelectTag()
+
+
+function sendData() {
+    let commentContent = document.getElementById('comment-input')
+    let csrf = document.getElementsByName('csrfmiddlewaretoken')
+    let commentBtn = document.getElementById('comment-btn')
+
+    commentBtn.addEventListener('click', (e) => {
+        console.log('cliked')
+        e.preventDefault()
+        $.ajax({
+            type: 'post',
+            url: '',
+            data: {
+                commentData: commentContent.value,
+                csrfmiddlewaretoken: csrf
+            },
+            success: (data) => {
+                console.log(data)
+            },
+            error: (error) => {
+                console.log(error)
+            }
+        })
+    })
+}
+
+// sendData()

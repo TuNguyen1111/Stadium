@@ -1,5 +1,7 @@
 .stadiums {
     display: flex;
+    padding: 5%;
+    background-color: #e4e3e3
 }
 
 .col {

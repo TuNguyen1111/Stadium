@@ -122,13 +122,8 @@ class Order(models.Model):
 
 class Comment(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE)
+    stadium = models.ForeignKey(Stadium, on_delete=models.CASCADE, null=True)
     comment = models.CharField(max_length=1000)
 
     def __str__(self):
         return f'Comment of {self.user}'
-class StadiumComment(models.Model):
-    stadium = models.ForeignKey(Stadium, on_delete=models.CASCADE)
-    comment = models.ManyToManyField(Comment, blank=True)
-
-    def __str__(self):
-        return f'{self.stadium.name} comments'

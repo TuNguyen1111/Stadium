@@ -1,22 +1,30 @@
 {% extends 'book_stadium/base.html' %}
 {% load crispy_forms_tags %}
 {% load static %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/userProfile.css' %}">
+{% endblock %}
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/userProfile.css' %}">
-{% if user.username == '' or user.phone_number == None %}
-    <div class="alert alert-primary" role="alert">
-        Hãy nhập số điện thoại và tên của bạn để đặt sân được tiện lợi hơn
-    </div>
-{% endif %}
-<div class="content-section">
-    <form method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        <legend class="border-bottom mb-4">Thông tin người dùng</legend>
-        {{ form|crispy }}
-        <div class="form-group mt-4 mb-4">
-            <button class="btn btn-outline-info" type="submit">Cập nhật</button>
+    {% for message in messages %}
+        <div class="alert alert-success" role="alert">
+            {{message}}
         </div>
-    </form>
-</div>
+    {% endfor %}
+
+    {% if user.username == '' or user.phone_number == None %}
+        <div class="alert alert-primary" role="alert">
+            Hãy nhập số điện thoại và tên của bạn để đặt sân được tiện lợi hơn
+        </div>
+    {% endif %}
+    <h2 class="border-bottom mb-4">Thông tin người dùng</h2>
+    <div class="content-section">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form|crispy }}
+            <div class="form-group mt-4 mb-4">
+                <button class="btn btn-outline-info" type="submit">Cập nhật</button>
+            </div>
+        </form>
+    </div>
 {% endblock %}

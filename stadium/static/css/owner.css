@@ -72,6 +72,10 @@ button {
     justify-content: flex-end;
 }
 
+.fas {
+    cursor: pointer;
+}
+
 .fa-check {
     color: green;
 }

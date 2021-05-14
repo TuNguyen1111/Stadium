@@ -1,3 +1,7 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300&display=swap');
+
+
 * {
     margin: 0;
     padding: 0;
@@ -6,7 +10,7 @@
 
 body{
     width: 100%;
-    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-family: 'Roboto Condensed', sans-serif;
 }
 
 .container-1 {
@@ -141,8 +145,8 @@ section{
 }
 
 .sidebar ul li a:hover {
-    background-color: rgb(135, 134, 134);
-    border-left: 3px solid rgb(167, 167, 167);
+    color: rgb(51, 50, 50);
+    border-left: 3px solid rgb(34, 33, 33);
 }
 
 .col {
@@ -180,4 +184,9 @@ a#all-notification-link {
     width: 100%;
     text-align: center;
     background-color: rgb(245, 229, 209);
+}
+
+.alert {
+    width: 100%;
+    text-align: center;
 }

@@ -1,6 +1,6 @@
 .stadium-detail{
     width: 80%;
-    height: 185vh;
+    height: 208vh;
     margin: auto;
 }
 
@@ -33,7 +33,10 @@ h1{
     width: 100%;
     text-align: center;
     border-bottom: 2px solid rgb(122, 122, 122) ;
-    color: #73f19d;
+    color: #555;
+    margin: 3% 0;
+    text-align: start;
+
 }
 
 .stadium-img{

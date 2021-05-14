@@ -23,6 +23,8 @@
 .day {
     display: flex;
     flex-direction: column;
+    padding: 5%;
+    background-color: #e4e3e3
 }
 
 .list-of-stadium{
@@ -31,20 +33,13 @@
 }
 
 .list-of-stadium {
-    /* flex-wrap: wrap; */
     padding-left: 1%;
 }
 
-/* .stadium-timeframe {
-    margin-bottom: 50px;
-    margin-left: 10px;
-} */
-
 .stadium-timeframe h3 {
     height: 35px;
-    text-align: center;
-    background-color: rgb(141, 141, 141);
-    color: bisque;
+    text-align: start;
+    color: rgb(221, 183, 137);
 }
 
 .stadium-detail {
@@ -65,8 +60,13 @@
     margin-left: 10px;
 }
 
+.card.style button:hover {
+    background-color: #e4e3e3;
+}
+
 #title {
-    text-align: center;
+    text-align: start;
+    margin-bottom: 3%;
 }
 
 .pagination {

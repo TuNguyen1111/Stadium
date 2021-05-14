@@ -1,0 +1,26 @@
+{% extends 'book_stadium/base.html' %}
+{% load crispy_forms_tags %}
+{% load humanize %}
+{% load static %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/ownerProfit.css' %}">
+{% endblock %}
+
+{% block content %}
+    <h1>Doanh thu </h1>
+    <div class="two-recent-month-profit">
+        <h3>Doanh thu tháng này: {{ stadium_sales_of_two_recent_months.current_month_sales|intcomma:False }}vnđ</h3>
+        <h3>Doanh thu tháng trước: {{ stadium_sales_of_two_recent_months.last_month_sales|intcomma }}vnđ</h3>
+    </div>
+    <div class="col-sm-12 charts" id="charts">
+        <!-- <div class="col-sm-7">
+            <canvas id="myChart" width="400" height="400"></canvas>
+        </div> -->
+    </div>
+
+{% endblock %}
+
+{% block javascript %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.2.1/dist/chart.min.js"></script>
+    <script src="{% static 'js/ownerProfit.js' %}" type="text/javascript"></script>
+{% endblock %}

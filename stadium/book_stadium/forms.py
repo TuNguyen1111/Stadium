@@ -197,6 +197,7 @@ class StadiumTimeFrameForm(forms.ModelForm):
         fields = ['time_frame', 'price', 'is_open']
 
 class UserProfileForm(forms.ModelForm):
+    email = forms.EmailField(max_length=200, required=True)
     class Meta:
         model = User
         fields = ['username', 'phone_number', 'email']
