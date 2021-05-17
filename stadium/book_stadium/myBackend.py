@@ -4,6 +4,9 @@ from django.contrib.auth.models import User
 from .models import User
 
 class CustomBackend(ModelBackend):
+    # REVIEW: Viết docstring cho class này
+    # Backend này để làm gì, có gì đặc biệt? (VD: cho phép authen bằng cả email và phone_number, v.v.)
+
     def authenticate(self, request, username=None, password=None):
         if '@' in username:
             kwargs = {'email': username}

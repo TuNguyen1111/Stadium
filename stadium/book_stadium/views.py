@@ -1,3 +1,15 @@
+# REVIEW:
+# 1. Bỏ các import không dùng. VD: HttpResponse, make_password
+# 2. Tách view ra thành nhiều file. VD:
+# |_ views
+# |__ __init__.py
+# |__ home.py
+# |__ register.py
+# v.v.
+# Trong file __init__.py sẽ import các view:
+# from .home import Home
+# from .register import Register
+
 from datetime import date
 
 from django.contrib import messages
@@ -30,16 +42,19 @@ from .myBackend import CustomBackend
 import json
 # Create your views here.
 
+# REVIEW: đặt tên cụ thể, tránh dùng "my...", "custom..."
+# Backend này làm gì? VD nếu làm về authen, thì đặt tên "CustomAuthenBackend"
 MY_BACKEND = CustomBackend()
 
-Notification = load_model('notifications', 'Notification')
+Notification = load_model('notifications', 'Notification')  # REVIEW: cách ra 2 dòng so với "class Home"
 class Home(View):
     form_class = UserCreationForm
     template_name = 'book_stadium/home.html'
-    #fields_by_owner = Stadium.objects.filter(owner=request.user)
+    #fields_by_owner = Stadium.objects.filter(owner=request.user)  # REVIEW: format viết comment: giữa dấu "#" và chữ đầu tiên cách ra 1 dấu cách
+    # REVIEW: giữa thuộc tính và hàm cách ra 1 dòng
     def get(self, request):
         context = {
-            'register_form' : self.form_class,
+            'register_form' : self.form_class,  # REVIEW: với dấu hai chấm: cách 1 dấu cách bên phải, nhưng không cách bên trái
         }
         return render(
             request,
@@ -57,10 +72,25 @@ class Register(View):
             user = create_user_form.save()
             login(request, user, backend='book_stadium.myBackend.CustomBackend')
             #checkRoleOfUser(request, user)
-            if user.role == "owner":
+            # REVIEW: không fix cứng chữ "owner" như thế này, sửa thành:
+            # if user.role == Roles.OWNER:
+            if user.role == "owner":  # REVIEW: thống nhất giữa việc sử dụng dấu ngoặc đơn hay ngoặc kép cho string
                 return redirect('create_stadium')
 
             else:
+                # REVIEW: đưa logic này về model User
+                # VD: trong model User viết 1 hàm là:
+                # def is_missing_info(self):
+                #     return self.username == '' or self.phone_number == ''
+                # Ở đây sẽ chỉ gọi hàm đó:
+                # if user.is_missing_info():
+                #     ...
+                # Lý do:
+                # Logic "thế nào là người dùng chưa điền đủ thông tin?" có thể thay đổi sau này,
+                # khi đó chỉ cần sửa ở model User
+                # Còn ở đây không quan tâm đến chi tiết đó, chỉ quan tâm là nếu thông tin chưa đủ thì
+                # redirect về 'user_profile'
+                # Ngoài ra code ở đây sẽ dễ đọc hơn.
                 if user.username == '' or user.phone_number == '':
                     return redirect('user_profile', user.id)
                 return redirect('home')
@@ -69,9 +99,9 @@ class Register(View):
             context = {
                 'register_form': create_user_form
             }
-            print(create_user_form.errors)
+            print(create_user_form.errors)  # REVIEW: chú ý debug xong thì bỏ các hàm print()
             return render(request, 'book_stadium/home.html', context)
-        return redirect('home')
+        return redirect('home')  # REVIEW: dòng này không cần thiết, code không thể chạy đến đây
 
 class Login(View):
     def post(self, request):
