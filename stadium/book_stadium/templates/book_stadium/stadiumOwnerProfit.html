@@ -1,0 +1,13 @@
+{% extends 'book_stadium/base.html' %}
+{% load static %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'css/stadiumOwnerProfit.css' %}">
+{% endblock %}
+
+{% block content %}
+    <canvas id="myChart" width="50" height="50"></canvas>
+{% endblock %}
+
+{% block javascript %}
+    <script src="{% static 'js/stadiumOwnerProfit.js' %}"></script>
+{% endblock %}

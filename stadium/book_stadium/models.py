@@ -3,9 +3,11 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
+
 class Roles(models.TextChoices):
     OWNER = 'owner', 'Chủ sân'
     PLAYER = 'player', 'Người đặt'
+
 
 class TypeOfStadium(models.TextChoices):
     SMALL = '7players', 'Sân 7'
@@ -49,7 +51,8 @@ class User(AbstractUser):
     username = models.CharField(max_length=100, default='')
     name = models.CharField(max_length=100, blank=True)
     phone_number = models.CharField(max_length=12, blank=True)
-    role = models.CharField(max_length=20, choices=Roles.choices, default='player')
+    role = models.CharField(
+        max_length=20, choices=Roles.choices, default='player')
     email = models.EmailField(_('email address'), blank=True)
     #image = models.ImageField(upload_to="user_images", default='default.jpg', null=True, blank=True)
     USERNAME_FIELD = 'email'
@@ -63,13 +66,17 @@ class User(AbstractUser):
         else:
             return self.email
 
+    def is_missing_information(self):
+        return self.phone_number == '' or self.username == ''
+
 
 class Stadium(models.Model):
     name = models.CharField(max_length=100)
     address = models.CharField(max_length=100, blank=True)
     owner = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)
     field_count = models.PositiveSmallIntegerField()
-    image = models.ImageField(upload_to="book_stadium", default=None, null=True, blank=True)
+    image = models.ImageField(upload_to="book_stadium",
+                              default=None, null=True, blank=True)
     time_frames = models.ManyToManyField(
         'TimeFrame', through='StadiumTimeFrame')
 
@@ -96,7 +103,8 @@ class StadiumTimeFrame(models.Model):
 
 
 class Order(models.Model):
-    user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
+    user = models.ForeignKey(
+        User, blank=True, null=True, on_delete=models.SET_NULL)
     # ngay dat san cua user
     order_date = models.DateField(default=timezone.now)
 
@@ -105,7 +113,8 @@ class Order(models.Model):
         StadiumTimeFrame, null=True, on_delete=models.SET_NULL)
     field_numbers = models.JSONField(blank=True, null=True)
     pitch_clothes = models.BooleanField(default=False, blank=True)
-    type_stadium = models.CharField(max_length=30, choices=TypeOfStadium.choices, default=TypeOfStadium.SMALL)
+    type_stadium = models.CharField(
+        max_length=30, choices=TypeOfStadium.choices, default=TypeOfStadium.SMALL)
 
     # ngay bat dau dat san cua user
     order_datetime = models.DateTimeField(default=timezone.now)
@@ -121,7 +130,7 @@ class Order(models.Model):
 
 
 class Comment(models.Model):
-    user = models.ForeignKey(User,on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     stadium = models.ForeignKey(Stadium, on_delete=models.CASCADE, null=True)
     comment = models.CharField(max_length=1000)
 

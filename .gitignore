@@ -1,4 +1,5 @@
 __pycache__
 .venv
+stadium/media
 # REVIEW: Thêm stadium/media vào gitignore, thư mục này chứa các file ảnh người dùng upload nên ko cần commit lên git
 # Câu hỏi: hiện tại "media" đã đang được track bởi git rồi, nên nếu bây giờ mới thêm vào gitignore thì các ảnh đang có trong đó vẫn tồn tại trong git => cần làm thế nào?

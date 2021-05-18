@@ -85,7 +85,7 @@ DATABASES = {
         'NAME': 'stadium_db',
         'HOST': 'localhost',
         'PORT': 3306,
-        'USER': 'stadium_dev',
+        'USER': 'root',
         'PASSWORD': 'admin123',
     }
 }
@@ -110,7 +110,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 AUTHENTICATION_BACKENDS = [
     # 'django.contrib.auth.backends.ModelBackend',
-    'book_stadium.myBackend.CustomBackend',
+    'book_stadium.myBackend.CustomAuthenticatedBackend',
     'social_core.backends.google.GoogleOAuth2',
 ]
 
@@ -137,8 +137,6 @@ USE_L10N = True
 USE_TZ = True
 
 
-
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
@@ -151,7 +149,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
 
-#SMTP Configuration
+# SMTP Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = '587'

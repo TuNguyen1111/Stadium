@@ -3,9 +3,11 @@ from django.contrib.auth.models import User
 
 from .models import User
 
-class CustomBackend(ModelBackend):
-    # REVIEW: Viết docstring cho class này
-    # Backend này để làm gì, có gì đặc biệt? (VD: cho phép authen bằng cả email và phone_number, v.v.)
+
+class CustomAuthenticatedBackend(ModelBackend):
+    '''
+        This class is allow user login with both email and phone number 
+    '''
 
     def authenticate(self, request, username=None, password=None):
         if '@' in username:
@@ -25,4 +27,3 @@ class CustomBackend(ModelBackend):
             return User.objects.get(pk=user_id)
         except User.DoesNotExist:
             return None
-

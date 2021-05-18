@@ -14,15 +14,13 @@ from datetime import date
 
 from django.contrib import messages
 from django.contrib.auth import login, logout
-from django.contrib.auth.hashers import make_password
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import update_session_auth_hash
 from django.forms import inlineformset_factory
-from django.shortcuts import HttpResponse, redirect, render, get_object_or_404
+from django.shortcuts import redirect, render
 from django.http import JsonResponse
 from django.contrib.auth.forms import PasswordChangeForm
 from django.views import View
-from django.views.generic.edit import FormView, CreateView
 from django.views.generic import ListView
 from django.core.paginator import Paginator
 from django.utils import timezone
@@ -31,36 +29,36 @@ from datetime import datetime
 from notifications.signals import notify
 from swapper import load_model
 
-from random import choice
 import datetime
 
 from .forms import (OrderForm, StadiumForm, StadiumTimeFrameForm, StadiumFormForUser,
                     UserCreationForm, UserProfileForm, ChangeNumberOfStadium7Form, ChangeNumberOfStadium11Form, CommentForm)
-from .models import Order, Stadium, StadiumTimeFrame, TimeFrame, User, Comment
-from .myBackend import CustomBackend
+from .models import Order, Stadium, StadiumTimeFrame, TimeFrame, User, Comment, Roles
+from .myBackend import CustomAuthenticatedBackend
 
 import json
 # Create your views here.
 
-# REVIEW: đặt tên cụ thể, tránh dùng "my...", "custom..."
-# Backend này làm gì? VD nếu làm về authen, thì đặt tên "CustomAuthenBackend"
-MY_BACKEND = CustomBackend()
+MY_BACKEND = CustomAuthenticatedBackend()
 
-Notification = load_model('notifications', 'Notification')  # REVIEW: cách ra 2 dòng so với "class Home"
+Notification = load_model('notifications', 'Notification')
+
+
 class Home(View):
     form_class = UserCreationForm
     template_name = 'book_stadium/home.html'
-    #fields_by_owner = Stadium.objects.filter(owner=request.user)  # REVIEW: format viết comment: giữa dấu "#" và chữ đầu tiên cách ra 1 dấu cách
-    # REVIEW: giữa thuộc tính và hàm cách ra 1 dòng
+    # fields_by_owner = Stadium.objects.filter(owner=request.user)
+
     def get(self, request):
         context = {
-            'register_form' : self.form_class,  # REVIEW: với dấu hai chấm: cách 1 dấu cách bên phải, nhưng không cách bên trái
+            'register_form': self.form_class,
         }
         return render(
             request,
             self.template_name,
             context
-            )
+        )
+
 
 class Register(View):
     # t đã chỉnh username field của bảng user thành id rồi để đảm bảo nó duy nhất nên là phone_number với email có thể ko có cũng đc nha.
@@ -72,26 +70,12 @@ class Register(View):
             user = create_user_form.save()
             login(request, user, backend='book_stadium.myBackend.CustomBackend')
             #checkRoleOfUser(request, user)
-            # REVIEW: không fix cứng chữ "owner" như thế này, sửa thành:
-            # if user.role == Roles.OWNER:
-            if user.role == "owner":  # REVIEW: thống nhất giữa việc sử dụng dấu ngoặc đơn hay ngoặc kép cho string
+
+            if user.role == Roles.OWNER:
                 return redirect('create_stadium')
 
             else:
-                # REVIEW: đưa logic này về model User
-                # VD: trong model User viết 1 hàm là:
-                # def is_missing_info(self):
-                #     return self.username == '' or self.phone_number == ''
-                # Ở đây sẽ chỉ gọi hàm đó:
-                # if user.is_missing_info():
-                #     ...
-                # Lý do:
-                # Logic "thế nào là người dùng chưa điền đủ thông tin?" có thể thay đổi sau này,
-                # khi đó chỉ cần sửa ở model User
-                # Còn ở đây không quan tâm đến chi tiết đó, chỉ quan tâm là nếu thông tin chưa đủ thì
-                # redirect về 'user_profile'
-                # Ngoài ra code ở đây sẽ dễ đọc hơn.
-                if user.username == '' or user.phone_number == '':
+                if user.is_missing_information():
                     return redirect('user_profile', user.id)
                 return redirect('home')
         else:
@@ -99,19 +83,20 @@ class Register(View):
             context = {
                 'register_form': create_user_form
             }
-            print(create_user_form.errors)  # REVIEW: chú ý debug xong thì bỏ các hàm print()
             return render(request, 'book_stadium/home.html', context)
-        return redirect('home')  # REVIEW: dòng này không cần thiết, code không thể chạy đến đây
+
 
 class Login(View):
     def post(self, request):
         email = request.POST.get('email')
         password = request.POST.get('password')
-        user = MY_BACKEND.authenticate(request, username=email, password=password)
+        user = MY_BACKEND.authenticate(
+            request, username=email, password=password)
         if user:
-            login(request, user, backend='book_stadium.myBackend.CustomBackend')
+            login(request, user,
+                  backend='book_stadium.myBackend.CustomAuthenticatedBackend')
             #checkRoleOfUser(request, user)
-            if user.role == 'owner':
+            if user.role == Roles.OWNER:
                 stadiums = Stadium.objects.filter(owner=request.user)
 
                 if len(stadiums) == 0:
@@ -126,17 +111,19 @@ class Login(View):
             messages.info(request, 'Tên đăng nhập hoặc mật khẩu không đúng!')
         return redirect('home')
 
+
 class Logout(View):
     def get(self, request):
         logout(request)
         return redirect('home')
+
 
 class OwnerPage(LoginRequiredMixin, View):
     login_url = "home"
     template_name = "book_stadium/owner.html"
 
     def get(self, request, id):
-        if request.user.role != 'owner':
+        if request.user.role != Roles.OWNER:
             logout(request)
             return redirect('home')
         fields_by_owner = Stadium.objects.filter(owner=request.user)
@@ -150,22 +137,22 @@ class OwnerPage(LoginRequiredMixin, View):
         update_stadium_7players_form = ChangeNumberOfStadium7Form()
         update_stadium_11players_form = ChangeNumberOfStadium11Form()
 
-
-
         self.general_orders(all_orders, orders, stadium)
-        #tao dict voi moi ngay co order
+        # tao dict voi moi ngay co order
         for order in orders:
             is_same_day = False
             if all_orders:
-                #lay ra order cuoi va check xem co cung ngay hay khong
+                # lay ra order cuoi va check xem co cung ngay hay khong
                 last_order = all_orders[-1]
                 if last_order['ngay'] == 'Hôm nay':
                     last_order['ngay'] = today.date().strftime('%Y/%m/%d')
                 elif last_order['ngay'] == 'Ngày mai':
                     last_order['ngay'] = tomorrow.strftime('%Y/%m/%d')
 
-                is_same_day = last_order['ngay'] == order.order_date.strftime('%Y/%m/%d')
-                print(is_same_day, last_order['ngay'], order.order_date.strftime('%Y/%m/%d'))
+                is_same_day = last_order['ngay'] == order.order_date.strftime(
+                    '%Y/%m/%d')
+                print(is_same_day, last_order['ngay'],
+                      order.order_date.strftime('%Y/%m/%d'))
             if is_same_day:
                 current_order = all_orders[-1]
             else:
@@ -216,7 +203,7 @@ class OwnerPage(LoginRequiredMixin, View):
 
                     current_timeframe['nguoi_dat'].append(customer)
 
-        #dem xem khung gio con bao nhieu san trong dua tren so nguoi da duyet
+        # dem xem khung gio con bao nhieu san trong dua tren so nguoi da duyet
         for order in all_orders:
             for key, time_frame in order['khung_gio'].items():
                 count_accept_user = 0
@@ -238,9 +225,9 @@ class OwnerPage(LoginRequiredMixin, View):
             'update_stadium_11players_form': update_stadium_11players_form
         }
         return render(request,
-            'book_stadium/owner.html',
-            fields,
-        )
+                      'book_stadium/owner.html',
+                      fields,
+                      )
 
     def general_orders(self, all_orders, orders, stadium):
         all_time_frames = TimeFrame.objects.all()
@@ -253,7 +240,7 @@ class OwnerPage(LoginRequiredMixin, View):
                 is_today_in_all_orders = True
         if not is_today_in_all_orders:
             first_order = {
-                'ngay': 'Hôm nay' ,
+                'ngay': 'Hôm nay',
                 'khung_gio': {}
             }
             all_orders.append(first_order)
@@ -270,6 +257,7 @@ class OwnerPage(LoginRequiredMixin, View):
                     }
                     time_frames[time] = current_timeframe
 
+
 class CreateStadium(LoginRequiredMixin, View):
     login_url = 'home'
     create_stadium_form = StadiumForm
@@ -278,16 +266,17 @@ class CreateStadium(LoginRequiredMixin, View):
         fields_by_owner = Stadium.objects.filter(owner=request.user)
         form = self.create_stadium_form
         context = {
-            'fields':fields_by_owner,
-            'form':form
-            }
+            'fields': fields_by_owner,
+            'form': form
+        }
         return render(
             request,
             'book_stadium/createStadium.html',
             context)
 
-    def post(self,request):
-        create_stadium_form = self.create_stadium_form(request.POST, request.FILES)
+    def post(self, request):
+        create_stadium_form = self.create_stadium_form(
+            request.POST, request.FILES)
         owner = request.user
         if create_stadium_form.is_valid():
             # nếu form valid thì đẩy owner bằng request.user rồi mới save nha
@@ -305,14 +294,17 @@ class CreateStadium(LoginRequiredMixin, View):
         messages.success(request, 'Tạo sân thành công!')
         return redirect('stadium_detail', pk=stadium.id)
 
+
 class StadiumDetail(LoginRequiredMixin, View):
     login_url = 'home'
-    formset = inlineformset_factory(Stadium, StadiumTimeFrame, form=StadiumTimeFrameForm, extra=0)
+    formset = inlineformset_factory(
+        Stadium, StadiumTimeFrame, form=StadiumTimeFrameForm, extra=0)
 
     def get(self, request, pk):
         fields_by_owner = Stadium.objects.filter(owner=request.user)
         current_stadium = Stadium.objects.get(id=pk)
-        times_and_prices = StadiumTimeFrame.objects.filter(stadium=current_stadium)
+        times_and_prices = StadiumTimeFrame.objects.filter(
+            stadium=current_stadium)
         #formset = inlineformset_factory(Stadium, StadiumTimeFrame, fields=['time_frame', 'price'], extra=0)
         formDetail = StadiumForm(instance=current_stadium)
         formTimeFrame = self.formset(instance=current_stadium)
@@ -321,7 +313,7 @@ class StadiumDetail(LoginRequiredMixin, View):
         comment_form = CommentForm()
 
         page_info = {
-            'fields':fields_by_owner,
+            'fields': fields_by_owner,
             'stadium': current_stadium,
             'times_and_prices': times_and_prices,
             'formDetail': formDetail,
@@ -334,14 +326,15 @@ class StadiumDetail(LoginRequiredMixin, View):
             request,
             'book_stadium/stadiumDetail.html',
             page_info,
-            )
+        )
 
     def post(self, request, pk):
         formname = request.POST.get('form_type')
         stadium = Stadium.objects.get(id=pk)
         owner = request.user
         if formname == 'form_detail':
-            form_detail = StadiumForm(request.POST, request.FILES, instance=stadium)
+            form_detail = StadiumForm(
+                request.POST, request.FILES, instance=stadium)
             if form_detail.is_valid():
                 # như trên, đẩy owner vào.
                 instance = form_detail.save(commit=False)
@@ -360,11 +353,13 @@ class StadiumDetail(LoginRequiredMixin, View):
 
         elif formname == "form-comment":
             comment = request.POST.get('comment')
-            new_comment = Comment.objects.create(user=request.user, stadium=stadium, comment=comment)
+            new_comment = Comment.objects.create(
+                user=request.user, stadium=stadium, comment=comment)
             new_comment.save()
 
         messages.success(request, 'Cập nhật thành công!')
         return redirect('stadium_detail', pk=stadium.id)
+
 
 class UserProfile(View):
     form_class = UserProfileForm
@@ -375,7 +370,7 @@ class UserProfile(View):
         form = self.form_class(instance=user)
         context = {
             'form': form,
-            'fields':fields_by_owner,
+            'fields': fields_by_owner,
         }
         return render(request, 'book_stadium/userProfile.html', context)
 
@@ -387,15 +382,19 @@ class UserProfile(View):
         messages.success(request, 'Cập nhật thông tin thành công!')
         return redirect('user_profile', user.id)
 
+
 class BookStadium(ListView):
     form_class = OrderForm
+
     def get(self, request):
         register_form = UserCreationForm
         order_form = self.form_class
-        stadium_timeframes = StadiumTimeFrame.objects.filter(is_open=True).order_by('time_frame__start_time')
+        stadium_timeframes = StadiumTimeFrame.objects.filter(
+            is_open=True).order_by('time_frame__start_time')
         all_stadiums = []
         stadium_search_result = []
-        self.put_out_null_stadiums_and_timesframe(all_stadiums, stadium_timeframes)
+        self.put_out_null_stadiums_and_timesframe(
+            all_stadiums, stadium_timeframes)
         paginator = Paginator(all_stadiums, 2)
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
@@ -405,7 +404,8 @@ class BookStadium(ListView):
         address_search = request.GET.get('address-search')
         stadium_name_search = request.GET.get('stadium-name-search')
 
-        self.search_stadium(stadium_search_result, day_search, time_frame_search, address_search, stadium_name_search)
+        self.search_stadium(stadium_search_result, day_search,
+                            time_frame_search, address_search, stadium_name_search)
 
         if request.user.is_authenticated:
             fields_by_owner = Stadium.objects.filter(owner=request.user)
@@ -415,7 +415,7 @@ class BookStadium(ListView):
         # print(json.dumps(all_stadiums, indent=4))
 
         context = {
-            'fields':fields_by_owner,
+            'fields': fields_by_owner,
             'stadiums': all_stadiums,
             'page_obj': page_obj,
             'order_form': order_form,
@@ -441,7 +441,8 @@ class BookStadium(ListView):
                 sender = request.user
             else:
                 sender = User.objects.get(id=10)
-            notify.send(sender, recipient=receiver, verb=f'Thông báo từ {sender_name}', description=f'{sender_name} đã đặt sân {stadium_name_notification} của bạn vào ngày {date_notification}, khung giờ {timeframe_notification}')
+            notify.send(sender, recipient=receiver, verb=f'Thông báo từ {sender_name}',
+                        description=f'{sender_name} đã đặt sân {stadium_name_notification} của bạn vào ngày {date_notification}, khung giờ {timeframe_notification}')
 
             messages.success(request, 'Đặt sân thành công!')
         else:
@@ -486,7 +487,8 @@ class BookStadium(ListView):
                             time = str(timeframe.time_frame)
                             current_timeframe = []
                             timeframes_of_day[time] = current_timeframe
-                        self.check_is_same_stadium(current_timeframe, stadium_of_timeframe, timeframe)
+                        self.check_is_same_stadium(
+                            current_timeframe, stadium_of_timeframe, timeframe)
                 else:
                     if is_in_6_to_17:
                         current_timeframe = timeframes_of_day[timeframe_fixed]
@@ -499,7 +501,8 @@ class BookStadium(ListView):
                         else:
                             current_timeframe = []
                             timeframes_of_day[time] = current_timeframe
-                    self.check_is_same_stadium(current_timeframe, stadium_of_timeframe, timeframe)
+                    self.check_is_same_stadium(
+                        current_timeframe, stadium_of_timeframe, timeframe)
 
     def check_is_same_stadium(self, current_timeframe, stadium_of_timeframe, timeframe):
         if len(current_timeframe) < 4:
@@ -519,20 +522,24 @@ class BookStadium(ListView):
                 }
                 current_timeframe.append(stadium_detail)
 
-    def search_stadium(self,stadium_search_result, day_search, time_frame_search, address_search, stadium_name_search):
+    def search_stadium(self, stadium_search_result, day_search, time_frame_search, address_search, stadium_name_search):
         if day_search:
             day_search = day_search.replace('/', '-')
             if not stadium_name_search:
-                stadiums_timeframe_search = StadiumTimeFrame.objects.filter(time_frame=time_frame_search, stadium__address=address_search)
+                stadiums_timeframe_search = StadiumTimeFrame.objects.filter(
+                    time_frame=time_frame_search, stadium__address=address_search)
 
             elif not address_search:
-                stadiums_timeframe_search = StadiumTimeFrame.objects.filter(time_frame=time_frame_search, stadium__name=stadium_name_search)
+                stadiums_timeframe_search = StadiumTimeFrame.objects.filter(
+                    time_frame=time_frame_search, stadium__name=stadium_name_search)
 
             elif stadium_name_search and address_search:
-                stadiums_timeframe_search = StadiumTimeFrame.objects.filter(time_frame=time_frame_search, stadium__name=stadium_name_search, stadium__address=address_search)
+                stadiums_timeframe_search = StadiumTimeFrame.objects.filter(
+                    time_frame=time_frame_search, stadium__name=stadium_name_search, stadium__address=address_search)
 
             for timeframe in stadiums_timeframe_search:
-                orders = Order.objects.filter(stadium_time_frame=timeframe, order_date=day_search)
+                orders = Order.objects.filter(
+                    stadium_time_frame=timeframe, order_date=day_search)
                 stadium_of_timeframe = timeframe.stadium
                 if orders:
                     count_order_accepted = 0
@@ -598,6 +605,7 @@ class BookStadium(ListView):
         stadium_obj['id'] = stadium_of_timeframe.id
         search_obj['khung_gio'][time].append(stadium_obj)
 
+
 class HistoryBookedOfUser(View):
     def get(self, request, id):
         user = User.objects.get(id=id)
@@ -625,19 +633,19 @@ class HistoryBookedOfUser(View):
         }
         return render(request, 'book_stadium/historyBookedOfUser.html', context)
 
-
     def post(self, request, id):
         user = request.user
         order = Order.objects.get(id=id)
         order.delete()
-        return redirect('history_booked',user.id)
+        return redirect('history_booked', user.id)
 
     def general_order_of_user(self,  user_orders, all_orders_of_user):
         for order in user_orders:
             is_same_day = False
             if all_orders_of_user:
                 last_order = all_orders_of_user[-1]
-                is_same_day = last_order['ngay'] == order.order_date.strftime('%Y/%m/%d')
+                is_same_day = last_order['ngay'] == order.order_date.strftime(
+                    '%Y/%m/%d')
             if is_same_day:
                 current_order = all_orders_of_user[-1]
             else:
@@ -664,6 +672,7 @@ class HistoryBookedOfUser(View):
             }
             current_timeframe.append(stadium_obj)
 
+
 class SearchStadium(BookStadium):
     def get(self, request):
         order_form = self.form_class
@@ -681,8 +690,8 @@ class SearchStadium(BookStadium):
         address_search = request.GET.get('address-search')
         stadium_name_search = request.GET.get('stadium-name-search')
 
-        self.search_stadium(stadium_search_result, day_search, time_frame_search, address_search, stadium_name_search)
-
+        self.search_stadium(stadium_search_result, day_search,
+                            time_frame_search, address_search, stadium_name_search)
 
         # import json
         # # print(json.dumps(all_stadiums, indent=4))
@@ -718,8 +727,10 @@ class SearchStadium(BookStadium):
             }
             current_timeframe.append(stadium_detail)
 
+
 class PasswordChange(View):
     form_class = PasswordChangeForm
+
     def get(self, request):
         form = self.form_class(request.user)
         context = {
@@ -735,6 +746,7 @@ class PasswordChange(View):
             messages.success(request, 'Thay đổi mật khẩu thành công!')
         return redirect('password_change')
 
+
 class AcceptOrderView(View):
     def post(self, request, id):
         form_type = request.POST.get('form_type')
@@ -749,7 +761,8 @@ class AcceptOrderView(View):
             sender = request.user
 
         if form_type == 'accept-input':
-            orders_filter = Order.objects.filter(stadium_time_frame=stadium_timeframe, order_date=order_date, is_accepted=True)
+            orders_filter = Order.objects.filter(
+                stadium_time_frame=stadium_timeframe, order_date=order_date, is_accepted=True)
 
             for order_filter in orders_filter:
                 if order_filter.type_stadium == "7players":
@@ -776,25 +789,27 @@ class AcceptOrderView(View):
             order.is_accepted = True
             order.save()
             notify.send(sender, recipient=receiver, verb=f'Thông báo từ {sender}',
-                description=f'Sân {order.stadium_time_frame.stadium.name} bạn đặt vào ngày {order.order_date}, khung giờ {order.stadium_time_frame.time_frame} đã được duyệt! ')
+                        description=f'Sân {order.stadium_time_frame.stadium.name} bạn đặt vào ngày {order.order_date}, khung giờ {order.stadium_time_frame.time_frame} đã được duyệt! ')
 
-            #Gui thong bao "het san" cho nhung nguoi khac
+            # Gui thong bao "het san" cho nhung nguoi khac
             if not list_field_number:
                 users_list = list()
-                orders_not_accepted = Order.objects.filter(stadium_time_frame=stadium_timeframe, order_date=order_date, is_accepted=False)
+                orders_not_accepted = Order.objects.filter(
+                    stadium_time_frame=stadium_timeframe, order_date=order_date, is_accepted=False)
                 for order in orders_not_accepted:
                     user_order = order.user
                     if user_order:
                         users_list.append(user_order)
                 receiver = users_list
                 notify.send(sender, recipient=receiver, verb=f'Thông báo từ {sender}',
-                    description=f'Sân {order.stadium_time_frame.stadium.name} bạn đặt vào ngày {order.order_date}, khung giờ {order.stadium_time_frame.time_frame} đã hết sân! Vui lòng chọn khung giờ khác! ')
+                            description=f'Sân {order.stadium_time_frame.stadium.name} bạn đặt vào ngày {order.order_date}, khung giờ {order.stadium_time_frame.time_frame} đã hết sân! Vui lòng chọn khung giờ khác! ')
             messages.success(request, 'Đã duyệt!')
 
         elif form_type == 'accept-delete':
             order.delete()
             messages.success(request, 'Xóa thành công!')
         return redirect('owner', stadium.id)
+
 
 class ChangeNumberOfField(View):
     def post(self, request, id):
@@ -809,9 +824,11 @@ class ChangeNumberOfField(View):
             form.save()
             messages.success(request, 'Cập nhật vị trí thành công!')
         else:
-            messages.error(request, 'Vị trí này đã được duyệt! Vui lòng chọn vị trí khác!')
+            messages.error(
+                request, 'Vị trí này đã được duyệt! Vui lòng chọn vị trí khác!')
 
         return redirect('owner', id=order.stadium_time_frame.stadium.id)
+
 
 class Notifications(View):
     def get(self, request):
@@ -828,6 +845,7 @@ class Notifications(View):
         }
         return render(request, 'book_stadium/notifications.html', context)
 
+
 class NotificationDetail(View):
     def get(self, request, id):
         notify = Notification.objects.get(id=id)
@@ -842,17 +860,26 @@ class NotificationDetail(View):
 
         return render(request, 'book_stadium/notificationDetail.html', context)
 
+
 class OwnerProfit(View):
     def get(self, request):
 
         user = request.user
         fields_by_owner = Stadium.objects.filter(owner=user)
-        stadium_sales_of_two_recent_months = self.get_stadium_sales_of_two_recent_months(fields_by_owner)
-        stadiums_sales_information_in_lastest_12_months = self.general_stadium_sales_in_lastest_12_months(fields_by_owner)
+        stadium_sales_of_two_recent_months = self.get_stadium_sales_of_two_recent_months(
+            fields_by_owner)
+        all_stadiums_sales_information_in_lastest_12_months = self.general_stadium_sales_in_lastest_12_months(
+            fields_by_owner)
+        all_stadium_sales_of_this_month_by_timeframes = self.get_all_stadiums_sales_of_this_month_by_timeframes(
+            fields_by_owner)
 
         if request.is_ajax():
             data = request.GET.get('datasend')
-            return JsonResponse({'sales': stadiums_sales_information_in_lastest_12_months})
+            json_respone = {
+                'sales_in_lastest_12_months': all_stadiums_sales_information_in_lastest_12_months,
+                'all_stadium_sales_of_this_month_by_timeframes': all_stadium_sales_of_this_month_by_timeframes
+            }
+            return JsonResponse(json_respone)
 
         context = {
             'fields': fields_by_owner,
@@ -860,7 +887,6 @@ class OwnerProfit(View):
         }
         print(stadium_sales_of_two_recent_months)
         return render(request, 'book_stadium/ownerProfit.html', context)
-
 
     def get_stadium_sales_of_two_recent_months(self, fields_by_owner):
         current_date = date.today()
@@ -871,48 +897,52 @@ class OwnerProfit(View):
         sales = {}
 
         for stadium in fields_by_owner:
-            orders = Order.objects.filter(stadium_time_frame__stadium=stadium, is_accepted=True)
+            orders = Order.objects.filter(
+                stadium_time_frame__stadium=stadium, is_accepted=True)
             is_same_current_month = False
             is_same_last_month = False
 
             for order in orders:
-                order_month = self.get_order_month(order)
+                order_month, order_year = self.get_order_month_and_year(order)
+                order_price = self.get_order_price(order)
                 is_same_current_month = order_month == current_month
                 is_same_last_month = order_month == last_month
 
                 if is_same_current_month:
-                    sales_of_current_month += order.stadium_time_frame.price
+                    sales_of_current_month += order_price
                 if is_same_last_month:
-                    sales_of_last_month += order.stadium_time_frame.price
+                    sales_of_last_month += order_price
 
         sales['current_month_sales'] = sales_of_current_month
         sales['last_month_sales'] = sales_of_last_month
-
+        print(sales)
         return sales
 
     def get_stadium_sales_in_lastest_12_months(self, stadium):
         stadium_sales = dict()
         remaining_months = 12
-        current_month = 1
-        current_year = date.today().year
+        current_month, current_year = self.get_current_month_and_year()
         oldest_month_in_profit = 0
         oldest_year_in_profit = 0
         is_same_month = False
         is_same_year = False
-        orders = Order.objects.filter(stadium_time_frame__stadium=stadium).order_by('-order_date')
+        orders = Order.objects.filter(
+            stadium_time_frame__stadium=stadium).order_by('-order_date')
 
         if orders:
             for order in orders:
                 if remaining_months > 0:
-                    order_month, order_year = self.get_order_month_and_year(order)
+                    order_month, order_year = self.get_order_month_and_year(
+                        order)
                     is_same_month = order_month == current_month
                     is_same_year = order_year == current_year
-                    money = order.stadium_time_frame.price
-                    if not is_same_month or not is_same_year:
+                    order_price = self.get_order_price(order)
+                    if not is_same_month or not is_same_year or not stadium_sales:
                         remaining_months -= 1
                         current_month = order_month
                         current_year = order_year
-                        stadium_sales = self.set_stadium_name_in_stadium_sales(stadium_sales, stadium)
+                        stadium_sales = self.set_stadium_name_in_stadium_sales(
+                            stadium_sales, stadium)
                         if 'months_and_year' not in stadium_sales:
                             months_and_year = list()
                             stadium_sales['months_and_year'] = months_and_year
@@ -926,9 +956,9 @@ class OwnerProfit(View):
                             sales = stadium_sales['sales']
 
                         months_and_year.append(f'{order_month}-{order_year}')
-                        sales.append(money)
+                        sales.append(order_price)
                     elif is_same_month and is_same_year:
-                        stadium_sales['sales'][-1] += money
+                        stadium_sales['sales'][-1] += order_price
 
             if remaining_months:
                 while remaining_months > 0:
@@ -937,16 +967,19 @@ class OwnerProfit(View):
                         current_month = 12
                         current_year -= 1
 
-                    stadium_sales['months_and_year'].append(f'{current_month}-{current_year}')
+                    stadium_sales['months_and_year'].append(
+                        f'{current_month}-{current_year}')
                     stadium_sales['sales'].append(0)
                     remaining_months -= 1
 
         else:
-            stadium_sales = self.get_stadium_with_no_sales_in_lastest_12_months(stadium_sales, stadium, current_year)
+            stadium_sales = self.get_stadium_with_no_sales_in_lastest_12_months(
+                stadium_sales, stadium, current_year)
         return stadium_sales
 
     def get_stadium_with_no_sales_in_lastest_12_months(self, stadium_sales, stadium, current_year):
-        stadium_sales = self.set_stadium_name_in_stadium_sales(stadium_sales, stadium)
+        stadium_sales = self.set_stadium_name_in_stadium_sales(
+            stadium_sales, stadium)
         months_and_year = list()
         sales = list()
 
@@ -963,8 +996,10 @@ class OwnerProfit(View):
         all_stadiums_total_sales = self.get_all_stadiums_total_sales_in_lastest_12_months()
 
         for stadium in fields_by_owner:
-            stadium_sales = self.get_stadium_sales_in_lastest_12_months(stadium)
-            stadium_name, total_stadium_sales = self.general_stadium_total_sales_in_lastest_12_months(stadium_sales)
+            stadium_sales = self.get_stadium_sales_in_lastest_12_months(
+                stadium)
+            stadium_name, total_stadium_sales = self.general_stadium_total_sales_in_lastest_12_months(
+                stadium_sales)
 
             all_stadiums_total_sales['stadiums_name'].append(stadium_name)
             all_stadiums_total_sales['sales'].append(total_stadium_sales)
@@ -1001,3 +1036,78 @@ class OwnerProfit(View):
         all_stadiums_total_sales['sales'] = all_stadiums_sales
 
         return all_stadiums_total_sales
+
+    def get_current_month_and_year(self):
+        current_date = date.today()
+        current_month = current_date.month
+        current_year = current_date.year
+
+        return [current_month, current_year]
+
+    def get_order_price(self, order):
+        order_price = order.stadium_time_frame.price
+        return order_price
+
+    def general_stadium_sales_of_this_month_by_timeframes(self, stadium):
+        stadium_sales = dict()
+        stadium_sales = self.set_stadium_name_in_stadium_sales(
+            stadium_sales, stadium)
+        current_month, current_year = self.get_current_month_and_year()
+        is_same_month = False
+
+        orders = Order.objects.filter(
+            stadium_time_frame__stadium=stadium).order_by('order_date')
+        stadium_timeframe = StadiumTimeFrame.objects.filter(stadium=stadium)
+        all_timeframes = TimeFrame.objects.all()
+
+        # initialization stadium_sales
+        if 'timeframes' not in stadium_sales:
+            timeframes = list()
+            sales_and_number_of_orders = {
+                'sales': list(),
+                'number_of_orders': list()
+            }
+
+            for timeframe in all_timeframes:
+                sales = sales_and_number_of_orders['sales']
+                number_of_orders = sales_and_number_of_orders['number_of_orders']
+                timeframe = str(timeframe)
+
+                timeframes.append(timeframe)
+                sales.append(0)
+                number_of_orders.append(0)
+
+            stadium_sales['timeframes'] = timeframes
+            stadium_sales['sales_and_number_of_orders'] = sales_and_number_of_orders
+
+        if orders:
+
+            for order in orders:
+                order_month, order_year = self.get_order_month_and_year(order)
+                is_same_month = order_month == current_month
+                order_price = self.get_order_price(order)
+
+                if is_same_month:
+
+                    timeframes = stadium_sales['timeframes']
+                    sales = stadium_sales['sales_and_number_of_orders']['sales']
+                    number_of_orders = stadium_sales['sales_and_number_of_orders']['number_of_orders']
+
+                    order_timeframe = str(order.stadium_time_frame.time_frame)
+
+                    if order_timeframe in timeframes:
+                        index_of_timeframe = timeframes.index(order_timeframe)
+                        sales[index_of_timeframe] += order_price
+                        number_of_orders[index_of_timeframe] += 1
+
+        # print(json.dumps(stadium_sales, indent=4))
+        return stadium_sales
+
+    def get_all_stadiums_sales_of_this_month_by_timeframes(self, fields_by_owner):
+        all_stadium_sales = list()
+        for stadium in fields_by_owner:
+            stadium_sales = self.general_stadium_sales_of_this_month_by_timeframes(
+                stadium)
+            all_stadium_sales.append(stadium_sales)
+        print(json.dumps(all_stadium_sales, indent=4))
+        return all_stadium_sales

@@ -3,8 +3,6 @@
     height: auto;
 }
 
-.charts {
-    display: flex;
-    justify-content: space-around;
-    /* background-color: rgb(55, 52, 214); */
+.show-charts {
+    text-align: center;
 }
