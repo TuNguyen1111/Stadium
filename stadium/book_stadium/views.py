@@ -68,7 +68,7 @@ class Register(View):
         create_user_form = self.form_class(request.POST)
         if create_user_form.is_valid():
             user = create_user_form.save()
-            login(request, user, backend='book_stadium.myBackend.CustomBackend')
+            login(request, user, backend='book_stadium.myBackend.CustomBackend')  # REVIEW: Hình như quên sửa tên chỗ này: CustomBackend -> CustomAuthenticatedBackend
             #checkRoleOfUser(request, user)
 
             if user.role == Roles.OWNER:
@@ -90,12 +90,12 @@ class Login(View):
     def post(self, request):
         email = request.POST.get('email')
         password = request.POST.get('password')
-        user = MY_BACKEND.authenticate(
+        user = MY_BACKEND.authenticate(  # REVIEW: Sửa tên cả biến "MY_BACKEND" nữa
             request, username=email, password=password)
-        if user:
+        if user:  # REVIEW: Phần này nên cách ra 1 dòng, không nên viết 1 hàm dài mà không cách dòng nào cả
             login(request, user,
                   backend='book_stadium.myBackend.CustomAuthenticatedBackend')
-            #checkRoleOfUser(request, user)
+            #checkRoleOfUser(request, user)  # REVIEW: với comment thì sau dấu "#" phải cách 1 dấu
             if user.role == Roles.OWNER:
                 stadiums = Stadium.objects.filter(owner=request.user)
 
@@ -103,11 +103,15 @@ class Login(View):
                     return redirect('create_stadium')
                 else:
                     fisrt_stadium = stadiums.first()
+                    # REVIEW: với Django thì khi dùng đến cột primary key nên viết là ".pk" thay vì ".id"
+                    # Lý do: giả sử tên cột "id" sau này đổi thành "stadium_id", thì mình không cần sửa code những chỗ khác
+                    # vì Django tự hiểu ".pk" là cột primary_key, không quan tâm tên cột đó là gì
                     return redirect('owner', fisrt_stadium.id)
             else:
-                if user.username == '' or user.phone_number == '':
+                if user.username == '' or user.phone_number == '':  # REVIEW: chỗ này có thể sử dụng hàm .is_missing_information()
                     return redirect('user_profile', user.id)
         else:
+            # REVIEW: chỗ này nên là messages.error thay vì messages.info
             messages.info(request, 'Tên đăng nhập hoặc mật khẩu không đúng!')
         return redirect('home')
 
@@ -124,6 +128,15 @@ class OwnerPage(LoginRequiredMixin, View):
 
     def get(self, request, id):
         if request.user.role != Roles.OWNER:
+            # REVIEW:
+            # 1. Không cần logout ở chỗ này
+            # 2. Để xử lý về permission, làm theo 1 trong những cách sau thì hay hơn:
+            #   - Cách 1: Ở đây chỉ cần raise PermissionDenied (from django.core.exceptions import PermissionDenied)
+            #     Lý do:
+            #       + Người khác đọc vào biết rõ đây là đoạn code dành cho trường hợp không có quyền
+            #       + Việc xử lý thế nào với người dùng không có quyền sẽ được quy định chung ở đâu đó, chứ không phải quy định riêng ở từng view
+            #         VD: Django tự động bắt được PermissionDenied và hiện ra trang 403.html (mình có thể tùy chỉnh cái này)
+            #   - Cách 2 (cách này hay hơn): tìm hiểu "UserPassesTestMixin"
             logout(request)
             return redirect('home')
         fields_by_owner = Stadium.objects.filter(owner=request.user)
