@@ -1,15 +1,14 @@
-.stadium-detail{
+.stadium-detail {
     width: 80%;
-    height: 208vh;
+    height: 290vh;
     margin: auto;
 }
 
-.stadium-detail .form-group{
+.stadium-detail .form-group {
     width: 100%;
-
 }
 
-.add-stadium input{
+.add-stadium input {
     text-align: left;
 }
 
@@ -18,7 +17,7 @@
     align-items: flex-end;
 }
 
-i{
+i {
     margin-left: 10px;
     cursor: pointer;
 }
@@ -29,17 +28,16 @@ i{
     height: auto;
 }
 
-h1{
+h1 {
     width: 100%;
     text-align: center;
-    border-bottom: 2px solid rgb(122, 122, 122) ;
+    border-bottom: 2px solid rgb(122, 122, 122);
     color: #555;
     margin: 3% 0;
     text-align: start;
-
 }
 
-.stadium-img{
+.stadium-img {
     width: 100%;
     height: 25%;
 }
@@ -54,7 +52,7 @@ h1{
     right: 43%;
 }
 
-.stadium-form-detail button{
+.stadium-form-detail button {
     margin-right: 15%;
 }
 
@@ -85,7 +83,27 @@ h1{
     margin: auto;
 }
 
-.timeframe-state input{
+.timeframe-state input {
     margin-top: 1.7%;
 }
 
+/* .star-rating input {
+    display: none;
+} */
+
+.checked {
+    color: orange;
+}
+
+.hover {
+    color: orange;
+}
+
+.star-rating span {
+    float: right;
+}
+
+.star-rating span:hover,
+.star-rating span:hover ~ span {
+    color: #fd4;
+}

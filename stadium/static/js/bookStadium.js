@@ -3,7 +3,7 @@ $(document).ready(function() {
         if ( $('#success').length ) {
             $('#notification-success').modal('show');
         }
-        else if ( $('#error').length ) {
+        else if ( $('#warning').length ) {
             $('#notification-failed').modal('show');
         };
     }

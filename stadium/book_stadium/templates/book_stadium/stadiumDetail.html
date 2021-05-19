@@ -13,10 +13,11 @@
     {% endfor %}
     <div class="container stadium-detail">
         <h1 class="stadium-name pt-2">{{ stadium.name }}</h1>
+        <input type="hidden" id="stadium-id" value="{{ stadium.pk }}">
         <h2 class="col-5">
             Thông tin chung
         </h2>
-        <img class="stadium-img" src="{{stadium.image.url}}" alt="stadium-image">
+        <img class="stadium-img" src="{{ stadium.image.url }}" alt="stadium-image">
         <div class="form-info">
             <div class="save-or-delete-form">
                 <form action="" method="POST" class="stadium-form-detail" enctype="multipart/form-data">
@@ -37,7 +38,7 @@
                     {% else %}
                         {% for input in form_detail_for_user.visible_fields %}
                             <div class="form-group mt-4">
-                                <label for="exampleInputEmail1">{{input.label}} </label>
+                                <label for="exampleInputEmail1">{{ input.label }} </label>
                                 <div class="inputField">
                                     {{ input }}
                                 </div>
@@ -118,18 +119,37 @@
 
     <hr>
     <div class="comments-section">
-        <div class="all-comments">
+        <div class="all-comments" id="all-comments">
+
             {% for comment in comments_of_stadium %}
-                <a class="mr-2" href="#">{{ comment.user.username}}</a>
-                <h4>{{comment.comment}}</h4>
+                <div class="comment-infor">
+                    <a class="mr-2" href="#">{{ comment.user.username}}</a>
+                    <h4>{{ comment.comment }}</h4>
+                    <div class="user-star-rating" id="user-star-rating">
+                        <span class="fa fa-star" id="user-1-star"></span>
+                        <span class="fa fa-star" id="user-2-star"></span>
+                        <span class="fa fa-star" id="user-3-star"></span>
+                        <span class="fa fa-star" id="user-4-star"></span>
+                        <span class="fa fa-star" id="user-5-star"></span>
+                        <input type="hidden" id="user-star-point-rating" value="{{ comment.star_point }}">
+                    </div>
+                </div>
                 <hr>
             {% endfor %}
+
         </div>
 
         <div class="stadium-comments">
-            <form id="comment-form" method="POST", action="">
+            <form id="comment-form" method="POST">
               {% csrf_token %}
-              {{comment_form.comment|as_crispy_field}}
+              <div class="star-rating" id="star-rating">
+                <span class="fa fa-2x fa-star" id="five-star"></span>
+                <span class="fa fa-2x fa-star" id="four-star"></span>
+                <span class="fa fa-2x fa-star" id="three-star"></span>
+                <span class="fa fa-2x fa-star" id="two-star"></span>
+                <span class="fa fa-2x fa-star" id="one-star"></span>
+              </div>
+              {{ comment_form.comment|as_crispy_field }}
               <input type="hidden" name="form_type" value="form-comment">
               <button id="comment-btn" class="btn btn-primary" type="submit">Bình luận</button>
             </form>

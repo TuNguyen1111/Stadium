@@ -82,7 +82,7 @@ AUTH_USER_MODEL = 'book_stadium.User'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'stadium_db',
+        'NAME': 'stadium_db_2',
         'HOST': 'localhost',
         'PORT': 3306,
         'USER': 'root',
