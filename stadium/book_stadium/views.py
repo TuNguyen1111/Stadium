@@ -125,11 +125,19 @@ class OwnerPage(LoginRequiredMixin, UserPassesTestMixin, View):
     template_name = 'book_stadium/owner.html'
 
     def get(self, request, pk):
+        # REVIEW: chú ý đặt tên thống nhất, VD chỗ này nên là "stadiums_by_owner"
         fields_by_owner = Stadium.objects.filter(owner=request.user)
+        # REVIEW: nên dùng hàm get_object_or_404 để nếu "pk" không tồn tại thì sẽ hiện trang 404, thay vì lỗi 500
+        # Trường hợp này có thể xảy ra nếu người dùng tự điền 1 số "pk" linh tinh lên url
+        # Câu hỏi: đằng nào cũng là lỗi, tại sao mình lại muốn lỗi 404 thay vì lỗi 500?
         stadium = Stadium.objects.get(pk=pk)
         all_time_frames = TimeFrame.objects.all()
+        # REVIEW: đặt tên biến chưa hợp lý, "today" thì phải là ngày, nhưng "timezone.now()" lại trả ra ngày giờ
+        # Anh thấy ở dưới đều dùng là "today.date()", nên ".date()" luôn ở đây thì hợp lý hơn
         today = timezone.now()
+        # REVIEW: bên trên đã có "today" rồi thì ở đây có thể viết thành "today + datetime.timedelta..."
         tomorrow = datetime.date.today() + datetime.timedelta(days=1)
+        # REVIEW: bên trên đã có 1 biến bằng "timezone.now()" thì ở đây nên dùng lại biến đó thay vì lại gọi lại hàm
         orders = Order.objects.filter(stadium_time_frame__stadium=stadium, order_date__gte=timezone.now())\
                               .order_by('order_date')
         all_orders = []
@@ -144,6 +152,10 @@ class OwnerPage(LoginRequiredMixin, UserPassesTestMixin, View):
                 # lay ra order cuoi va check xem co cung ngay hay khong
                 last_order = all_orders[-1]
                 if last_order['ngay'] == 'Hôm nay':
+                    # REVIEW: nếu format '%Y/%m/%d' là chung thì nên định nghĩa thành 1 biến chung ở trên
+                    # Lợi ích:
+                    #   - Nếu sửa thì chỉ cần sửa 1 chỗ
+                    #   - Tránh viết nhầm
                     last_order['ngay'] = today.date().strftime('%Y/%m/%d')
                 elif last_order['ngay'] == 'Ngày mai':
                     last_order['ngay'] = tomorrow.strftime('%Y/%m/%d')
@@ -213,10 +225,10 @@ class OwnerPage(LoginRequiredMixin, UserPassesTestMixin, View):
                             count_accept_user += 3
                 total_stadium = stadium.field_count - count_accept_user
                 time_frame['con_trong'] = total_stadium
-        # import json
+        # import json  # REVIEW: chú ý xóa code thừa sau khi debug xong, hạn chế comment code
         # print(json.dumps(all_orders, indent=4))
         fields = {
-
+# REVIEW: đang thừa 1 dòng trống ở đây
             'fields': fields_by_owner,
             'all_orders': all_orders,
             'update_stadium_7players_form': update_stadium_7players_form,
@@ -234,8 +246,12 @@ class OwnerPage(LoginRequiredMixin, UserPassesTestMixin, View):
         is_today_in_all_orders = False
 
         for order in orders:
+            # REVIEW: "today.date()" và "order.order_date" đều là kiểu dữ liệu date, nên có thể so sánh thẳng,
+            # không cần chuyển sang string bằng hàm strftime()
             if today.date().strftime('%Y/%m/%d') == order.order_date.strftime('%Y/%m/%d'):
                 is_today_in_all_orders = True
+                # REVIEW: nếu việc loop qua các "orders" chỉ để gán biến "is_today_in_all_orders = True"
+                # thì ở đây có thể đặt "break" để dừng loop luôn khi đã gán xong => tiết kiệm số vòng loop
 
         if not is_today_in_all_orders:
             first_order = {
@@ -260,6 +276,8 @@ class OwnerPage(LoginRequiredMixin, UserPassesTestMixin, View):
         return self.request.user.role == Roles.OWNER
 
     def handle_no_permission(self):
+        # REVIEW: Không cần override hàm này
+        # Chú ý: các hoạt động chung của hệ thống thì không định nghĩa riêng ở từng view, trừ trường hợp đặc biệt
         return HttpResponse('You have been denied')
 
 
@@ -291,6 +309,8 @@ class CreateStadium(LoginRequiredMixin, View):
             instance.owner = owner
             instance.save()
 
+        # REVIEW: "name" của Stadium không phải unique, nên .get() theo name là không ổn,
+        # sẽ lỗi khi có 2 sân cùng tên
         stadium = Stadium.objects.get(name=request.POST.get("name"))
         time_frames = TimeFrame.objects.all()
 
@@ -298,6 +318,8 @@ class CreateStadium(LoginRequiredMixin, View):
             time_frame = StadiumTimeFrame.objects.create(
                 stadium=stadium,
                 time_frame=i,
+                # REVIEW: khi viết 1 số lớn trong python có thể dùng dấu "_" để phân cách hàng nghìn cho dễ đọc
+                # 300000 -> 300_000
                 price=300000,
             )
         messages.success(request, 'Tạo sân thành công!')
