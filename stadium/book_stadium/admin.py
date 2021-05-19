@@ -8,7 +8,7 @@ from django.contrib.auth.admin import UserAdmin
 class UserAdmin(UserAdmin):
     model = User
     add_form = UserCreationForm
-    list_display = ['id','phone_number','email', 'username', 'role']
+    list_display = ['id', 'phone_number', 'email', 'username', 'role']
 
     # None is a Header of User Detail in Admin page
     fieldsets = (
@@ -19,19 +19,21 @@ class UserAdmin(UserAdmin):
         (None, {
             'classes': ('wide',),
             'fields': ('email', 'password1', 'password2', 'is_superuser', 'phone_number', 'username', 'role')}
-            ),
-        )
+         ),
+    )
     list_filter = ["is_superuser", "role"]
+
 
 class AdminTimeFrame(admin.ModelAdmin):
     list_display = ['stadium', 'time_frame', 'price']
+
 
 admin.site.register(User, UserAdmin)
 admin.site.register(Stadium)
 admin.site.register(TimeFrame)
 admin.site.register(StadiumTimeFrame, AdminTimeFrame)
 admin.site.register(Order)
-admin.site.register(Comment)
+admin.site.register(StarRating)
 
 
 # class UserCreationForm(forms.ModelForm):

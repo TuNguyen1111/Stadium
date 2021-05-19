@@ -129,7 +129,7 @@ class Order(models.Model):
         return f'Booked by {self.customer_name}'
 
 
-class Comment(models.Model):
+class StarRating(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     stadium = models.ForeignKey(Stadium, on_delete=models.CASCADE, null=True)
     comment = models.CharField(max_length=1000)
@@ -137,4 +137,4 @@ class Comment(models.Model):
         default=0, blank=True, null=True)
 
     def __str__(self):
-        return f'Comment of {self.user}'
+        return f'Star rate of {self.user}'
