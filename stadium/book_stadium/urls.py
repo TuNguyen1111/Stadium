@@ -39,7 +39,7 @@ urlpatterns = [
     path('thong-bao/', views.Notifications.as_view(), name='notifications'),
     path('chi-tiet-thong-bao/<int:pk>',
          views.NotificationDetail.as_view(), name='notification_detail'),
-    path('doanh-thu/', views.OwnerProfit.as_view(), name='owner_profit'),
+    path('doanh-thu/<int:pk>', views.OwnerProfit.as_view(), name='owner_profit'),
     path('danh-gia/', views.StadiumRating.as_view(), name='stadium_rating'),
 ]
 

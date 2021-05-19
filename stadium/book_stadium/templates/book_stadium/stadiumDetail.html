@@ -119,8 +119,15 @@
 
     <hr>
     <div class="comments-section">
+        <div class="average-users-rating">
+            <button class="btn btn-primary star-rate-btn" id="all_users_rated">Tất cả</button>
+            <button class="btn btn-primary star-rate-btn" id="five_star" star-type="5">5 sao</button>
+            <button class="btn btn-primary star-rate-btn" id="four_star" star-type="4">4 sao</button>
+            <button class="btn btn-primary star-rate-btn" id="three_star" star-type="3">3 sao</button>
+            <button class="btn btn-primary star-rate-btn" id="two_star" star-type="2">2 sao</button>
+            <button class="btn btn-primary star-rate-btn" id="one_star" star-type="1">1 sao</button>
+        </div>
         <div class="all-comments" id="all-comments">
-
             {% for comment in comments_of_stadium %}
                 <div class="comment-infor">
                     <a class="mr-2" href="#">{{ comment.user.username}}</a>
@@ -155,7 +162,6 @@
             </form>
         </div>
     </div>
-
 
     <div class="modal fade " id="delete-form-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
     aria-labelledby="staticBackdropLabel" aria-hidden="true">

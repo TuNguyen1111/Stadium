@@ -3,14 +3,16 @@ from django.contrib.auth.forms import UserCreationForm
 from .models import User, Order, Stadium, StadiumTimeFrame
 from crispy_forms.helper import FormHelper
 from django.contrib.auth.hashers import make_password
-from .models import User, Stadium, StadiumTimeFrame, TimeFrame, Order, Comment
+from .models import User, Stadium, StadiumTimeFrame, TimeFrame, Order, StarRating
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from random import choice
 
+
 class UserCreationForm(UserCreationForm):
     # đống này để set custom cho Register form nha
-    email_or_phone = forms.CharField(label="Email hoặc số điện thoại",max_length=254)
+    email_or_phone = forms.CharField(
+        label="Email hoặc số điện thoại", max_length=254)
     password1 = forms.CharField(
         label="Mật khẩu", widget=forms.PasswordInput,
         help_text="""
@@ -23,6 +25,7 @@ class UserCreationForm(UserCreationForm):
         label="Nhập lại mật khẩu", widget=forms.PasswordInput,
         help_text=""
     )
+
     class Meta:
         model = User
         fields = ['role', 'email_or_phone', 'password1', 'password2']
@@ -64,13 +67,17 @@ class UserCreationForm(UserCreationForm):
             raise forms.ValidationError('Tên tài khoản của bạn đã tồn tại!')
         return user
 
+
 class OrderForm(forms.ModelForm):
-    stadium_name = forms.CharField(label="Tên sân", max_length=100, widget=forms.TextInput(attrs={'id': 'stadium-name', 'readonly': True}))
-    time_frame = forms.ModelChoiceField(label="Khung giờ", queryset=TimeFrame.objects.all(), widget=forms.Select(attrs={'id': 'time_frame'}))
+    stadium_name = forms.CharField(label="Tên sân", max_length=100, widget=forms.TextInput(
+        attrs={'id': 'stadium-name', 'readonly': True}))
+    time_frame = forms.ModelChoiceField(label="Khung giờ", queryset=TimeFrame.objects.all(
+    ), widget=forms.Select(attrs={'id': 'time_frame'}))
 
     class Meta:
         model = Order
-        fields = ['stadium_name','order_date', 'time_frame', 'pitch_clothes', 'type_stadium', 'customer_name', 'customer_phone_number']
+        fields = ['stadium_name', 'order_date', 'time_frame', 'pitch_clothes',
+                  'type_stadium', 'customer_name', 'customer_phone_number']
         labels = {
             'order_date': 'Ngày đặt',
             'customer_phone_number': 'Số điện thoại',
@@ -78,7 +85,6 @@ class OrderForm(forms.ModelForm):
             'pitch_clothes': 'Áo pitch',
             'type_stadium': 'Loại sân'
         }
-
 
     def save(self, commit=True):
         order = super().save(commit=False)
@@ -89,9 +95,12 @@ class OrderForm(forms.ModelForm):
             pitch_clothes = self.cleaned_data.get('pitch_clothes')
             type_stadium = self.cleaned_data.get('type_stadium')
             customer_name = self.cleaned_data.get('customer_name')
-            customer_phone_number = self.cleaned_data.get('customer_phone_number')
-            stadium_timeframe = StadiumTimeFrame.objects.get(time_frame=time_frame, stadium__name=stadium_name)
-            order = Order.objects.create(order_date=order_date, stadium_time_frame=stadium_timeframe, pitch_clothes=pitch_clothes, type_stadium=type_stadium,customer_phone_number=customer_phone_number, customer_name=customer_name)
+            customer_phone_number = self.cleaned_data.get(
+                'customer_phone_number')
+            stadium_timeframe = StadiumTimeFrame.objects.get(
+                time_frame=time_frame, stadium__name=stadium_name)
+            order = Order.objects.create(order_date=order_date, stadium_time_frame=stadium_timeframe, pitch_clothes=pitch_clothes,
+                                         type_stadium=type_stadium, customer_phone_number=customer_phone_number, customer_name=customer_name)
             order.save()
         return order
 
@@ -100,9 +109,11 @@ class OrderForm(forms.ModelForm):
         stadium_name = self.cleaned_data.get('stadium_name')
         order_date = self.cleaned_data.get('order_date')
         type_stadium = self.cleaned_data.get('type_stadium')
-        stadium_timeframe = StadiumTimeFrame.objects.get(time_frame=time_frame, stadium__name=stadium_name)
+        stadium_timeframe = StadiumTimeFrame.objects.get(
+            time_frame=time_frame, stadium__name=stadium_name)
         stadium_of_timeframe_field_count = stadium_timeframe.stadium.field_count
-        orders = Order.objects.filter(stadium_time_frame=stadium_timeframe, order_date=order_date, is_accepted=True)
+        orders = Order.objects.filter(
+            stadium_time_frame=stadium_timeframe, order_date=order_date, is_accepted=True)
         all_fields = list(range(1, stadium_of_timeframe_field_count + 1))
         for order in orders:
             if order.type_stadium == '7players':
@@ -115,11 +126,14 @@ class OrderForm(forms.ModelForm):
                         all_fields.remove(number_of_field)
         if type_stadium == '11players':
             if len(all_fields) < 3:
-                raise forms.ValidationError('Khung giờ của này không đủ để chuẩn bị sân 11! Vui lòng chọn khung giờ khác!')
+                raise forms.ValidationError(
+                    'Khung giờ của này không đủ để chuẩn bị sân 11! Vui lòng chọn khung giờ khác!')
         else:
             if not all_fields:
-                raise forms.ValidationError('Khung giờ của này đã hết sân! Vui lòng chọn khung giờ khác!')
+                raise forms.ValidationError(
+                    'Khung giờ của này đã hết sân! Vui lòng chọn khung giờ khác!')
         return self.cleaned_data
+
 
 class StadiumForm(forms.ModelForm):
     # sửa lại class form theo kiểu t quen. M thích thì sửa lại như cũ cũng đc
@@ -129,7 +143,8 @@ class StadiumForm(forms.ModelForm):
         # check xem có truyền instance vào không
         self._newly_created = kwargs.get('instance')
         # cái này để set input cho ảnh trông đỡ xấu, xoá thử đi để trải nghiệm nếu muốn
-        self.fields['image'] = forms.FileField(label='Ảnh', widget=forms.FileInput)
+        self.fields['image'] = forms.FileField(
+            label='Ảnh', widget=forms.FileInput)
         # update input ảnh tự động tìm ảnh. Sau phải validate lại bằng JS đấy
         self.fields['image'].widget.attrs.update({
             'accept': '.png, .jpg, .jpeg"'
@@ -150,7 +165,6 @@ class StadiumForm(forms.ModelForm):
         self.fields['owner'].required = False
         self.fields['owner'].widget = forms.HiddenInput()
 
-
     class Meta:
         model = Stadium
         fields = ['name', 'address', 'field_count', 'image', 'owner']
@@ -161,6 +175,7 @@ class StadiumForm(forms.ModelForm):
             'image': 'Ảnh sân',
             'owner': ''
         }
+
 
 class StadiumFormForUser(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -180,6 +195,7 @@ class StadiumFormForUser(forms.ModelForm):
         # ẩn trường owner trong form đi.
         self.fields['owner'].required = False
         self.fields['owner'].widget = forms.HiddenInput()
+
     class Meta:
         model = Stadium
         fields = ['name', 'address', 'field_count', 'owner']
@@ -190,14 +206,19 @@ class StadiumFormForUser(forms.ModelForm):
             'owner': ''
         }
 
+
 class StadiumTimeFrameForm(forms.ModelForm):
-    time_frame = forms.ModelChoiceField(queryset=TimeFrame.objects.all(), disabled=True)
+    time_frame = forms.ModelChoiceField(
+        queryset=TimeFrame.objects.all(), disabled=True)
+
     class Meta:
         model = StadiumTimeFrame
         fields = ['time_frame', 'price', 'is_open']
 
+
 class UserProfileForm(forms.ModelForm):
     email = forms.EmailField(max_length=200, required=True)
+
     class Meta:
         model = User
         fields = ['username', 'phone_number', 'email']
@@ -207,10 +228,13 @@ class UserProfileForm(forms.ModelForm):
             'email': 'Email'
         }
 
+
 class ChangeNumberOfStadium7Form(forms.Form):
     order_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
-    stadium_type = forms.CharField(widget=forms.HiddenInput(attrs={'value': '7players'}), required=False)
-    field_number = forms.IntegerField(label='Nhập vị trí sân: ', widget=forms.NumberInput(attrs={'class': 'field_number'}))
+    stadium_type = forms.CharField(widget=forms.HiddenInput(
+        attrs={'value': '7players'}), required=False)
+    field_number = forms.IntegerField(
+        label='Nhập vị trí sân: ', widget=forms.NumberInput(attrs={'class': 'field_number'}))
 
     def save(self):
         order_id = self.cleaned_data.get('order_id')
@@ -241,12 +265,17 @@ class ChangeNumberOfStadium7Form(forms.Form):
     #         raise forms.ValidationError('San nay da duoc dat, vui long chon san khac!')
     #     return field_number
 
+
 class ChangeNumberOfStadium11Form(forms.Form):
     order_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
-    stadium_type = forms.CharField(widget=forms.HiddenInput(attrs={'value': '11players'}), required=False)
-    field_1 = forms.IntegerField(label='Nhập vị trí sân thứ nhất: ', widget=forms.NumberInput(attrs={'class': 'field_number'}))
-    field_2 = forms.IntegerField(label='Nhập vị trí sân thứ hai: ', widget=forms.NumberInput(attrs={'class': 'field_number'}))
-    field_3 = forms.IntegerField(label='Nhập vị trí sân thứ ba: ', widget=forms.NumberInput(attrs={'class': 'field_number'}))
+    stadium_type = forms.CharField(widget=forms.HiddenInput(
+        attrs={'value': '11players'}), required=False)
+    field_1 = forms.IntegerField(label='Nhập vị trí sân thứ nhất: ',
+                                 widget=forms.NumberInput(attrs={'class': 'field_number'}))
+    field_2 = forms.IntegerField(label='Nhập vị trí sân thứ hai: ',
+                                 widget=forms.NumberInput(attrs={'class': 'field_number'}))
+    field_3 = forms.IntegerField(label='Nhập vị trí sân thứ ba: ', widget=forms.NumberInput(
+        attrs={'class': 'field_number'}))
 
     def save(self):
         order_id = self.cleaned_data.get('order_id')
@@ -281,14 +310,14 @@ class ChangeNumberOfStadium11Form(forms.Form):
     #         raise forms.ValidationError('San nay da duoc dat, vui long chon san khac!')
     #     return self.cleaned_data
 
-class CommentForm(forms.ModelForm):
+
+class StarRatingForm(forms.ModelForm):
     class Meta:
-        model = Comment
+        model = StarRating
         fields = ['comment']
         labels = {
             'comment': 'Bình luận'
         }
         widgets = {
-                   "comment":forms.TextInput(attrs={'id':'comment-input'}),
-                }
-
+            "comment": forms.TextInput(attrs={'id': 'comment-input'}),
+        }

@@ -14,6 +14,7 @@ function executeFunctions() {
     sendData()
     setEventForStars()
     setUserStarRating()
+    getAverageUsersRating()
 }
 
 for (let i = 1; i < stadiumFormDetail.length; i++) {
@@ -205,10 +206,11 @@ function sendData() {
                 csrfmiddlewaretoken: csrf[0].value
             },
             success: (data) => {
-
+                let totalOfStarTypeRated = data.total_of_star_type_rated
+                console.log(totalOfStarTypeRated)
                 handleDataRespone(data)
                 clearInputAndStar(commentContent)
-
+                getTotalOfStarType(totalOfStarTypeRated)
             },
             error: (error) => {
                 console.log(error)
@@ -218,43 +220,10 @@ function sendData() {
 }
 
 function handleDataRespone(data) {
-    userCommentInfor = data.data_respone
-    username = userCommentInfor.username
-    commentContent = userCommentInfor.comment
-    star_point = userCommentInfor.star_point
-    
-    allCommentsDiv = document.getElementById('all-comments')
-    commentDiv = document.createElement('div')
-    aTag = document.createElement('a')
-    h4Tag = document.createElement('h4')
-    userStarRatingDiv = document.createElement('div')
-    starPointInput = document.createElement('input')
+    let userRated = data.user_rated_information
+    let allCommentsDiv = document.getElementById('all-comments')
 
-    for (let i = 0; i < 5; i++) {
-        spanTag = document.createElement('span')
-        spanTag.className = 'fa fa-star'
-        spanTag.id = `user-${i + 1}-star`
-        userStarRatingDiv.appendChild(spanTag)
-    }
-
-    commentDiv.className = 'comment-infor'
-    userStarRatingDiv.className = 'user-star-rating'
-    userStarRatingDiv.id = 'userStarRatingDiv'
-    aTag.className = 'mr-2'
-    starPointInput.type = 'hidden'
-    starPointInput.id = 'user-star-point-rating'
-    starPointInput.value = star_point
-
-    aTag.innerHTML = username
-    h4Tag.innerHTML = commentContent
-
-    userStarRatingDiv.appendChild(starPointInput)
-    commentDiv.appendChild(aTag)
-    commentDiv.appendChild(h4Tag)
-    commentDiv.appendChild(userStarRatingDiv)
-
-    allCommentsDiv.appendChild(commentDiv)
-    setUserStarRating()
+    createElementForUserRated(userRated, allCommentsDiv)
 }
 
 function setUserStarRating() {
@@ -262,7 +231,7 @@ function setUserStarRating() {
 
     for (let i = 0; i < allUsersStarRating.length; i++ ) {
         let userStarRating = allUsersStarRating[i]
-        childrenElements = userStarRating.children
+        let childrenElements = userStarRating.children
         userStarRating = childrenElements[childrenElements.length - 1].value
 
         for (let j = 0; j < childrenElements.length; j++) {
@@ -284,3 +253,100 @@ function clearInputAndStar(commentContent) {
 
     commentContent.value = ''
 }
+
+function getAverageUsersRating() {
+    let stadiumId = document.getElementById('stadium-id').value
+    $.ajax({
+        type: 'get',
+        url: '/danh-gia/',
+        data: {
+            stadiumId: stadiumId
+        },
+        success: function(data) {
+            let totalOfStarTypeRated = data.total_of_star_type_rated
+
+            getTotalOfStarType(totalOfStarTypeRated)
+            setEventForStarTypeBtn(data)
+        },
+        error: function(error) {
+            console.log(error)
+        }
+    })
+}
+
+function getTotalOfStarType(totalOfStarTypeRated) {
+    let allStarRateBtns = document.querySelectorAll('.star-rate-btn')
+
+    for (const [star, totalStar] of Object.entries(totalOfStarTypeRated)) {
+        for (let i = 0; i < allStarRateBtns.length; i++) {
+            let starRateBtn = allStarRateBtns[i]
+            if (starRateBtn.id === star) {
+                let typeOfStar = starRateBtn.getAttribute('star-type')
+                starRateBtn.innerHTML = `${typeOfStar} sao (${totalStar})`
+            }   
+        }
+    }
+}
+
+function setEventForStarTypeBtn(data) {
+    let amountOfStarRatingType = data.amount_of_star_rating_type
+    let allStarRateTypeBtns = document.querySelectorAll('.star-rate-btn')
+
+    for (let i = 0; i < allStarRateTypeBtns.length; i++) {
+        let starRateTypeBtn = allStarRateTypeBtns[i]
+
+        starRateTypeBtn.addEventListener('click', function() {
+            let starRateTypeBtnId = starRateTypeBtn.id
+            var allCommentsDiv = document.getElementById('all-comments')
+            allCommentsDiv.innerHTML = ''
+
+            for (const [starType, allUsersRated] of Object.entries(amountOfStarRatingType)) {
+                
+                if (starType === starRateTypeBtnId) {
+                    for (let userRated of allUsersRated) {  
+                        createElementForUserRated(userRated, allCommentsDiv)
+                    }
+                }
+            }
+        })
+    }
+}
+
+function createElementForUserRated(userRated, allCommentsDiv) {
+    let username = userRated.username
+    let commentContent = userRated.comment
+    let star_point = userRated.star_point
+    let commentDiv = document.createElement('div')
+    let aTag = document.createElement('a')
+    let h4Tag = document.createElement('h4')
+    let userStarRatingDiv = document.createElement('div')
+    let starPointInput = document.createElement('input')
+    let hrTag = document.createElement('hr')
+
+    for (let i = 0; i < 5; i++) {
+        let spanTag = document.createElement('span')
+        spanTag.className = 'fa fa-star'
+        spanTag.id = `user-${i + 1}-star`
+        userStarRatingDiv.appendChild(spanTag)
+    }
+
+    commentDiv.className = 'comment-infor'
+    userStarRatingDiv.className = 'user-star-rating'
+    userStarRatingDiv.id = 'userStarRatingDiv'
+    aTag.className = 'mr-2'
+    starPointInput.type = 'hidden'
+    starPointInput.id = 'user-star-point-rating'
+    starPointInput.value = star_point
+
+    aTag.innerHTML = username
+    h4Tag.innerHTML = commentContent
+
+    userStarRatingDiv.appendChild(starPointInput)
+    commentDiv.appendChild(aTag)
+    commentDiv.appendChild(h4Tag)
+    commentDiv.appendChild(userStarRatingDiv)
+    allCommentsDiv.appendChild(commentDiv)
+    allCommentsDiv.appendChild(hrTag)
+    setUserStarRating()
+}
+

@@ -32,8 +32,8 @@ from swapper import load_model
 import datetime
 
 from .forms import (OrderForm, StadiumForm, StadiumTimeFrameForm, StadiumFormForUser,
-                    UserCreationForm, UserProfileForm, ChangeNumberOfStadium7Form, ChangeNumberOfStadium11Form, CommentForm)
-from .models import Order, Stadium, StadiumTimeFrame, TimeFrame, User, Comment, Roles
+                    UserCreationForm, UserProfileForm, ChangeNumberOfStadium7Form, ChangeNumberOfStadium11Form, StarRatingForm)
+from .models import Order, Stadium, StadiumTimeFrame, TimeFrame, User, StarRating, Roles
 from .myBackend import CustomAuthenticatedBackend
 
 import json
@@ -70,11 +70,9 @@ class Register(View):
             user = create_user_form.save()
             login(request, user,
                   backend='book_stadium.myBackend.CustomAuthenticatedBackend')
-            # checkRoleOfUser(request, user)
 
             if user.role == Roles.OWNER:
                 return redirect('create_stadium')
-
             else:
                 if user.is_missing_information():
                     return redirect('user_profile', user.pk)
@@ -97,7 +95,7 @@ class Login(View):
         if user:
             login(request, user,
                   backend='book_stadium.myBackend.CustomAuthenticatedBackend')
-            # checkRoleOfUser(request, user)
+
             if user.role == Roles.OWNER:
                 stadiums = Stadium.objects.filter(owner=request.user)
 
@@ -121,7 +119,7 @@ class Logout(View):
 
 
 class OwnerPage(LoginRequiredMixin, UserPassesTestMixin, View):
-    # login_url = "home"
+    login_url = "home"
     template_name = 'book_stadium/owner.html'
 
     def get(self, request, pk):
@@ -141,6 +139,7 @@ class OwnerPage(LoginRequiredMixin, UserPassesTestMixin, View):
         # tao dict voi moi ngay co order
         for order in orders:
             is_same_day = False
+
             if all_orders:
                 # lay ra order cuoi va check xem co cung ngay hay khong
                 last_order = all_orders[-1]
@@ -148,7 +147,6 @@ class OwnerPage(LoginRequiredMixin, UserPassesTestMixin, View):
                     last_order['ngay'] = today.strftime(date_format)
                 elif last_order['ngay'] == 'Ngày mai':
                     last_order['ngay'] = tomorrow.strftime(date_format)
-
                 is_same_day = last_order['ngay'] == order.order_date.strftime(
                     date_format)
 
@@ -164,13 +162,14 @@ class OwnerPage(LoginRequiredMixin, UserPassesTestMixin, View):
                     current_order['ngay'] = 'Hôm nay'
                 elif order.order_date == tomorrow:
                     current_order['ngay'] = 'Ngày mai'
-
                 all_orders.append(current_order)
 
             time_frames = current_order['khung_gio']
+
             for time_frame in all_time_frames:
                 time = str(time_frame)
                 is_same_timeframe = time in time_frames
+
                 if is_same_timeframe:
                     current_timeframe = time_frames[time]
                 else:
@@ -179,6 +178,7 @@ class OwnerPage(LoginRequiredMixin, UserPassesTestMixin, View):
                         'nguoi_dat': []
                     }
                     time_frames[time] = current_timeframe
+
                 if time == str(order.stadium_time_frame.time_frame):
                     customer = {
                         'sdt': order.customer_phone_number,
@@ -245,6 +245,7 @@ class OwnerPage(LoginRequiredMixin, UserPassesTestMixin, View):
             }
             all_orders.append(first_order)
             time_frames = all_orders[0]['khung_gio']
+
             for time_frame in all_time_frames:
                 time = str(time_frame)
                 is_same_timeframe = time in time_frames
@@ -262,7 +263,7 @@ class OwnerPage(LoginRequiredMixin, UserPassesTestMixin, View):
         return self.request.user.role == Roles.OWNER
 
 
-class CreateStadium(LoginRequiredMixin, View):
+class CreateStadium(LoginRequiredMixin, UserPassesTestMixin, View):
     login_url = 'home'
     create_stadium_form = StadiumForm
 
@@ -293,14 +294,18 @@ class CreateStadium(LoginRequiredMixin, View):
         stadium = Stadium.objects.get(pk=new_stadium.pk)
         time_frames = TimeFrame.objects.all()
 
-        for i in time_frames:
-            time_frame = StadiumTimeFrame.objects.create(
+        for timeframe in time_frames:
+            stadium_time_frame = StadiumTimeFrame.objects.create(
                 stadium=stadium,
-                time_frame=i,
+                time_frame=timeframe,
                 price=300_000,
             )
+            stadium_time_frame.save()
         messages.success(request, 'Tạo sân thành công!')
         return redirect('stadium_detail', pk=stadium.pk)
+
+    def test_func(self):
+        return self.request.user.role == Roles.OWNER
 
 
 class StadiumDetail(LoginRequiredMixin, View):
@@ -317,8 +322,9 @@ class StadiumDetail(LoginRequiredMixin, View):
         formDetail = StadiumForm(instance=current_stadium)
         formTimeFrame = self.formset(instance=current_stadium)
         form_detail_for_user = StadiumFormForUser(instance=current_stadium)
-        comments_of_stadium = Comment.objects.filter(stadium=current_stadium)
-        comment_form = CommentForm()
+        star_rating_of_stadiums = StarRating.objects.filter(
+            stadium=current_stadium).order_by('-star_point')
+        comment_form = StarRatingForm()
 
         page_info = {
             'fields': stadiums_by_owner,
@@ -327,7 +333,7 @@ class StadiumDetail(LoginRequiredMixin, View):
             'formDetail': formDetail,
             'formTimeFrame': formTimeFrame,
             'form_detail_for_user': form_detail_for_user,
-            'comments_of_stadium': comments_of_stadium,
+            'comments_of_stadium': star_rating_of_stadiums,
             'comment_form': comment_form
         }
         return render(
@@ -368,6 +374,25 @@ class StadiumDetail(LoginRequiredMixin, View):
 
 
 class StadiumRating(View):
+
+    def get(self, request):
+        if request.is_ajax():
+            stadium_id = request.GET.get('stadiumId')
+            stadium = Stadium.objects.get(pk=stadium_id)
+            all_star_rate_of_stadiums = StarRating.objects.filter(
+                stadium=stadium).order_by('-star_point')
+            total_of_star_type_rated, total_users_rate_of_stadium = self.get_total_of_star_type_rated(
+                all_star_rate_of_stadiums)
+            amount_of_star_rating_type = self.get_amount_of_star_rating_type_of_stadium(
+                all_star_rate_of_stadiums)
+
+            data_response = {
+                'total_of_star_type_rated': total_of_star_type_rated,
+                'total_users_rate_of_stadium': total_users_rate_of_stadium,
+                'amount_of_star_rating_type': amount_of_star_rating_type
+            }
+            return JsonResponse(data_response)
+
     def post(self, request):
         if request.is_ajax():
             star_point = int(request.POST.get('starPoint'))
@@ -375,16 +400,70 @@ class StadiumRating(View):
             stadium_id = int(request.POST.get('stadiumId'))
             stadium = Stadium.objects.get(pk=stadium_id)
 
-            new_comment = Comment.objects.create(
+            new_user_rate = StarRating.objects.create(
                 user=request.user, stadium=stadium, comment=comment, star_point=star_point)
-            new_comment.save()
+            new_user_rate.save()
+
+            all_star_rate_of_stadiums = StarRating.objects.filter(
+                stadium=stadium).order_by('-star_point')
+            total_of_star_type_rated, total_users_rate_of_stadium = self.get_total_of_star_type_rated(
+                all_star_rate_of_stadiums)
 
             data_respone = {
-                'username': request.user.username,
-                'comment': new_comment.comment,
-                'star_point': new_comment.star_point
+                'user_rated_information': {
+                    'username': request.user.username,
+                    'comment': new_user_rate.comment,
+                    'star_point': new_user_rate.star_point,
+                },
+                'total_of_star_type_rated': total_of_star_type_rated
             }
-            return JsonResponse({'data_respone': data_respone})
+            return JsonResponse(data_respone)
+
+    def get_total_of_star_type_rated(self, all_star_rate_of_stadiums):
+        total_of_star_type_rated = dict()
+        total_users_rate_of_stadium = all_star_rate_of_stadiums.count()
+        list_of_star_type = self.get_list_of_star_type()
+
+        for star_rate in all_star_rate_of_stadiums:
+            star_point = star_rate.star_point
+            star_type = list_of_star_type[star_point - 1]
+
+            if star_type in total_of_star_type_rated:
+                total_of_star_type_rated[star_type] += 1
+            else:
+                total_of_star_type_rated[star_type] = 1
+
+        return [total_of_star_type_rated, total_users_rate_of_stadium]
+
+    def get_amount_of_star_rating_type_of_stadium(self, all_star_rate_of_stadiums):
+        amount_of_star_rating_type = dict()
+        all_users_rated = list()
+        amount_of_star_rating_type['all_users_rated'] = all_users_rated
+        list_of_star_type = self.get_list_of_star_type()
+
+        for star_rate in all_star_rate_of_stadiums:
+            star_point = star_rate.star_point
+            star_type = list_of_star_type[star_point - 1]
+
+            if star_type in amount_of_star_rating_type:
+                all_users_rate_of_star_type = amount_of_star_rating_type[star_type]
+            else:
+                all_users_rate_of_star_type = list()
+                amount_of_star_rating_type[star_type] = all_users_rate_of_star_type
+
+            user_rated_information = dict()
+            user_rated_information['username'] = star_rate.user.username
+            user_rated_information['comment'] = star_rate.comment
+            user_rated_information['star_point'] = star_rate.star_point
+
+            all_users_rate_of_star_type.append(user_rated_information)
+            all_users_rated.append(user_rated_information)
+        return amount_of_star_rating_type
+
+    def get_list_of_star_type(self):
+        list_of_star_type = ['one_star', 'two_star',
+                             'three_star', 'four_star', 'five_star']
+        return list_of_star_type
 
 
 class UserProfile(View):
@@ -421,8 +500,8 @@ class BookStadium(ListView):
         stadium_timeframes = StadiumTimeFrame.objects.filter(
             is_open=True).order_by('time_frame__start_time')
         all_stadiums = []
-        self.put_out_null_stadiums_and_timesframe(
-            all_stadiums, stadium_timeframes)
+        all_stadiums = self.put_out_null_stadiums_and_timesframe(
+            stadium_timeframes)
         paginator = Paginator(all_stadiums, 2)
 
         page_number = request.GET.get('page')
@@ -480,7 +559,9 @@ class BookStadium(ListView):
 
         return redirect('book_stadium')
 
-    def put_out_null_stadiums_and_timesframe(self, all_stadiums, stadium_timeframes):
+    def put_out_null_stadiums_and_timesframe(self, stadium_timeframes):
+        all_stadiums = []
+
         for number in range(8):
             current_day = datetime.date.today() + datetime.timedelta(days=number)
             timeframe_fixed = '6:30:00 - 17:00:00'
@@ -497,9 +578,6 @@ class BookStadium(ListView):
 
             if not is_have_6_to_17_in_dict:
                 timeframes_of_day[timeframe_fixed] = []
-            count_stadium_in_timeframe_6_to_17 = 4
-            count_stadium_in_timeframe = 4
-            total_stadium_in_6_to_17 = len(timeframes_of_day[timeframe_fixed])
 
             for timeframe in stadium_timeframes:
                 orders = Order.objects.filter(stadium_time_frame=timeframe)
@@ -537,11 +615,13 @@ class BookStadium(ListView):
                         else:
                             current_timeframe = []
                             timeframes_of_day[time] = current_timeframe
-                    self.check_is_same_stadium(
+
+                    current_timeframe = self.check_is_same_stadium(
                         current_timeframe, stadium_of_timeframe, timeframe)
+        return all_stadiums
 
     def check_is_same_stadium(self, current_timeframe, stadium_of_timeframe, timeframe):
-        if len(current_timeframe) < 4:
+        if len(current_timeframe) < 3:
             stadiums = []
 
             for single_stadium in current_timeframe:
@@ -559,6 +639,7 @@ class BookStadium(ListView):
                     'khung_gio_dat': timeframe.time_frame.pk
                 }
                 current_timeframe.append(stadium_detail)
+        return current_timeframe
 
     def search_stadium(self, day_search, time_frame_search, address_search, stadium_name_search):
         stadium_search_result = []
@@ -600,6 +681,7 @@ class BookStadium(ListView):
 
     def add_stadium_obj(self, stadium_search_result, day_search, stadium_of_timeframe, timeframe):
         time = str(timeframe.time_frame)
+
         if stadium_search_result:
             search_obj = stadium_search_result[-1]
         else:
@@ -882,14 +964,16 @@ class NotificationDetail(View):
             'fields': stadiums_by_owner,
             'notify': notify
         }
-
         return render(request, 'book_stadium/notificationDetail.html', context)
 
 
-class OwnerProfit(View):
-    def get(self, request):
-        user = request.user
+class OwnerProfit(LoginRequiredMixin, UserPassesTestMixin, View):
+    login_url = 'home'
+
+    def get(self, request, pk):
+        user = User.objects.get(pk=pk)
         stadiums_by_owner = Stadium.objects.filter(owner=user)
+
         stadium_sales_of_two_recent_months = self.get_stadium_sales_of_two_recent_months(
             stadiums_by_owner)
         all_stadiums_sales_information_in_lastest_12_months = self.general_stadium_sales_in_lastest_12_months(
@@ -898,7 +982,6 @@ class OwnerProfit(View):
             stadiums_by_owner)
 
         if request.is_ajax():
-            data = request.GET.get('datasend')
             json_respone = {
                 'sales_in_lastest_12_months': all_stadiums_sales_information_in_lastest_12_months,
                 'all_stadium_sales_of_this_month_by_timeframes': all_stadium_sales_of_this_month_by_timeframes
@@ -909,7 +992,6 @@ class OwnerProfit(View):
             'fields': stadiums_by_owner,
             'stadium_sales_of_two_recent_months': stadium_sales_of_two_recent_months,
         }
-        print(stadium_sales_of_two_recent_months)
         return render(request, 'book_stadium/ownerProfit.html', context)
 
     def get_stadium_sales_of_two_recent_months(self, stadiums_by_owner):
@@ -939,7 +1021,6 @@ class OwnerProfit(View):
 
         sales['current_month_sales'] = sales_of_current_month
         sales['last_month_sales'] = sales_of_last_month
-        print(sales)
         return sales
 
     def get_stadium_sales_in_lastest_12_months(self, stadium):
@@ -1134,3 +1215,6 @@ class OwnerProfit(View):
             all_stadium_sales.append(stadium_sales)
         print(json.dumps(all_stadium_sales, indent=4))
         return all_stadium_sales
+
+    def test_func(self):
+        return self.request.user.role == Roles.OWNER

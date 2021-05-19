@@ -107,3 +107,9 @@ h1 {
 .star-rating span:hover ~ span {
     color: #fd4;
 }
+
+.average-users-rating {
+    width: 60%;
+    margin: auto;
+    margin-bottom: 10%;
+}
