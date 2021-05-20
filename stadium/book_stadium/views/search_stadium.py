@@ -32,7 +32,7 @@ class SearchStadium(BookStadium):
         if user.is_authenticated:
             stadiums_by_owner = Stadium.objects.filter(owner=user)
             context['fields'] = stadiums_by_owner
-        return render(request, 'book_stadium/searchStadium.html', context)
+        return render(request, 'book_stadium/search_stadium.html', context)
 
     def check_is_same_stadium(self, current_timeframe, stadium_of_timeframe, timeframe):
         stadiums = []

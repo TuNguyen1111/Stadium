@@ -1,6 +1,4 @@
-
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300&display=swap');
-
+@import url("https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300&display=swap");
 
 * {
     margin: 0;
@@ -8,9 +6,9 @@
     box-sizing: border-box;
 }
 
-body{
+body {
     width: 100%;
-    font-family: 'Roboto Condensed', sans-serif;
+    font-family: "Roboto Condensed", sans-serif;
 }
 
 .container-1 {
@@ -24,8 +22,13 @@ body{
 }
 
 .navbar {
-    background-image: linear-gradient(to right, rgb(121, 119, 119), rgb(163, 163, 163), rgb(163, 163, 163), rgb(121, 119, 119));
-
+    background-image: linear-gradient(
+        to right,
+        rgb(121, 119, 119),
+        rgb(163, 163, 163),
+        rgb(163, 163, 163),
+        rgb(121, 119, 119)
+    );
 }
 
 .navbar > ul {
@@ -48,9 +51,9 @@ body{
     width: 100%;
     background-color: #555;
     color: white;
-    }
+}
 
-.modal-footer.base{
+.modal-footer.base {
     display: flex;
     justify-content: space-between;
 }
@@ -86,7 +89,7 @@ form {
     margin-right: 5px;
 }
 
-section{
+section {
     display: flex;
     height: auto;
 }
@@ -109,7 +112,6 @@ section{
     list-style: none;
     padding: 0;
     /* border-bottom: 1px solid rgb(151, 151, 151); */
-
 }
 
 .sidebar ul li a {
@@ -141,7 +143,7 @@ section{
 }
 
 .sidebar ul li a span.rotate {
-    transform: translateY(-50%) rotate(-180deg)
+    transform: translateY(-50%) rotate(-180deg);
 }
 
 .sidebar ul li a:hover {
@@ -154,10 +156,10 @@ section{
     height: 100vh;
 }
 
-/* .stadium-manage {
-    display: none;
-} */
-
+.dropdown-menu.show {
+    display: block;
+    right: 0%;
+}
 
 .active {
     background-color: rgb(135, 134, 134);
@@ -168,7 +170,6 @@ section{
     color: black;
 }
 
-
 .notification-dropdown a {
     color: black;
 }
@@ -176,7 +177,7 @@ section{
 .dropdown .notification-dropdown.show .notification {
     height: 300px;
     overflow-y: scroll;
-    color: black
+    color: black;
 }
 
 a#all-notification-link {

@@ -3,7 +3,7 @@
 {% load crispy_forms_tags %}
 {% load humanize %}
 {% block css %}
-<link rel="stylesheet" href="{% static 'css/stadiumDetail.css' %}">
+<link rel="stylesheet" href="{% static 'css/stadium_detail.css' %}">
 {% endblock %}
 {% block content %}
     {% for message in messages %}
@@ -144,22 +144,24 @@
             {% endfor %}
 
         </div>
-
-        <div class="stadium-comments">
-            <form id="comment-form" method="POST">
-              {% csrf_token %}
-              <div class="star-rating" id="star-rating">
-                <span class="fa fa-2x fa-star" id="five-star"></span>
-                <span class="fa fa-2x fa-star" id="four-star"></span>
-                <span class="fa fa-2x fa-star" id="three-star"></span>
-                <span class="fa fa-2x fa-star" id="two-star"></span>
-                <span class="fa fa-2x fa-star" id="one-star"></span>
-              </div>
-              {{ comment_form.comment|as_crispy_field }}
-              <input type="hidden" name="form_type" value="form-comment">
-              <button id="comment-btn" class="btn btn-primary" type="submit">Bình luận</button>
-            </form>
-        </div>
+        {% if stadium.owner != user %}
+            <div class="stadium-comments">
+                <form class="shadow" id="comment-form" method="POST">
+                    <h4>Đánh giá sân</h4>
+                    {% csrf_token %}
+                    <div class="star-rating" id="star-rating">
+                        <span class="fa fa-2x fa-star" id="five-star"></span>
+                        <span class="fa fa-2x fa-star" id="four-star"></span>
+                        <span class="fa fa-2x fa-star" id="three-star"></span>
+                        <span class="fa fa-2x fa-star" id="two-star"></span>
+                        <span class="fa fa-2x fa-star" id="one-star"></span>
+                    </div>
+                    {{ comment_form.comment|as_crispy_field }}
+                    <input type="hidden" name="form_type" value="form-comment">
+                    <button id="comment-btn" class="btn btn-primary" type="submit">Bình luận</button>
+                </form>
+            </div>
+        {% endif %}
     </div>
 
     <div class="modal fade " id="delete-form-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
@@ -186,5 +188,5 @@
     </div>
 {% endblock %}
 {% block javascript %}
-    <script src="{% static 'js/stadiumDetail.js' %}"></script>
+    <script src="{% static 'js/stadium_detail.js' %}"></script>
 {% endblock %}

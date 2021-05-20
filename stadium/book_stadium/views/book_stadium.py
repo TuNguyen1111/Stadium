@@ -39,7 +39,6 @@ class BookStadium(ListView):
             stadiums_by_owner = Stadium.objects.filter(owner=request.user)
         else:
             stadiums_by_owner = ''
-        # print(json.dumps(all_stadiums, indent=4))
 
         context = {
             'fields': stadiums_by_owner,
@@ -71,7 +70,6 @@ class BookStadium(ListView):
                             description=f'{sender_name} đã đặt sân {stadium_name_notification} của bạn vào ngày {date_notification}, khung giờ {timeframe_notification}')
             else:
                 pass
-                # sender = User.objects.get(pk=10)
 
             messages.success(request, 'Đặt sân thành công!')
 

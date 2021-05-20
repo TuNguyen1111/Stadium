@@ -32,7 +32,7 @@ class OwnerProfit(LoginRequiredMixin, UserPassesTestMixin, View):
             'fields': stadiums_by_owner,
             'stadium_sales_of_two_recent_months': stadium_sales_of_two_recent_months,
         }
-        return render(request, 'book_stadium/ownerProfit.html', context)
+        return render(request, 'book_stadium/owner_profit.html', context)
 
     def get_stadium_sales_of_two_recent_months(self, stadiums_by_owner):
         current_date = date.today()

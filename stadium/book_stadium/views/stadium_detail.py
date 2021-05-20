@@ -36,7 +36,7 @@ class StadiumDetail(LoginRequiredMixin, View):
         }
         return render(
             request,
-            'book_stadium/stadiumDetail.html',
+            'book_stadium/stadium_detail.html',
             page_info,
         )
 
@@ -57,7 +57,7 @@ class StadiumDetail(LoginRequiredMixin, View):
                 context = {
                     'form_detail': form_detail
                 }
-                return render(request, 'book_stadium/stadiumDetail.html', context)
+                return render(request, 'book_stadium/stadium_detail.html', context)
 
         elif form_name == 'form_time':
             form_time_frame = self.formset(request.POST, instance=stadium)

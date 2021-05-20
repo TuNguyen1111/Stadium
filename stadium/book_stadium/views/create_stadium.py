@@ -20,7 +20,7 @@ class CreateStadium(LoginRequiredMixin, UserPassesTestMixin, View):
         }
         return render(
             request,
-            'book_stadium/createStadium.html',
+            'book_stadium/create_stadium.html',
             context)
 
     def post(self, request):

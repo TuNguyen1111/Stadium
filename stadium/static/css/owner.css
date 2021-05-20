@@ -1,7 +1,6 @@
-
 .form-group {
     width: 100%;
-    margin-bottom: 20px;;
+    margin-bottom: 20px;
 }
 
 button {
@@ -17,7 +16,6 @@ button {
 .accepted-btn {
     padding: 0.5px;
     width: 50px;
-
 }
 
 .delete-btn {
@@ -30,7 +28,7 @@ button {
 .col {
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    height: auto;
 }
 
 .table {
@@ -45,17 +43,14 @@ button {
 
 .form {
     margin-bottom: 10px;
-
 }
-
-
 
 .crud-btn {
     display: flex;
     justify-content: space-between;
 }
 
-.accepted input{
+.accepted input {
     margin-left: 10px;
 }
 

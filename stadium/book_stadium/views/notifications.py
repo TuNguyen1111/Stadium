@@ -39,4 +39,4 @@ class NotificationDetail(View):
             'fields': stadiums_by_owner,
             'notify': notify
         }
-        return render(request, 'book_stadium/notificationDetail.html', context)
+        return render(request, 'book_stadium/notification_detail.html', context)

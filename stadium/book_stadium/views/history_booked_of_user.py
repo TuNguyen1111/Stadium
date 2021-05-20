@@ -27,7 +27,7 @@ class HistoryBookedOfUser(View):
         context = {
             'all_orders_of_user': all_orders_of_user
         }
-        return render(request, 'book_stadium/historyBookedOfUser.html', context)
+        return render(request, 'book_stadium/history_booked_of_user.html', context)
 
     def post(self, request, pk):
         user = request.user

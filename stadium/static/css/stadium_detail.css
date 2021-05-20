@@ -68,6 +68,10 @@ h1 {
     width: 70%;
 }
 
+#comment-form {
+    padding: 6%;
+}
+
 #comment-form button {
     margin: 1%;
 }
@@ -79,17 +83,13 @@ h1 {
 }
 
 .all-comments {
-    width: 70%;
+    width: 80%;
     margin: auto;
 }
 
 .timeframe-state input {
     margin-top: 1.7%;
 }
-
-/* .star-rating input {
-    display: none;
-} */
 
 .checked {
     color: orange;
@@ -109,7 +109,8 @@ h1 {
 }
 
 .average-users-rating {
-    width: 60%;
+    width: 80%;
     margin: auto;
     margin-bottom: 10%;
+    text-align: center;
 }

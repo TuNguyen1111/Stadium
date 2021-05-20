@@ -19,7 +19,7 @@ class UserProfile(LoginRequiredMixin, View):
             'form': form,
             'fields': stadiums_by_owner,
         }
-        return render(request, 'book_stadium/userProfile.html', context)
+        return render(request, 'book_stadium/user_profile.html', context)
 
     def post(self, request, pk):
         user = User.objects.get(pk=pk)

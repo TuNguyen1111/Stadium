@@ -16,9 +16,6 @@ function initScreen() {
     getAverageUsersRating()
 }
 
-
-
-
 function getInput() {
     let getData = this.getAttribute('data-name')
     let dataCheck = this.getAttribute('data-check')
@@ -132,18 +129,23 @@ function changeSelectTag() {
 }
 
 function setEventForStars() {
-    const oneStar = document.getElementById('one-star')
-    const twoStar = document.getElementById('two-star')
-    const threeStar = document.getElementById('three-star')
-    const fourStar = document.getElementById('four-star')
-    const fiveStar = document.getElementById('five-star')
-    const starType = [oneStar, twoStar, threeStar, fourStar, fiveStar]
+    try {
+        const oneStar = document.getElementById('one-star')
+        const twoStar = document.getElementById('two-star')
+        const threeStar = document.getElementById('three-star')
+        const fourStar = document.getElementById('four-star')
+        const fiveStar = document.getElementById('five-star')
+        const starType = [oneStar, twoStar, threeStar, fourStar, fiveStar]
 
-    starType.forEach(item => {
-        item.addEventListener('click', function(e) {
-            handleStarSelect(e.target.id)
-        })
-    });
+        starType.forEach(item => {
+            item.addEventListener('click', function(e) {
+                handleStarSelect(e.target.id)
+            })
+        });
+    } catch(error) {
+        console.log(error)
+    }
+    
 }
 
 function handleStarSelect(starId) {
@@ -189,43 +191,48 @@ function addOrRemoveCheckedClass(size) {
 function sendData() {
     let commentContent = document.getElementById('comment-input')
     let csrf = document.getElementsByName('csrfmiddlewaretoken')
-    let commentBtn = document.getElementById('comment-btn')
     let stadiumId = document.getElementById('stadium-id').value
 
-    commentBtn.addEventListener('click', (e) => {
-        e.preventDefault() 
-        let spanChildrens = document.getElementById('star-rating').children
-        var starPoint = 0
-        spanChildrens = [].slice.call(spanChildrens, 0).reverse()
+    try {
+        let commentBtn = document.getElementById('comment-btn')
+        commentBtn.addEventListener('click', (e) => {
+            e.preventDefault() 
+            let spanChildrens = document.getElementById('star-rating').children
+            var starPoint = 0
+            spanChildrens = [].slice.call(spanChildrens, 0).reverse()
 
-        for (let item of spanChildrens) {
-            itemPoint = item.getAttribute('point')
-            if (itemPoint > 0) {
-                starPoint = itemPoint
+            for (let item of spanChildrens) {
+                itemPoint = item.getAttribute('point')
+                if (itemPoint > 0) {
+                    starPoint = itemPoint
+                }
             }
-        }
 
-        $.ajax({
-            type: 'post',
-            url: '/danh-gia/',
-            data: {
-                commentData: commentContent.value,
-                starPoint: starPoint,
-                stadiumId: stadiumId,
-                csrfmiddlewaretoken: csrf[0].value
-            },
-            success: (data) => {
-                let totalOfStarTypeRated = data.stars_type_rated_numbers
-                console.log(totalOfStarTypeRated)
-                handleDataRespone(data)
-                clearInputAndStar(commentContent)
-                getTotalOfStarType(totalOfStarTypeRated)
-            },
-            error: (error) => {
-                console.log(error)
-            }
+            $.ajax({
+                type: 'post',
+                url: '/danh-gia/',
+                data: {
+                    commentData: commentContent.value,
+                    starPoint: starPoint,
+                    stadiumId: stadiumId,
+                    csrfmiddlewaretoken: csrf[0].value
+                },
+                success: (data) => {
+                    let totalOfStarTypeRated = data.stars_type_rated_numbers
+                    console.log(totalOfStarTypeRated)
+                    handleDataRespone(data)
+                    clearInputAndStar(commentContent)
+                    getTotalOfStarType(totalOfStarTypeRated)
+                },
+                error: (error) => {
+                    console.log(error)
+                }
+            })
         })
-    })
+    } catch(error) {
+        console.log(error)
+    }
+    
 }
 
 function handleDataRespone(data) {

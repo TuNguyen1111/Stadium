@@ -1,17 +1,16 @@
-.add-stadium{
+.add-stadium {
     border-radius: 20px;
     padding: 20px;
     width: 80%;
-    margin-top: 40px;
+    margin: 40px 0;
     border: 1px solid rgb(182, 158, 158);
-
 }
 
-.add-stadium .form-group{
+.add-stadium .form-group {
     width: 100%;
 }
 
-.add-stadium input{
+.add-stadium input {
     text-align: left;
 }
 
@@ -23,6 +22,7 @@ button {
     display: flex;
     flex-direction: column;
     align-items: center;
+    height: auto;
 }
 
 .alert-primary {
