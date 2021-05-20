@@ -8,7 +8,7 @@ const commentInput = document.getElementById('comment-input')
 
 executeFunctions()
 
-function executeFunctions() {
+function executeFunctions() {  // REVIEW: tên hàm không rõ nghĩa, VD có thể đặt là initScreen() -> "khởi tạo màn hình"
     addEventInput()
     changeSelectTag()
     sendData()
@@ -24,7 +24,7 @@ for (let i = 1; i < stadiumFormDetail.length; i++) {
 for (let i = 1; i < stadiumFormTimeFrames.length; i++) {
     if ( stadiumFormTimeFrames[i].checked || !stadiumFormTimeFrames[i].checked ) {
         oldValuesTimeFrames[stadiumFormTimeFrames[i].id] = stadiumFormTimeFrames[i].checked
-    }else{
+    }else{  // REVIEW: thêm dấu cách giữa 2 đầu chữ "else"
         oldValuesTimeFrames[stadiumFormTimeFrames[i].id] = stadiumFormTimeFrames[i].value
     }
 
@@ -52,7 +52,7 @@ function getInput() {
     }
 }
 
-for (let i = 0; i < pencils.length;i++) {
+for (let i = 0; i < pencils.length;i++) {  // REVIEW: thêm dấu cách sau dấu chấm phẩy
     pencils[i].addEventListener('click', getInput)
 }
 
@@ -125,6 +125,7 @@ function setEventForStars() {
     const fourStar = document.getElementById('four-star')
     const fiveStar = document.getElementById('five-star')
     var starPoint = 0
+    // REVIEW: tương tự review code python: không nên dùng kiểu dữ liệu để đặt tên biến
     const starArr = [oneStar, twoStar, threeStar, fourStar, fiveStar]
 
     starArr.forEach(item => {
@@ -132,7 +133,7 @@ function setEventForStars() {
             handleStarSelect(e.target.id)
         })
     });
-    
+
     console.log(document.getElementById('star-rating').children)
 }
 
@@ -186,7 +187,7 @@ function sendData() {
         let spanChildrens = document.getElementById('star-rating').children
         var starPoint = 0
         spanChildrens = [].slice.call(spanChildrens, 0).reverse()
-        
+
         for (let i = 0; i < spanChildrens.length; i++) {
             item = spanChildrens[i]
             itemPoint = item.getAttribute('point')
@@ -194,8 +195,8 @@ function sendData() {
                 starPoint = itemPoint
             }
         }
-        
-        e.preventDefault()
+
+        e.preventDefault()  // REVIEW: những hàm như e.preventDefault, e.stopPropagation nên cho lên đầu
         $.ajax({
             type: 'post',
             url: '/danh-gia/',
@@ -229,6 +230,15 @@ function handleDataRespone(data) {
 function setUserStarRating() {
     let allUsersStarRating = document.querySelectorAll('.user-star-rating')
 
+    // REVIEW: để loop qua các phần tử của "allUsersStarRating" thì có thể dùng:
+    // for (const userStarRating of allUsersStarRating) {
+    //     ...
+    // }
+    // Hoặc
+    // allUsersStarRating.forEach(function (userStarRating) {
+    //     ...
+    // })
+    // Còn kiểu chú dùng giờ lạc hậu rồi, hơi khó đọc
     for (let i = 0; i < allUsersStarRating.length; i++ ) {
         let userStarRating = allUsersStarRating[i]
         let childrenElements = userStarRating.children
@@ -283,7 +293,7 @@ function getTotalOfStarType(totalOfStarTypeRated) {
             if (starRateBtn.id === star) {
                 let typeOfStar = starRateBtn.getAttribute('star-type')
                 starRateBtn.innerHTML = `${typeOfStar} sao (${totalStar})`
-            }   
+            }
         }
     }
 }
@@ -301,9 +311,9 @@ function setEventForStarTypeBtn(data) {
             allCommentsDiv.innerHTML = ''
 
             for (const [starType, allUsersRated] of Object.entries(amountOfStarRatingType)) {
-                
+
                 if (starType === starRateTypeBtnId) {
-                    for (let userRated of allUsersRated) {  
+                    for (let userRated of allUsersRated) {
                         createElementForUserRated(userRated, allCommentsDiv)
                     }
                 }

@@ -319,5 +319,8 @@ class StarRatingForm(forms.ModelForm):
             'comment': 'Bình luận'
         }
         widgets = {
+            # REVIEW:
+            #   - Thống nhất dùng dấu ngoặc đơn hay ngoặc kép
+            #   - Sử dụng Textarea thay cho TextInput
             "comment": forms.TextInput(attrs={'id': 'comment-input'}),
         }

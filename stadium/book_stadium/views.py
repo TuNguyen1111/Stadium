@@ -315,15 +315,19 @@ class StadiumDetail(LoginRequiredMixin, View):
 
     def get(self, request, pk):
         stadiums_by_owner = Stadium.objects.filter(owner=request.user)
-        # current_stadium = Stadium.objects.get(pk=pk)
+        # current_stadium = Stadium.objects.get(pk=pk)  # REVIEW: xóa luôn dòng này, hạn chế comment bỏ code
         current_stadium = get_object_or_404(Stadium, pk=pk)
         times_and_prices = StadiumTimeFrame.objects.filter(
             stadium=current_stadium)
-        formDetail = StadiumForm(instance=current_stadium)
+        formDetail = StadiumForm(instance=current_stadium)  # REVIEW: sử dụng snake_case thay vì camelCase
         formTimeFrame = self.formset(instance=current_stadium)
         form_detail_for_user = StadiumFormForUser(instance=current_stadium)
+        # REVIEW: TODO: tìm hiểu 1 vài trang khác xem review họ thường sắp xếp theo
+        # thời gian hay theo số sao
         star_rating_of_stadiums = StarRating.objects.filter(
             stadium=current_stadium).order_by('-star_point')
+        # REVIEW: Trang này với chủ sân thì chỉ hiện danh sách review thôi chứ không hiện form
+        # Hiện tại chủ sân cũng đang tự review được sân của mình
         comment_form = StarRatingForm()
 
         page_info = {
@@ -338,7 +342,7 @@ class StadiumDetail(LoginRequiredMixin, View):
         }
         return render(
             request,
-            'book_stadium/stadiumDetail.html',
+            'book_stadium/stadiumDetail.html',  # REVIEW: sử dụng snake_case thay vì camelCase
             page_info,
         )
 
@@ -357,6 +361,7 @@ class StadiumDetail(LoginRequiredMixin, View):
                 instance.owner = owner
                 instance.save()
             else:
+                # REVIEW: form không hợp lệ thì phải show lại form cùng với thông báo lỗi
                 print(form_detail.errors)
 
         elif formname == 'form_time':
@@ -365,7 +370,7 @@ class StadiumDetail(LoginRequiredMixin, View):
             if formTimeFrame.is_valid():
                 formTimeFrame.save()
 
-        elif formname == 'delete-input':
+        elif formname == 'delete-input':  # REVIEW: thống nhất sử dụng snake_case
             stadium.delete()
             return redirect('book_stadium')
 
@@ -378,7 +383,7 @@ class StadiumRating(View):
     def get(self, request):
         if request.is_ajax():
             stadium_id = request.GET.get('stadiumId')
-            stadium = Stadium.objects.get(pk=stadium_id)
+            stadium = Stadium.objects.get(pk=stadium_id)  # REVIEW: sử dụng get_objects_or_404
             all_star_rate_of_stadiums = StarRating.objects.filter(
                 stadium=stadium).order_by('-star_point')
             total_of_star_type_rated, total_users_rate_of_stadium = self.get_total_of_star_type_rated(
@@ -420,7 +425,17 @@ class StadiumRating(View):
             return JsonResponse(data_respone)
 
     def get_total_of_star_type_rated(self, all_star_rate_of_stadiums):
+        # REVIEW: Không nên đặt tên biến là total_of_, list_of_, chỉ cần sử dụng danh từ số nhiều là đủ
+        # VD: star_types, user_rates_of_stadium
+        # Nguyên tắc chung: không nên sử dụng kiểu dữ liệu làm tên biến, VD:
+        #   - star_list -> stars
+        #   - stadium_tuple -> stadiums
         total_of_star_type_rated = dict()
+        # REVIEW: ở đây dùng hàm .count() là không hiệu quả
+        # "all_star_rate_of_stadiums" là 1 queryset đằng nào cũng được evaluate sau này,
+        # nên ở đây dùng len(all_star_rate_of_stadiums) thay cho all_star_rate_of_stadiums.count()
+        # sẽ tiết kiệm 1 lần query database
+        # TODO: tìm hiểu: https://docs.djangoproject.com/en/3.2/ref/models/querysets/#when-querysets-are-evaluated
         total_users_rate_of_stadium = all_star_rate_of_stadiums.count()
         list_of_star_type = self.get_list_of_star_type()
 
