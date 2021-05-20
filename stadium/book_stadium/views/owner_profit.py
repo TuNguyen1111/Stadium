@@ -3,7 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render
 from django.http import JsonResponse
 from django.views import View
-from book_stadium.models import Order, Stadium, StadiumTimeFrame, TimeFrame, User, Roles
+from book_stadium.models import Order, Stadium, TimeFrame, User, Roles, TypeOfStadium
 import json
 
 
@@ -16,15 +16,15 @@ class OwnerProfit(LoginRequiredMixin, UserPassesTestMixin, View):
 
         stadium_sales_of_two_recent_months = self.get_stadium_sales_of_two_recent_months(
             stadiums_by_owner)
-        all_stadiums_sales_information_in_lastest_12_months = self.general_stadium_sales_in_lastest_12_months(
+        sales_information_in_lastest_12_months = self.general_stadium_sales_information_in_lastest_12_months(
             stadiums_by_owner)
-        all_stadium_sales_of_this_month_by_timeframes = self.get_all_stadiums_sales_of_this_month_by_timeframes(
+        sales_of_this_month_by_timeframes = self.get_stadiums_sales_of_this_month_by_timeframes(
             stadiums_by_owner)
-
+        print(json.dumps(sales_information_in_lastest_12_months, indent=4))
         if request.is_ajax():
             json_respone = {
-                'sales_in_lastest_12_months': all_stadiums_sales_information_in_lastest_12_months,
-                'all_stadium_sales_of_this_month_by_timeframes': all_stadium_sales_of_this_month_by_timeframes
+                'sales_information_in_lastest_12_months': sales_information_in_lastest_12_months,
+                'sales_of_this_month_by_timeframes': sales_of_this_month_by_timeframes
             }
             return JsonResponse(json_respone)
 
@@ -63,12 +63,10 @@ class OwnerProfit(LoginRequiredMixin, UserPassesTestMixin, View):
         sales['last_month_sales'] = sales_of_last_month
         return sales
 
-    def get_stadium_sales_in_lastest_12_months(self, stadium):
+    def get_stadium_sales_information_in_lastest_12_months(self, stadium):
         stadium_sales = dict()
         remaining_months = 12
         current_month, current_year = self.get_current_month_and_year()
-        oldest_month_in_profit = 0
-        oldest_year_in_profit = 0
         is_same_month = False
         is_same_year = False
         orders = Order.objects.filter(
@@ -119,11 +117,11 @@ class OwnerProfit(LoginRequiredMixin, UserPassesTestMixin, View):
                     stadium_sales['sales'].append(0)
                     remaining_months -= 1
         else:
-            stadium_sales = self.get_stadium_with_no_sales_in_lastest_12_months(
+            stadium_sales = self.get_stadium_with_no_sales_information_in_lastest_12_months(
                 stadium_sales, stadium, current_year)
         return stadium_sales
 
-    def get_stadium_with_no_sales_in_lastest_12_months(self, stadium_sales, stadium, current_year):
+    def get_stadium_with_no_sales_information_in_lastest_12_months(self, stadium_sales, stadium, current_year):
         stadium_sales = self.set_stadium_name_in_stadium_sales(
             stadium_sales, stadium)
         months_and_year = list()
@@ -137,21 +135,21 @@ class OwnerProfit(LoginRequiredMixin, UserPassesTestMixin, View):
 
         return stadium_sales
 
-    def general_stadium_sales_in_lastest_12_months(self, stadiums_by_owner):
+    def general_stadium_sales_information_in_lastest_12_months(self, stadiums_by_owner):
         stadiums_sales_information = list()
-        all_stadiums_total_sales = self.get_all_stadiums_total_sales_in_lastest_12_months()
+        stadiums_sales = self.get_stadiums_sales_information_in_lastest_12_months()
 
         for stadium in stadiums_by_owner:
-            stadium_sales = self.get_stadium_sales_in_lastest_12_months(
+            stadium_sales = self.get_stadium_sales_information_in_lastest_12_months(
                 stadium)
-            stadium_name, total_stadium_sales = self.general_stadium_total_sales_in_lastest_12_months(
+            stadium_name, total_stadium_sales = self.summary_stadium_sales_information_in_lastest_12_months(
                 stadium_sales)
 
-            all_stadiums_total_sales['stadiums_name'].append(stadium_name)
-            all_stadiums_total_sales['sales'].append(total_stadium_sales)
+            stadiums_sales['stadiums_name'].append(stadium_name)
+            stadiums_sales['sales'].append(total_stadium_sales)
             stadiums_sales_information.append(stadium_sales)
 
-        stadiums_sales_information.append(all_stadiums_total_sales)
+        stadiums_sales_information.append(stadiums_sales)
         return stadiums_sales_information
 
     def set_stadium_name_in_stadium_sales(self, stadium_sales, stadium):
@@ -164,7 +162,7 @@ class OwnerProfit(LoginRequiredMixin, UserPassesTestMixin, View):
         order_year = order_date.year
         return [order_month, order_year]
 
-    def general_stadium_total_sales_in_lastest_12_months(self, stadium_sales):
+    def summary_stadium_sales_information_in_lastest_12_months(self, stadium_sales):
         stadium_name = stadium_sales['stadium_name']
         stadium_sales = stadium_sales['sales']
         total_stadium_sales = 0
@@ -173,15 +171,15 @@ class OwnerProfit(LoginRequiredMixin, UserPassesTestMixin, View):
             total_stadium_sales += sales
         return [stadium_name, total_stadium_sales]
 
-    def get_all_stadiums_total_sales_in_lastest_12_months(self):
-        all_stadiums_total_sales = dict()
-        all_stadiums_name = list()
-        all_stadiums_sales = list()
+    def get_stadiums_sales_information_in_lastest_12_months(self):
+        stadiums_sales = dict()
+        stadiums_name = list()
+        sales = list()
 
-        all_stadiums_total_sales['stadiums_name'] = all_stadiums_name
-        all_stadiums_total_sales['sales'] = all_stadiums_sales
+        stadiums_sales['stadiums_name'] = stadiums_name
+        stadiums_sales['sales'] = sales
 
-        return all_stadiums_total_sales
+        return stadiums_sales
 
     def get_current_month_and_year(self):
         current_date = date.today()
@@ -191,7 +189,11 @@ class OwnerProfit(LoginRequiredMixin, UserPassesTestMixin, View):
         return [current_month, current_year]
 
     def get_order_price(self, order):
-        order_price = order.stadium_time_frame.price
+        if order.type_stadium == TypeOfStadium.BIG:
+            order_price = order.stadium_time_frame.price * 3
+        else:
+            order_price = order.stadium_time_frame.price
+
         return order_price
 
     def general_stadium_sales_of_this_month_by_timeframes(self, stadium):
@@ -203,8 +205,7 @@ class OwnerProfit(LoginRequiredMixin, UserPassesTestMixin, View):
 
         orders = Order.objects.filter(
             stadium_time_frame__stadium=stadium).order_by('order_date')
-        stadium_timeframe = StadiumTimeFrame.objects.filter(stadium=stadium)
-        all_timeframes = TimeFrame.objects.all()
+        stadium_timeframes = TimeFrame.objects.all()
 
         # initialization stadium_sales
         if 'timeframes' not in stadium_sales:
@@ -214,7 +215,7 @@ class OwnerProfit(LoginRequiredMixin, UserPassesTestMixin, View):
                 'number_of_orders': list()
             }
 
-            for timeframe in all_timeframes:
+            for timeframe in stadium_timeframes:
                 sales = sales_and_number_of_orders['sales']
                 number_of_orders = sales_and_number_of_orders['number_of_orders']
                 timeframe = str(timeframe)
@@ -246,15 +247,15 @@ class OwnerProfit(LoginRequiredMixin, UserPassesTestMixin, View):
                         number_of_orders[index_of_timeframe] += 1
         return stadium_sales
 
-    def get_all_stadiums_sales_of_this_month_by_timeframes(self, stadiums_by_owner):
-        all_stadium_sales = list()
+    def get_stadiums_sales_of_this_month_by_timeframes(self, stadiums_by_owner):
+        stadiums_sales = list()
 
         for stadium in stadiums_by_owner:
             stadium_sales = self.general_stadium_sales_of_this_month_by_timeframes(
                 stadium)
-            all_stadium_sales.append(stadium_sales)
-        print(json.dumps(all_stadium_sales, indent=4))
-        return all_stadium_sales
+            stadiums_sales.append(stadium_sales)
+
+        return stadiums_sales
 
     def test_func(self):
         return self.request.user.role == Roles.OWNER
