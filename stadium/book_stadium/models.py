@@ -54,7 +54,6 @@ class User(AbstractUser):
     role = models.CharField(
         max_length=20, choices=Roles.choices, default='player')
     email = models.EmailField(_('email address'), blank=True)
-    #image = models.ImageField(upload_to="user_images", default='default.jpg', null=True, blank=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
@@ -119,8 +118,6 @@ class Order(models.Model):
     # ngay bat dau dat san cua user
     order_datetime = models.DateTimeField(default=timezone.now)
 
-    # three_field_merge = models.JSONField(default={}, blank=True, null=True)
-
     is_accepted = models.BooleanField(default=False)
     customer_phone_number = models.CharField(max_length=12, blank=True)
     customer_name = models.CharField(max_length=100, blank=True)
@@ -131,13 +128,8 @@ class Order(models.Model):
 
 class StarRating(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    # REVIEW: rating lúc nào cũng phải gắn với 1 sân, nên "stadium" không cần "null=True"
-    stadium = models.ForeignKey(Stadium, on_delete=models.CASCADE, null=True)
-    # REVIEW:
-    #   - Comment nên để là TextField
-    #   - CharField chỉ nên để tối đa là "max_length=255". Câu hỏi: tại sao lại là 255?
-    #   - TODO: Tìm hiểu kiểu dữ liệu VARCHAR, TEXT của mysql
-    comment = models.CharField(max_length=1000)
+    stadium = models.ForeignKey(Stadium, on_delete=models.CASCADE)
+    comment = models.TextField()
     star_point = models.PositiveSmallIntegerField(
         default=0, blank=True, null=True)
 

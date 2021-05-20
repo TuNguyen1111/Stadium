@@ -15,9 +15,8 @@ $.ajax({
 })
 
 function createChartForSalesOfThisMonthByTimeframes(json) {
-    stadiums = json.all_stadium_sales_of_this_month_by_timeframes
-    for (let i = 0; i < stadiums.length; i++) {
-        stadium = stadiums[i]
+    stadiums = json.sales_of_this_month_by_timeframes
+    for (let stadium of stadiums) {
         stadiumName = stadium.stadium_name
         stadiumNameConverted = stadiumName.replace(/ /g, '_')
 
@@ -55,13 +54,10 @@ function createDoubleColumnChart(dataOfSales, dataOfNumberOfOrder, labelsOfChart
                 backgroundColor: [
                     'rgba(55, 52, 214, 0.2)',
                 ],
-                // This binds the dataset to the left y axis
                 yAxisID: 'left-y-axis'
             }, {
                 data: dataOfNumberOfOrder,
                 label: 'Số người đặt',
-    
-                // This binds the dataset to the right y axis
                 yAxisID: 'right-y-axis'
             }],
             labels: labelsOfChart
@@ -88,18 +84,20 @@ function createDoubleColumnChart(dataOfSales, dataOfNumberOfOrder, labelsOfChart
 }
 
 function createChartForLastest12MonthsSales(json) {
-    stadiums = json.sales_in_lastest_12_months
-        for (let i = 0; i < (stadiums.length - 1); i++) {
-            stadium = stadiums[i]
+    stadiums = json.sales_information_in_lastest_12_months
+ 
+        for (let [index, stadium] of stadiums.entries()) {
+            if (index === (stadiums.length - 1)) {
+                break
+            }
             stadiumName = stadium.stadium_name
+
             if(stadiumName === undefined) {
                 stadiumName = 'Total sales'
             }
-
             stadiumNameConverted = stadiumName.replace(/ /g, '_')
 
             let canvas =  document.createElement('CANVAS')
-            console.log(canvas)
             let chartsDiv = document.getElementById('twelve-months-charts')
             let newDiv = document.createElement('div')
             newDiv.className = 'col-sm-6'
@@ -162,19 +160,11 @@ function setEventForShowChartBtn() {
     thisMonthShowBtn.addEventListener('click', function() {
         twelveMonthsCharts.style.display = 'none'
         thisMonthCharts.style.display = 'flex'
-        // if (twelveMonthsCharts.style.display === 'block') {
-        //     twelveMonthsCharts.style.display = 'none'
-        // }
-        console.log('clicked')
     })
 
     twelveMonthsShowBtn.addEventListener('click', function() {
         twelveMonthsCharts.style.display = 'flex'
         thisMonthCharts.style.display = 'none'
-        // if (twelveMonthsCharts.style.display === 'block') {
-        //     twelveMonthsCharts.style.display = 'none'
-        // }
-        console.log('clicked')
     })
 }
 

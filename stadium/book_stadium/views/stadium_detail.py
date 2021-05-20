@@ -14,12 +14,11 @@ class StadiumDetail(LoginRequiredMixin, View):
 
     def get(self, request, pk):
         stadiums_by_owner = Stadium.objects.filter(owner=request.user)
-        # current_stadium = Stadium.objects.get(pk=pk)
         current_stadium = get_object_or_404(Stadium, pk=pk)
         times_and_prices = StadiumTimeFrame.objects.filter(
             stadium=current_stadium)
-        formDetail = StadiumForm(instance=current_stadium)
-        formTimeFrame = self.formset(instance=current_stadium)
+        form_detail = StadiumForm(instance=current_stadium)
+        form_time_frame = self.formset(instance=current_stadium)
         form_detail_for_user = StadiumFormForUser(instance=current_stadium)
         star_rating_of_stadiums = StarRating.objects.filter(
             stadium=current_stadium).order_by('-star_point')
@@ -29,8 +28,8 @@ class StadiumDetail(LoginRequiredMixin, View):
             'fields': stadiums_by_owner,
             'stadium': current_stadium,
             'times_and_prices': times_and_prices,
-            'formDetail': formDetail,
-            'formTimeFrame': formTimeFrame,
+            'form_detail': form_detail,
+            'form_time_frame': form_time_frame,
             'form_detail_for_user': form_detail_for_user,
             'comments_of_stadium': star_rating_of_stadiums,
             'comment_form': comment_form
@@ -42,29 +41,31 @@ class StadiumDetail(LoginRequiredMixin, View):
         )
 
     def post(self, request, pk):
-        formname = request.POST.get('form_type')
+        form_name = request.POST.get('form_type')
         stadium = Stadium.objects.get(pk=pk)
         owner = request.user
 
-        if formname == 'form_detail':
+        if form_name == 'form_detail':
             form_detail = StadiumForm(
                 request.POST, request.FILES, instance=stadium)
 
             if form_detail.is_valid():
-                # như trên, đẩy owner vào.
                 instance = form_detail.save(commit=False)
                 instance.owner = owner
                 instance.save()
             else:
-                print(form_detail.errors)
+                context = {
+                    'form_detail': form_detail
+                }
+                return render(request, 'book_stadium/stadiumDetail.html', context)
 
-        elif formname == 'form_time':
-            formTimeFrame = self.formset(request.POST, instance=stadium)
+        elif form_name == 'form_time':
+            form_time_frame = self.formset(request.POST, instance=stadium)
 
-            if formTimeFrame.is_valid():
-                formTimeFrame.save()
+            if form_time_frame.is_valid():
+                form_time_frame.save()
 
-        elif formname == 'delete-input':
+        elif form_name == 'delete_input':
             stadium.delete()
             return redirect('book_stadium')
 

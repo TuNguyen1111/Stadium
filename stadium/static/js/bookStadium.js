@@ -55,27 +55,5 @@ $(document).ready(function() {
 
 })
 
-// function focusForm(e) {
-//     stadiumName = e.target.getAttribute('stadium-name')
-//     userName = e.target.getAttribute('user-name')
-//     userPhoneNumber = e.target.getAttribute('user-phone-number')
-//     timeframe = e.target.getAttribute('time-frame')
-
-//     stadiumInput = document.getElementById('stadium-name')
-//     userNameInput = document.getElementById('id_customer_name')
-//     userPhoneNumberInput = document.getElementById('id_customer_phone_number')
-//     timeframeInput = document.querySelectorAll('#time_frame')
-//     console.log(timeframeInput[1].value)
-//     stadiumInput.value = stadiumName
-
-//     if ( timeframe ) {
-//         timeframeInput[1].value = timeframe
-//     }
-
-//     if ( userName ) {
-//         userNameInput.value = userName
-//         userPhoneNumberInput.value = userPhoneNumber
-//     }
-// }
 
 

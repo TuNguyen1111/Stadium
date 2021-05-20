@@ -1,14 +1,13 @@
-// var inputFields = document.querySelectorAll('input')
-var pencils = document.querySelectorAll('i')
-var stadiumFormDetail = document.querySelector('.stadium-form-detail').querySelectorAll('input')
+
 var stadiumFormTimeFrames = document.querySelector('.stadium-form-time-frames').querySelectorAll('input')
-var oldValuesDetail = {}
-var oldValuesTimeFrames = {}
-const commentInput = document.getElementById('comment-input')
+var stadiumFormDetail = document.querySelector('.stadium-form-detail').querySelectorAll('input')
+var oldValuesTimeFrames = getStadiumTimeFramesInformation()
+var oldValuesDetail =  getStadiumInformation()
 
-executeFunctions()
+initScreen()
 
-function executeFunctions() {  // REVIEW: tên hàm không rõ nghĩa, VD có thể đặt là initScreen() -> "khởi tạo màn hình"
+function initScreen() { 
+    setEventForPencilsIcon()
     addEventInput()
     changeSelectTag()
     sendData()
@@ -17,18 +16,8 @@ function executeFunctions() {  // REVIEW: tên hàm không rõ nghĩa, VD có th
     getAverageUsersRating()
 }
 
-for (let i = 1; i < stadiumFormDetail.length; i++) {
-    oldValuesDetail[stadiumFormDetail[i].id] = stadiumFormDetail[i].value
-}
 
-for (let i = 1; i < stadiumFormTimeFrames.length; i++) {
-    if ( stadiumFormTimeFrames[i].checked || !stadiumFormTimeFrames[i].checked ) {
-        oldValuesTimeFrames[stadiumFormTimeFrames[i].id] = stadiumFormTimeFrames[i].checked
-    }else{  // REVIEW: thêm dấu cách giữa 2 đầu chữ "else"
-        oldValuesTimeFrames[stadiumFormTimeFrames[i].id] = stadiumFormTimeFrames[i].value
-    }
 
-}
 
 function getInput() {
     let getData = this.getAttribute('data-name')
@@ -38,34 +27,59 @@ function getInput() {
     let input = document.getElementById(getData)
     if (input.disabled) {
         input.disabled = false
-    }else {
+    } else {
         input.disabled = true
     }
 
     if ( checkBox ) {
         if ( checkBox.disabled ) {
             checkBox.disabled = false
-        }else {
+        } else {
             checkBox.disabled = true
         }
 
     }
 }
 
-for (let i = 0; i < pencils.length;i++) {  // REVIEW: thêm dấu cách sau dấu chấm phẩy
-    pencils[i].addEventListener('click', getInput)
+function setEventForPencilsIcon() {
+    let pencils = document.querySelectorAll('i')
+    for (let pencil of pencils) { 
+        pencil.addEventListener('click', getInput)
+    }
+}
+
+function getStadiumInformation() {
+    let oldValuesDetail = {}
+
+    for (let item of stadiumFormDetail) {
+        oldValuesDetail[item.id] = item.value
+    } 
+    return oldValuesDetail      
+}
+
+function getStadiumTimeFramesInformation() {
+    let oldValuesTimeFrames = {}
+
+    for (let item of stadiumFormTimeFrames) {
+        if (item.checked || !item.checked) {
+            oldValuesTimeFrames[item.id] = item.checked
+        } else {  
+            oldValuesTimeFrames[item.id] = item.value
+        }
+    }
+    return oldValuesTimeFrames
 }
 
 function checkValueOfDetailInput() {
     let current = this.value
     let saveBtn = document.getElementById('saveDetailBtn')
-
+    
     if (current != oldValuesDetail[this.id]) {
         saveBtn.disabled = false
-        for (let i = 0; i < stadiumFormDetail.length; i++){
-            stadiumFormDetail[i].disabled = false
+        for (let item of stadiumFormDetail){
+            item.disabled = false
         }
-    }else {
+    } else {
         saveBtn.disabled = true
     }
 }
@@ -79,21 +93,21 @@ function checkValueOfTimeFrameInput() {
     let saveBtn = document.getElementById('saveTimeFramesBtn')
     if (current != oldValuesTimeFrames[this.id]) {
         saveBtn.disabled = false
-        for (let i = 0; i < stadiumFormTimeFrames.length; i++){
-            stadiumFormTimeFrames[i].disabled = false
+        for (let item of stadiumFormTimeFrames){
+            item.disabled = false
         }
-    }else {
+    } else {
         saveBtn.disabled = true
     }
 }
 
 function addEventInput() {
-    for (let i = 1; i < stadiumFormDetail.length; i++) {
-        stadiumFormDetail[i].addEventListener('input', checkValueOfDetailInput)
+    for (let item of stadiumFormDetail) {
+        item.addEventListener('input', checkValueOfDetailInput)
     }
-    for (let i = 1; i < stadiumFormTimeFrames.length; i++) {
-        stadiumFormTimeFrames[i].addEventListener('input', checkValueOfTimeFrameInput)
-        stadiumFormTimeFrames[i].disabled = true
+    for (let item of stadiumFormTimeFrames) {
+        item.addEventListener('input', checkValueOfTimeFrameInput)
+        item.disabled = true
     }
 }
 
@@ -109,8 +123,7 @@ function tunrOndeleteTimeFrameModal(id) {
 
 function changeSelectTag() {
     let inputTags = document.querySelectorAll('select')
-    for (let i = 0; i < inputTags.length; i++) {
-    let item = inputTags[i]
+    for (let item of inputTags) {
         let pTag = document.createElement('p')
         let value = item.options[item.selectedIndex].text;
         pTag.innerHTML = value
@@ -124,17 +137,13 @@ function setEventForStars() {
     const threeStar = document.getElementById('three-star')
     const fourStar = document.getElementById('four-star')
     const fiveStar = document.getElementById('five-star')
-    var starPoint = 0
-    // REVIEW: tương tự review code python: không nên dùng kiểu dữ liệu để đặt tên biến
-    const starArr = [oneStar, twoStar, threeStar, fourStar, fiveStar]
+    const starType = [oneStar, twoStar, threeStar, fourStar, fiveStar]
 
-    starArr.forEach(item => {
+    starType.forEach(item => {
         item.addEventListener('click', function(e) {
             handleStarSelect(e.target.id)
         })
     });
-
-    console.log(document.getElementById('star-rating').children)
 }
 
 function handleStarSelect(starId) {
@@ -165,13 +174,14 @@ function handleStarSelect(starId) {
 function addOrRemoveCheckedClass(size) {
     var spanChildrens = document.getElementById('star-rating').children
     spanChildrens = [].slice.call(spanChildrens, 0).reverse()
-    for (let i = 0; i < spanChildrens.length; i++) {
-        if (i < size) {
-            spanChildrens[i].classList.add('checked')
-            spanChildrens[i].setAttribute('point', i+1)
-        }else {
-            spanChildrens[i].classList.remove('checked')
-            spanChildrens[i].setAttribute('point', 0)
+
+    for (let [index, children] of spanChildrens.entries()) {
+        if (index < size) {
+            children.classList.add('checked')
+            children.setAttribute('point', index+1)
+        } else {
+            children.classList.remove('checked')
+            children.setAttribute('point', 0)
         }
     }
 }
@@ -183,20 +193,18 @@ function sendData() {
     let stadiumId = document.getElementById('stadium-id').value
 
     commentBtn.addEventListener('click', (e) => {
-        console.log('cliked')
+        e.preventDefault() 
         let spanChildrens = document.getElementById('star-rating').children
         var starPoint = 0
         spanChildrens = [].slice.call(spanChildrens, 0).reverse()
 
-        for (let i = 0; i < spanChildrens.length; i++) {
-            item = spanChildrens[i]
+        for (let item of spanChildrens) {
             itemPoint = item.getAttribute('point')
             if (itemPoint > 0) {
                 starPoint = itemPoint
             }
         }
 
-        e.preventDefault()  // REVIEW: những hàm như e.preventDefault, e.stopPropagation nên cho lên đầu
         $.ajax({
             type: 'post',
             url: '/danh-gia/',
@@ -207,7 +215,7 @@ function sendData() {
                 csrfmiddlewaretoken: csrf[0].value
             },
             success: (data) => {
-                let totalOfStarTypeRated = data.total_of_star_type_rated
+                let totalOfStarTypeRated = data.stars_type_rated_numbers
                 console.log(totalOfStarTypeRated)
                 handleDataRespone(data)
                 clearInputAndStar(commentContent)
@@ -230,23 +238,14 @@ function handleDataRespone(data) {
 function setUserStarRating() {
     let allUsersStarRating = document.querySelectorAll('.user-star-rating')
 
-    // REVIEW: để loop qua các phần tử của "allUsersStarRating" thì có thể dùng:
-    // for (const userStarRating of allUsersStarRating) {
-    //     ...
-    // }
-    // Hoặc
-    // allUsersStarRating.forEach(function (userStarRating) {
-    //     ...
-    // })
-    // Còn kiểu chú dùng giờ lạc hậu rồi, hơi khó đọc
-    for (let i = 0; i < allUsersStarRating.length; i++ ) {
-        let userStarRating = allUsersStarRating[i]
+    for (let userStarRating of allUsersStarRating ) {
         let childrenElements = userStarRating.children
         userStarRating = childrenElements[childrenElements.length - 1].value
+        childrenElements = Array.from(childrenElements);
 
-        for (let j = 0; j < childrenElements.length; j++) {
-            if (j < userStarRating) {
-                childrenElements[j].classList.add('checked')
+        for (let [index, childrenElement] of childrenElements.entries()) {
+            if (index < userStarRating) {
+                childrenElement.classList.add('checked')
             }
         }
 
@@ -257,8 +256,8 @@ function clearInputAndStar(commentContent) {
     let starRatingInput = document.getElementById('star-rating')
     let childrenElements = starRatingInput.children
 
-    for (let i = 0; i < childrenElements.length; i++) {
-        childrenElements[i].classList.remove('checked')
+    for (let childrenElement of childrenElements) {
+        childrenElement.classList.remove('checked')
     }
 
     commentContent.value = ''
@@ -273,7 +272,7 @@ function getAverageUsersRating() {
             stadiumId: stadiumId
         },
         success: function(data) {
-            let totalOfStarTypeRated = data.total_of_star_type_rated
+            let totalOfStarTypeRated = data.stars_type_rated_numbers
 
             getTotalOfStarType(totalOfStarTypeRated)
             setEventForStarTypeBtn(data)
@@ -288,8 +287,7 @@ function getTotalOfStarType(totalOfStarTypeRated) {
     let allStarRateBtns = document.querySelectorAll('.star-rate-btn')
 
     for (const [star, totalStar] of Object.entries(totalOfStarTypeRated)) {
-        for (let i = 0; i < allStarRateBtns.length; i++) {
-            let starRateBtn = allStarRateBtns[i]
+        for (let starRateBtn of allStarRateBtns) {
             if (starRateBtn.id === star) {
                 let typeOfStar = starRateBtn.getAttribute('star-type')
                 starRateBtn.innerHTML = `${typeOfStar} sao (${totalStar})`
@@ -299,18 +297,16 @@ function getTotalOfStarType(totalOfStarTypeRated) {
 }
 
 function setEventForStarTypeBtn(data) {
-    let amountOfStarRatingType = data.amount_of_star_rating_type
+    let summaryOfStarsType = data.summary_of_stars_type
     let allStarRateTypeBtns = document.querySelectorAll('.star-rate-btn')
 
-    for (let i = 0; i < allStarRateTypeBtns.length; i++) {
-        let starRateTypeBtn = allStarRateTypeBtns[i]
-
+    for (let starRateTypeBtn of allStarRateTypeBtns) {
         starRateTypeBtn.addEventListener('click', function() {
             let starRateTypeBtnId = starRateTypeBtn.id
             var allCommentsDiv = document.getElementById('all-comments')
             allCommentsDiv.innerHTML = ''
 
-            for (const [starType, allUsersRated] of Object.entries(amountOfStarRatingType)) {
+            for (const [starType, allUsersRated] of Object.entries(summaryOfStarsType)) {
 
                 if (starType === starRateTypeBtnId) {
                     for (let userRated of allUsersRated) {

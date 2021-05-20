@@ -26,17 +26,14 @@ function turnOnModalUpdate(e, id) {
     let orderIdInput = document.querySelectorAll('#id_order_id')
     let changeNumberFieldInput = document.querySelectorAll('.field_number')
 
-    for (let i = 0; i < changeNumberFieldInput.length; i++) {
-        input = changeNumberFieldInput[i]
-        input.setAttribute('max', maxNumber)
-        input.setAttribute('min', 1)
+    for (let item of changeNumberFieldInput) {
+        item.setAttribute('max', maxNumber)
+        item.setAttribute('min', 1)
     }
 
-    for (let i = 0; i < orderIdInput.length; i++) {
-        input = orderIdInput[i]
-        input.value = getOrderid
+    for (let item of orderIdInput) {
+        item.value = getOrderid
     }
-
 
     modalUpdate.show();
 }

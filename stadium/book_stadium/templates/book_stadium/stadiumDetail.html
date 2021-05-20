@@ -24,9 +24,8 @@
                     {% csrf_token %}
 
                     {% if stadium.owner == user %}
-                        {% for input in formDetail.visible_fields %}
+                        {% for input in form_detail.visible_fields %}
                             <div class="form-group mt-4">
-                                <!-- <label for="exampleInputEmail1">{{ input.label }} </label> -->
                                 <div class="inputField">
                                     {{ input|as_crispy_field }}
                                     <i data-name="{{input.auto_id }}" class="fas fa-pen-square"></i>
@@ -56,7 +55,7 @@
                 </h2>
                 <form action="{% url 'stadium_detail' stadium.id %}" method="POST" class="stadium-form-time-frames"
                 id="stadium-form-time-frames">
-                {{ formTimeFrame.management_form }}
+                {{ form_time_frame.management_form }}
                 {% csrf_token %}
                 <table class="table">
                     <thead class="thead-dark">
@@ -69,7 +68,7 @@
                     </thead>
                     <tbody>
 
-                    {% for form in formTimeFrame %}
+                    {% for form in form_time_frame %}
                         {% for hidden in form.hidden_fields %}
                             {{ hidden }}
                         {% endfor %}
@@ -177,7 +176,7 @@
                 <div class="modal-footer">
                     <form class="form-accept" method="POST" action="">
                         {% csrf_token %}
-                        <input type="hidden" name="form_type" value="delete-input">
+                        <input type="hidden" name="form_type" value="delete_input">
                         <input type="submit" class="btn btn-danger" value="Có">
                     </form>
                     <input type="submit" class="btn btn-secondary" data-bs-dismiss="modal" value="Hủy">
