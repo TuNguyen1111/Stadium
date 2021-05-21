@@ -2,16 +2,16 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-  }
+}
 
 .col {
     display: flex;
     flex-direction: column;
     height: auto;
-
 }
 
 .overview {
+    width: 80%;
     padding: 2%;
 }
 
@@ -24,12 +24,11 @@
     display: flex;
     flex-direction: column;
     padding: 5%;
-    background-color: #e4e3e3
+    background-color: #e4e3e3;
 }
 
-.list-of-stadium{
+.list-of-stadium {
     display: flex;
-
 }
 
 .list-of-stadium {
@@ -91,7 +90,8 @@
     align-items: center;
 }
 
-.form-search, .form-order {
+.form-search,
+.form-order {
     width: 75%;
     margin-bottom: 2%;
 }
@@ -106,7 +106,8 @@
     align-items: initial;
 }
 
-.form-search .search-btn-dropdown, .form-order .order-btn-dropdown {
+.form-search .search-btn-dropdown,
+.form-order .order-btn-dropdown {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -117,7 +118,7 @@
     width: 30%;
 }
 
-.submit-btn  {
+.submit-btn {
     text-align: center;
 }
 
@@ -126,12 +127,12 @@
     margin: auto;
 }
 
-.form-search .search-show, .form-order .order-show {
+.form-search .search-show,
+.form-order .order-show {
     padding: 5%;
     margin-bottom: 5%;
     display: none;
 }
-
 
 .book-stadium-btn {
     position: absolute;
@@ -158,5 +159,3 @@
 .view-all-stadium {
     text-align: end;
 }
-
-
