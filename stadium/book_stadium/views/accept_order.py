@@ -9,7 +9,7 @@ from book_stadium.models import Order
 class AcceptOrderView(View):
     def post(self, request, pk):
         form_type = request.POST.get('form_type')
-        order = Order.objects.get(pk=pk)
+        order = Order.objects.get(pk=pk)  # REVIEW: biết cần phải làm gì ở đây rồi chứ :))
         type_stadium = order.type_stadium
         order_date = order.order_date
         stadium_timeframe = order.stadium_time_frame
@@ -25,7 +25,7 @@ class AcceptOrderView(View):
                 stadium_time_frame=stadium_timeframe, order_date=order_date, is_accepted=True)
 
             for order_filter in orders_filter:
-                if order_filter.type_stadium == "7players":
+                if order_filter.type_stadium == "7players":  # REVIEW: ở đây cũng thế
                     order_field_number = order_filter.field_numbers
 
                     if order_field_number in list_field_number:
@@ -49,6 +49,12 @@ class AcceptOrderView(View):
 
             order.is_accepted = True
             order.save()
+            # REVIEW: một dòng chỉ nên có tối đa 120 ký tự
+            # Trong vscode có thể xem số ký tự ở góc phải dưới: "Ln ..., Col ..." -> Col chính là số ký tự
+            # Với 1 string dài, có thể viết kiểu như sau để không có quá nhiều ký tự 1 dòng:
+            ('Sân xxx bạn đặt vào ngày xxx, '
+             'khung giờ xxx '
+             'đã được duyệt')
             notify.send(sender, recipient=receiver, verb=f'Thông báo từ {sender}',
                         description=f'Sân {order.stadium_time_frame.stadium.name} bạn đặt vào ngày {order.order_date}, khung giờ {order.stadium_time_frame.time_frame} đã được duyệt! ')
 

@@ -1,11 +1,25 @@
+# REVIEW: import nên sắp xếp thành 3 phần
+# (import từ những lib python)
+# (cách dòng)
+# (import từ django)
+# (cách dòng)
+# (imoprt từ code của mình)
+# Anh đã làm mẫu cho file này
+
+# REVIEW: ở đây có "from datetime import datetime" và "import datetime"
+# => sẽ chỉ có import sau có tác dụng vì 2 import này trùng tên
+# Nếu muốn import 2 module trùng tên, có thế sử dụng keyword "as"
+# VD: from datetime import datetime as dt
+from datetime import datetime
+import datetime
+from notifications.signals import notify
+from swapper import load_model
+
 from django.contrib import messages
 from django.shortcuts import redirect, render
 from django.views.generic import ListView
 from django.core.paginator import Paginator
-from datetime import datetime
-from notifications.signals import notify
-from swapper import load_model
-import datetime
+
 from book_stadium.forms import OrderForm, UserCreationForm
 from book_stadium.models import Order, Stadium, StadiumTimeFrame
 
