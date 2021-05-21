@@ -75,8 +75,7 @@
                                                 <div class="modal-footer">
                                                     <form class="form-accept" method="POST" action="{% url 'history_booked' stadium.order_id %}">
                                                         {% csrf_token %}
-                                                        <!-- <input type="hidden" name="form_type" value="accept-input"> -->
-                                                        <input type="submit" class="btn btn-success" value="Có">
+                                                        <input type="submit" class="btn btn-danger" value="Có">
                                                     </form>
                                                     <input type="submit" class="btn btn-secondary" data-bs-dismiss="modal" value="Hủy">
                                                 </div>
