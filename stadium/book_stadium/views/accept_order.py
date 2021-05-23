@@ -1,15 +1,18 @@
-from django.contrib import messages
-from django.shortcuts import redirect
-from django.views import View
 from notifications.signals import notify
 from swapper import load_model
-from book_stadium.models import Order
+
+from django.contrib import messages
+from django.shortcuts import redirect, get_object_or_404
+from django.views import View
+
+from book_stadium.models import Order, TypeOfStadium
 
 
 class AcceptOrderView(View):
     def post(self, request, pk):
         form_type = request.POST.get('form_type')
-        order = Order.objects.get(pk=pk)  # REVIEW: biết cần phải làm gì ở đây rồi chứ :))
+        order = get_object_or_404(Order, pk=pk)
+
         type_stadium = order.type_stadium
         order_date = order.order_date
         stadium_timeframe = order.stadium_time_frame
@@ -25,7 +28,7 @@ class AcceptOrderView(View):
                 stadium_time_frame=stadium_timeframe, order_date=order_date, is_accepted=True)
 
             for order_filter in orders_filter:
-                if order_filter.type_stadium == "7players":  # REVIEW: ở đây cũng thế
+                if order_filter.type_stadium == TypeOfStadium.SMALL:
                     order_field_number = order_filter.field_numbers
 
                     if order_field_number in list_field_number:
@@ -35,7 +38,7 @@ class AcceptOrderView(View):
                         if number_of_field in list_field_number:
                             list_field_number.remove(number_of_field)
 
-            if type_stadium == '7players':
+            if type_stadium == TypeOfStadium.SMALL:
                 order.field_numbers = list_field_number[0]
                 list_field_number.remove(list_field_number[0])
             else:
@@ -49,14 +52,11 @@ class AcceptOrderView(View):
 
             order.is_accepted = True
             order.save()
-            # REVIEW: một dòng chỉ nên có tối đa 120 ký tự
-            # Trong vscode có thể xem số ký tự ở góc phải dưới: "Ln ..., Col ..." -> Col chính là số ký tự
-            # Với 1 string dài, có thể viết kiểu như sau để không có quá nhiều ký tự 1 dòng:
-            ('Sân xxx bạn đặt vào ngày xxx, '
-             'khung giờ xxx '
-             'đã được duyệt')
+
             notify.send(sender, recipient=receiver, verb=f'Thông báo từ {sender}',
-                        description=f'Sân {order.stadium_time_frame.stadium.name} bạn đặt vào ngày {order.order_date}, khung giờ {order.stadium_time_frame.time_frame} đã được duyệt! ')
+                        description=(f'Sân {order.stadium_time_frame.stadium.name} bạn đặt vào ngày {order.order_date}, '
+                                     f'khung giờ {order.stadium_time_frame.time_frame} '
+                                     'đã được duyệt! '))
 
             # Gui thong bao "het san" cho nhung nguoi khac
             if not list_field_number:
@@ -70,7 +70,9 @@ class AcceptOrderView(View):
                         users_list.append(user_order)
                 receiver = users_list
                 notify.send(sender, recipient=receiver, verb=f'Thông báo từ {sender}',
-                            description=f'Sân {order.stadium_time_frame.stadium.name} bạn đặt vào ngày {order.order_date}, khung giờ {order.stadium_time_frame.time_frame} đã hết sân! Vui lòng chọn khung giờ khác! ')
+                            description=(f'Sân {order.stadium_time_frame.stadium.name} bạn đặt vào ngày {order.order_date}, '
+                                         'khung giờ {order.stadium_time_frame.time_frame} đã hết sân! '
+                                         'Vui lòng chọn khung giờ khác! '))
             messages.success(request, 'Đã duyệt!')
 
         elif form_type == 'accept-delete':

@@ -1,8 +1,10 @@
-from django.shortcuts import render
-from django.views import View
-from book_stadium.models import Stadium
 from notifications.signals import notify
 from swapper import load_model
+
+from django.shortcuts import render, get_object_or_404
+from django.views import View
+
+from book_stadium.models import Stadium
 
 
 Notification = load_model('notifications', 'Notification')

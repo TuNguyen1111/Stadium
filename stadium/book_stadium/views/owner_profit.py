@@ -1,17 +1,19 @@
+import json
 from datetime import date
+
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.views import View
+
 from book_stadium.models import Order, Stadium, TimeFrame, User, Roles, TypeOfStadium
-import json
 
 
 class OwnerProfit(LoginRequiredMixin, UserPassesTestMixin, View):
     login_url = 'home'
 
     def get(self, request, pk):
-        user = User.objects.get(pk=pk)
+        user = get_object_or_404(User, pk=pk)
         stadiums_by_owner = Stadium.objects.filter(owner=user)
 
         stadium_sales_of_two_recent_months = self.get_stadium_sales_of_two_recent_months(

@@ -23,8 +23,10 @@ $(document).ready(function(){
         console.log($('#error_1_id_email_or_phone'))
     }
 
-    if ( $(`#message-info`).length ) {
+    if ( $(`#message-error`).length ) {
         $('#login-modal').modal('show');
     }
+
+    $('#id_role').addClass('form-select')
 })
 

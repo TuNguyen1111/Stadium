@@ -1,6 +1,7 @@
 from django.shortcuts import render
-from book_stadium.forms import UserCreationForm
 from django.views import View
+
+from book_stadium.forms import UserCreationForm
 
 
 class Home(View):

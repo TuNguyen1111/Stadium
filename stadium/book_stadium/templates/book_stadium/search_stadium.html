@@ -81,7 +81,7 @@
                                             <hr>
                                             <p class="card-text">Địa chỉ: {{ stadium.address }}</p>
                                             <hr>
-                                            <button class="order-btn" stadium-name="{{ stadium.name }}" user-name="{{ user.username }}" user-phone-number="{{ user.phone_number }}" onclick="focusForm(event)">Đặt sân</button>
+                                            <button class="order-btn" stadium-name="{{ stadium.name }}" user-name="{{ user.username }}" user-phone-number="{{ user.phone_number }}">Đặt sân</button>
                                         </div>
                                     </div>
                                 </div>
@@ -102,7 +102,7 @@
                     </div>
 
 
-                <div class="pagination">
+                <div class="pagination mt-5">
                     <div class="number-of-page">
                         {% if page_obj.has_previous %}
                         <a class="btn btn-outline-info mb-4" href="?page=1" >First</a>
@@ -228,6 +228,5 @@
 {% endblock %}
 
 {% block javascript %}
-    <script src="{% static 'js/search_stadium.js' %}" type="text/javascript"></script>
-    <script src="{% static 'js/bookStadium.js' %}" type="text/javascript"></script>
+    <script src="{% static 'js/book_stadium.js' %}" type="text/javascript"></script>
 {% endblock %}

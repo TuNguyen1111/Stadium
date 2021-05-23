@@ -1,11 +1,12 @@
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.views import View
+
 from book_stadium.models import Order, User
 
 
 class HistoryBookedOfUser(View):
     def get(self, request, pk):
-        user = User.objects.get(pk=pk)
+        user = get_object_or_404(User, pk=pk)
         start_day = request.GET.get('start-day')
         end_day = request.GET.get('end-day')
         user_orders = Order.objects.filter(user=user)
@@ -31,7 +32,8 @@ class HistoryBookedOfUser(View):
 
     def post(self, request, pk):
         user = request.user
-        order = Order.objects.get(pk=pk)
+        order = get_object_or_404(Order, pk=pk)
+
         order.delete()
         return redirect('history_booked', user.pk)
 

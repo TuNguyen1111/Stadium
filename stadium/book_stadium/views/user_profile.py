@@ -1,7 +1,8 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.views import View
+
 from book_stadium.forms import UserProfileForm
 from book_stadium.models import Stadium, User
 
@@ -11,7 +12,7 @@ class UserProfile(LoginRequiredMixin, View):
     form_class = UserProfileForm
 
     def get(self, request, pk):
-        user = User.objects.get(pk=pk)
+        user = get_object_or_404(User, pk=pk)
         stadiums_by_owner = Stadium.objects.filter(owner=request.user)
         form = self.form_class(instance=user)
 
@@ -22,7 +23,7 @@ class UserProfile(LoginRequiredMixin, View):
         return render(request, 'book_stadium/user_profile.html', context)
 
     def post(self, request, pk):
-        user = User.objects.get(pk=pk)
+        user = get_object_or_404(User, pk=pk)
         form = self.form_class(request.POST, instance=user)
 
         if form.is_valid():

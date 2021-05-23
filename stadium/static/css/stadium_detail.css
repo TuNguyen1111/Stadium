@@ -99,12 +99,15 @@ h1 {
     color: orange;
 }
 
-.star-rating span {
+.star-rating span,
+.star-rated span {
     float: right;
 }
 
 .star-rating span:hover,
-.star-rating span:hover ~ span {
+.star-rating span:hover ~ span,
+.star-rated span:hover,
+.star-rated span:hover ~ span {
     color: #fd4;
 }
 

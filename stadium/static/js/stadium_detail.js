@@ -3,6 +3,7 @@ var stadiumFormTimeFrames = document.querySelector('.stadium-form-time-frames').
 var stadiumFormDetail = document.querySelector('.stadium-form-detail').querySelectorAll('input')
 var oldValuesTimeFrames = getStadiumTimeFramesInformation()
 var oldValuesDetail =  getStadiumInformation()
+var modalEditForm = new bootstrap.Modal(document.getElementById('edit-rate-form-modal'))
 
 initScreen()
 
@@ -14,6 +15,8 @@ function initScreen() {
     setEventForStars()
     setUserStarRating()
     getAverageUsersRating()
+    editUserRated()
+    
 }
 
 function getInput() {
@@ -130,6 +133,7 @@ function changeSelectTag() {
 
 function setEventForStars() {
     try {
+        var spanChildrens = document.getElementById('star-rating').children
         const oneStar = document.getElementById('one-star')
         const twoStar = document.getElementById('two-star')
         const threeStar = document.getElementById('three-star')
@@ -137,44 +141,53 @@ function setEventForStars() {
         const fiveStar = document.getElementById('five-star')
         const starType = [oneStar, twoStar, threeStar, fourStar, fiveStar]
 
-        starType.forEach(item => {
-            item.addEventListener('click', function(e) {
-                handleStarSelect(e.target.id)
-            })
-        });
+        const oneStarId = oneStar.id
+        const twoStarId = twoStar.id
+        const threeStarId = threeStar.id
+        const fourStarId = fourStar.id
+        const fiveStarId = fiveStar.id
+
+        setEventForEachStar(starType, spanChildrens, oneStarId, twoStarId, threeStarId, fourStarId, fiveStarId)
+        
     } catch(error) {
         console.log(error)
     }
-    
 }
 
-function handleStarSelect(starId) {
+function setEventForEachStar(starType, spanChildrens, oneStarId, twoStarId, threeStarId, fourStarId, fiveStarId) {
+    starType.forEach(item => {
+        item.addEventListener('click', function(e) {
+            handleStarSelect(e.target.id, spanChildrens, oneStarId, twoStarId, threeStarId, fourStarId, fiveStarId)
+        })
+    });
+}
+
+function handleStarSelect(starId, spanChildrens, oneStarId, twoStarId, threeStarId, fourStarId, fiveStarId) {
     switch(starId) {
-        case 'one-star': {
-            addOrRemoveCheckedClass(1)
+        case oneStarId: {
+            addOrRemoveCheckedClass(1, spanChildrens)
             return
         }
-        case 'two-star': {
-            addOrRemoveCheckedClass(2)
+        case twoStarId: {
+            addOrRemoveCheckedClass(2, spanChildrens)
             return
         }
-        case 'three-star': {
-            addOrRemoveCheckedClass(3)
+        case threeStarId: {
+            addOrRemoveCheckedClass(3, spanChildrens)
             return
         }
-        case 'four-star': {
-            addOrRemoveCheckedClass(4)
+        case fourStarId: {
+            addOrRemoveCheckedClass(4, spanChildrens)
             return
         }
-        case 'five-star': {
-            addOrRemoveCheckedClass(5)
+        case fiveStarId: {
+            addOrRemoveCheckedClass(5, spanChildrens)
             return
         }
     }
 }
 
-function addOrRemoveCheckedClass(size) {
-    var spanChildrens = document.getElementById('star-rating').children
+function addOrRemoveCheckedClass(size, spanChildrens) {
     spanChildrens = [].slice.call(spanChildrens, 0).reverse()
 
     for (let [index, children] of spanChildrens.entries()) {
@@ -197,17 +210,11 @@ function sendData() {
         let commentBtn = document.getElementById('comment-btn')
         commentBtn.addEventListener('click', (e) => {
             e.preventDefault() 
+
             let spanChildrens = document.getElementById('star-rating').children
-            var starPoint = 0
             spanChildrens = [].slice.call(spanChildrens, 0).reverse()
 
-            for (let item of spanChildrens) {
-                itemPoint = item.getAttribute('point')
-                if (itemPoint > 0) {
-                    starPoint = itemPoint
-                }
-            }
-
+            let starPoint = getStarsPoint(spanChildrens)
             $.ajax({
                 type: 'post',
                 url: '/danh-gia/',
@@ -219,10 +226,12 @@ function sendData() {
                 },
                 success: (data) => {
                     let totalOfStarTypeRated = data.stars_type_rated_numbers
-                    console.log(totalOfStarTypeRated)
-                    handleDataRespone(data)
-                    clearInputAndStar(commentContent)
+                    let allCommentsDiv = document.getElementById('all-comments')
+
+                    handleDataRespone(data, allCommentsDiv)
+                    // clearInputAndStar(commentContent)
                     getTotalOfStarType(totalOfStarTypeRated)
+                    setEventForStarTypeBtn(data, allCommentsDiv)
                 },
                 error: (error) => {
                     console.log(error)
@@ -235,11 +244,35 @@ function sendData() {
     
 }
 
-function handleDataRespone(data) {
+function getStarsPoint(spanChildrens) {
+    let starPoint = 0
+    for (let item of spanChildrens) {
+        itemPoint = item.getAttribute('point')
+        if (itemPoint > 0) {
+            starPoint = itemPoint
+        }
+    }
+
+    if (starPoint === 0) {
+        starPoint = 5
+    }
+    return starPoint
+}
+
+function handleDataRespone(data, allCommentsDiv) {
     let userRated = data.user_rated_information
-    let allCommentsDiv = document.getElementById('all-comments')
 
     createElementForUserRated(userRated, allCommentsDiv)
+    checkUserRatePermission(userRated)
+}
+
+function checkUserRatePermission(userRated) {
+    let userRatePermission = userRated.user_rate_permission
+    let stadiumRate = document.getElementById('stadium-rate')
+
+    if (userRatePermission === false) {
+        stadiumRate.innerHTML = '<h3>Bạn đã hết lượt đánh giá</h3>'
+    }
 }
 
 function setUserStarRating() {
@@ -247,15 +280,20 @@ function setUserStarRating() {
 
     for (let userStarRating of allUsersStarRating ) {
         let childrenElements = userStarRating.children
-        userStarRating = childrenElements[childrenElements.length - 1].value
+        let userStarPointRated = childrenElements[childrenElements.length - 1].value
         childrenElements = Array.from(childrenElements);
 
         for (let [index, childrenElement] of childrenElements.entries()) {
-            if (index < userStarRating) {
-                childrenElement.classList.add('checked')
+            if (index < userStarPointRated) {
+                if (childrenElement.classList.contains('checked') === false) {
+                    childrenElement.classList.add('checked')
+                }
+            } else {
+                if (childrenElement.classList.contains('checked')) {
+                    childrenElement.classList.remove('checked')
+                }
             }
         }
-
     }
 }
 
@@ -272,6 +310,7 @@ function clearInputAndStar(commentContent) {
 
 function getAverageUsersRating() {
     let stadiumId = document.getElementById('stadium-id').value
+    let allCommentsDiv = document.getElementById('all-comments')
     $.ajax({
         type: 'get',
         url: '/danh-gia/',
@@ -279,10 +318,9 @@ function getAverageUsersRating() {
             stadiumId: stadiumId
         },
         success: function(data) {
-            let totalOfStarTypeRated = data.stars_type_rated_numbers
-
-            getTotalOfStarType(totalOfStarTypeRated)
-            setEventForStarTypeBtn(data)
+            getTotalOfStarType(data)
+            setEventForStarTypeBtn(data, allCommentsDiv)
+            getUsersRated(data, allCommentsDiv) 
         },
         error: function(error) {
             console.log(error)
@@ -290,43 +328,68 @@ function getAverageUsersRating() {
     })
 }
 
-function getTotalOfStarType(totalOfStarTypeRated) {
-    let allStarRateBtns = document.querySelectorAll('.star-rate-btn')
+function getTotalOfStarType(data) {
+    let totalOfStarTypeRated = data.stars_type_rated_numbers
+    console.log('totalOfStarTypeRated', totalOfStarTypeRated)
+    let starRateBtns = document.querySelectorAll('.star-rate-btn')
 
-    for (const [star, totalStar] of Object.entries(totalOfStarTypeRated)) {
-        for (let starRateBtn of allStarRateBtns) {
+    
+    for (let starRateBtn of starRateBtns) {
+        let typeOfStar = starRateBtn.getAttribute('star-type')
+        starRateBtn.innerHTML = `${typeOfStar} sao`
+
+        if (typeOfStar === null) {
+            starRateBtn.innerHTML = 'Tất cả'
+        } 
+        for (const [star, totalStar] of Object.entries(totalOfStarTypeRated)) {
             if (starRateBtn.id === star) {
-                let typeOfStar = starRateBtn.getAttribute('star-type')
-                starRateBtn.innerHTML = `${typeOfStar} sao (${totalStar})`
+                if (totalStar > 0) {
+                    console.log(totalStar)
+                    starRateBtn.innerHTML = `${typeOfStar} sao (${totalStar})`
+                } else {
+                    starRateBtn.innerHTML = `${typeOfStar} sao`
+                } 
             }
-        }
+        }   
     }
 }
 
-function setEventForStarTypeBtn(data) {
+function setEventForStarTypeBtn(data, allCommentsDiv) {
     let summaryOfStarsType = data.summary_of_stars_type
     let allStarRateTypeBtns = document.querySelectorAll('.star-rate-btn')
-
+    console.log("asef", summaryOfStarsType)
     for (let starRateTypeBtn of allStarRateTypeBtns) {
         starRateTypeBtn.addEventListener('click', function() {
             let starRateTypeBtnId = starRateTypeBtn.id
-            var allCommentsDiv = document.getElementById('all-comments')
             allCommentsDiv.innerHTML = ''
 
             for (const [starType, allUsersRated] of Object.entries(summaryOfStarsType)) {
 
                 if (starType === starRateTypeBtnId) {
+                    console.log(starType)
                     for (let userRated of allUsersRated) {
                         createElementForUserRated(userRated, allCommentsDiv)
                     }
+                    showEditModal()
                 }
             }
         })
     }
 }
 
+function getUsersRated(data, allCommentsDiv) {
+    let usersRated = data.summary_of_stars_type.users_rated
+
+    for (userRated of usersRated) {
+        createElementForUserRated(userRated, allCommentsDiv)
+    }
+    showEditModal()
+}
+
 function createElementForUserRated(userRated, allCommentsDiv) {
+    let currentUserId = document.getElementById('user-id').value
     let username = userRated.username
+    let userRatedId = userRated.user_id
     let commentContent = userRated.comment
     let star_point = userRated.star_point
     let commentDiv = document.createElement('div')
@@ -335,6 +398,7 @@ function createElementForUserRated(userRated, allCommentsDiv) {
     let userStarRatingDiv = document.createElement('div')
     let starPointInput = document.createElement('input')
     let hrTag = document.createElement('hr')
+    let iTag = document.createElement('i')
 
     for (let i = 0; i < 5; i++) {
         let spanTag = document.createElement('span')
@@ -346,20 +410,130 @@ function createElementForUserRated(userRated, allCommentsDiv) {
     commentDiv.className = 'comment-infor'
     userStarRatingDiv.className = 'user-star-rating'
     userStarRatingDiv.id = 'userStarRatingDiv'
+
     aTag.className = 'mr-2'
+    aTag.classList.add('username') 
+
+    h4Tag.className = 'user-comment'
+
+    iTag.id = 'edit-rate'
+    iTag.className = 'fas fa-edit'
+    iTag.setAttribute('point', star_point)
+    iTag.setAttribute('comment', commentContent)
+
     starPointInput.type = 'hidden'
     starPointInput.id = 'user-star-point-rating'
+    starPointInput.className = 'user-star-point-rating'
     starPointInput.value = star_point
+
 
     aTag.innerHTML = username
     h4Tag.innerHTML = commentContent
 
     userStarRatingDiv.appendChild(starPointInput)
     commentDiv.appendChild(aTag)
+
+    if (currentUserId == userRatedId) {
+        commentDiv.id = 'user-rated'
+        iTag.setAttribute('userRated', 'user-rated')
+
+        commentDiv.appendChild(iTag)
+    }
+
     commentDiv.appendChild(h4Tag)
     commentDiv.appendChild(userStarRatingDiv)
     allCommentsDiv.appendChild(commentDiv)
     allCommentsDiv.appendChild(hrTag)
     setUserStarRating()
+    // showEditModal()
 }
 
+function editUserRated() {
+    let commentContent = document.getElementById('comment-input')
+    let csrf = document.getElementsByName('csrfmiddlewaretoken')
+    let stadiumId = document.getElementById('stadium-id').value
+    let spanChildrens = document.getElementById('star-rated').children
+    let editCommentBtn = document.getElementById('edit-comment-btn')
+    let allCommentsDiv = document.getElementById('all-comments')
+    
+    spanChildrens = Array.from(spanChildrens).reverse()
+
+    editCommentBtn.addEventListener('click', function(e) {
+        e.preventDefault()
+
+        let starPoint = getStarsPoint(spanChildrens)
+        let editRatedIcon = document.getElementById('edit-rate')
+        let commentInforId = editRatedIcon.getAttribute('userRated')
+        let commentInfor = document.getElementById(commentInforId)
+        let userComment = commentInfor.getElementsByClassName('user-comment')[0]
+        let userStarRated = commentInfor.getElementsByClassName('user-star-rating')[0]
+        let userStarPointRated = userStarRated.getElementsByClassName('user-star-point-rating')[0]
+
+        $.ajax({
+            type: 'post',
+            url: '/sua-danh-gia/',
+            data: {
+                commentData: commentContent.value,
+                starPoint: starPoint,
+                stadiumId: stadiumId,
+                csrfmiddlewaretoken: csrf[0].value
+            },
+            success: function(data) {
+                let userRated = data.user_rated_information_edited
+                let userPointEdited = userRated.star_point
+                let userCommentEdited = userRated.comment
+
+                userComment.innerHTML = userCommentEdited
+                userStarPointRated.value = userPointEdited
+
+                editRatedIcon.setAttribute('point', userPointEdited) 
+                editRatedIcon.setAttribute('comment', userCommentEdited)
+
+                setUserStarRating()
+                setEventForStarTypeBtn(data, allCommentsDiv)
+                getTotalOfStarType(data) 
+                modalEditForm.hide()
+            }   
+        })
+        
+    })
+}
+
+function showEditModal() {
+    let editRatedIcon = document.getElementById('edit-rate')
+    let spanChildrens = document.getElementById('star-rated').children
+
+    const oneStar = document.getElementById('one-star-rated')
+    const twoStar = document.getElementById('two-star-rated')
+    const threeStar = document.getElementById('three-star-rated')
+    const fourStar = document.getElementById('four-star-rated')
+    const fiveStar = document.getElementById('five-star-rated')
+    const starType = [oneStar, twoStar, threeStar, fourStar, fiveStar]
+
+    const oneStarId = oneStar.id
+    const twoStarId = twoStar.id
+    const threeStarId = threeStar.id
+    const fourStarId = fourStar.id
+    const fiveStarId = fiveStar.id
+    
+    setEventForEachStar(starType, spanChildrens, oneStarId, twoStarId, threeStarId, fourStarId, fiveStarId)
+    spanChildrens = Array.from(spanChildrens).reverse()
+    
+    editRatedIcon.addEventListener('click', function(e) {
+        let starPoint = e.target.getAttribute('point')
+        let commentContent = e.target.getAttribute('comment')
+        let commentInput = document.getElementById('comment-input')
+
+        commentInput.value = commentContent
+        
+        for (const [index, spanChildren] of spanChildrens.entries()) {
+            if (index < starPoint) {
+                spanChildren.classList.add('checked')
+            } else {
+                spanChildren.classList.remove('checked')
+            }
+        }
+
+        modalEditForm.show()
+    })
+}

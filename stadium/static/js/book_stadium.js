@@ -50,9 +50,7 @@ $(document).ready(function() {
         $('.order-show').slideDown();
     })
 
-
-
-
+    $('.select').addClass('form-select')
 })
 
 

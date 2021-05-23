@@ -1,11 +1,12 @@
+import datetime
+
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render, get_object_or_404
 from django.views import View
 from django.utils import timezone
-from datetime import datetime
-import datetime
+
 from book_stadium.forms import ChangeNumberOfStadium7Form, ChangeNumberOfStadium11Form
-from book_stadium.models import Order, Stadium, TimeFrame, Roles
+from book_stadium.models import Order, Stadium, TimeFrame, Roles, TypeOfStadium
 
 
 class OwnerPage(LoginRequiredMixin, UserPassesTestMixin, View):
@@ -19,7 +20,7 @@ class OwnerPage(LoginRequiredMixin, UserPassesTestMixin, View):
         today = datetime.date.today()
         tomorrow = today + datetime.timedelta(days=1)
         date_format = '%Y/%m/%d'
-        orders = Order.objects.filter(stadium_time_frame__stadium=stadium, order_date__gte=timezone.now())\
+        orders = Order.objects.filter(stadium_time_frame__stadium=stadium, order_date__gte=today)\
                               .order_by('order_date')
 
         update_stadium_7players_form = ChangeNumberOfStadium7Form()
@@ -28,6 +29,7 @@ class OwnerPage(LoginRequiredMixin, UserPassesTestMixin, View):
         all_orders = self.general_orders(orders, stadium)
         # tao dict voi moi ngay co order
         for order in orders:
+            order_date = order.order_date
             is_same_day = False
 
             if all_orders:
@@ -37,20 +39,20 @@ class OwnerPage(LoginRequiredMixin, UserPassesTestMixin, View):
                     last_order['ngay'] = today.strftime(date_format)
                 elif last_order['ngay'] == 'Ngày mai':
                     last_order['ngay'] = tomorrow.strftime(date_format)
-                is_same_day = last_order['ngay'] == order.order_date.strftime(
+                is_same_day = last_order['ngay'] == order_date.strftime(
                     date_format)
 
             if is_same_day:
                 current_order = all_orders[-1]
             else:
                 current_order = {
-                    'ngay': order.order_date.strftime(date_format),
+                    'ngay': order_date.strftime(date_format),
                     'khung_gio': {}
                 }
 
-                if order.order_date == today:
+                if order_date == today:
                     current_order['ngay'] = 'Hôm nay'
-                elif order.order_date == tomorrow:
+                elif order_date == tomorrow:
                     current_order['ngay'] = 'Ngày mai'
                 all_orders.append(current_order)
 
@@ -80,7 +82,7 @@ class OwnerPage(LoginRequiredMixin, UserPassesTestMixin, View):
                         'tong_san': stadium.field_count
                     }
 
-                    if order.type_stadium == "7players":
+                    if order.type_stadium == TypeOfStadium.SMALL:
                         customer['vi_tri'] = order.field_numbers
                     else:
                         if order.is_accepted:
@@ -98,13 +100,14 @@ class OwnerPage(LoginRequiredMixin, UserPassesTestMixin, View):
                 count_accept_user = 0
                 for user in time_frame['nguoi_dat']:
                     if user['da_duyet']:
-                        if user['loai_san'] == "7players":
+                        if user['loai_san'] == TypeOfStadium.SMALL:
                             count_accept_user += 1
                         else:
                             count_accept_user += 3
                 total_stadium = stadium.field_count - count_accept_user
                 time_frame['con_trong'] = total_stadium
 
+        # print(all_orders)
         context = {
             'fields': stadiums_by_owner,
             'all_orders': all_orders,
@@ -124,7 +127,8 @@ class OwnerPage(LoginRequiredMixin, UserPassesTestMixin, View):
         is_today_in_all_orders = False
 
         for order in orders:
-            if today == order.order_date:
+            order_date = order.order_date
+            if today == order_date:
                 is_today_in_all_orders = True
                 break
 

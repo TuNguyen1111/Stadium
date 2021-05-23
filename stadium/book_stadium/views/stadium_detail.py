@@ -3,8 +3,9 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.forms import inlineformset_factory
 from django.shortcuts import redirect, render, get_object_or_404
 from django.views import View
+
 from book_stadium.forms import StadiumForm, StadiumTimeFrameForm, StadiumFormForUser, StarRatingForm
-from book_stadium.models import Stadium, StadiumTimeFrame, StarRating
+from book_stadium.models import Stadium, StadiumTimeFrame, StarRating, StarRatingPermission
 
 
 class StadiumDetail(LoginRequiredMixin, View):
@@ -24,6 +25,9 @@ class StadiumDetail(LoginRequiredMixin, View):
             stadium=current_stadium).order_by('-star_point')
         comment_form = StarRatingForm()
 
+        user_vote_permission = get_object_or_404(
+            StarRatingPermission, user=request.user, stadium=current_stadium)
+
         page_info = {
             'fields': stadiums_by_owner,
             'stadium': current_stadium,
@@ -32,8 +36,10 @@ class StadiumDetail(LoginRequiredMixin, View):
             'form_time_frame': form_time_frame,
             'form_detail_for_user': form_detail_for_user,
             'comments_of_stadium': star_rating_of_stadiums,
-            'comment_form': comment_form
+            'comment_form': comment_form,
+            'user_vote_permission': user_vote_permission
         }
+
         return render(
             request,
             'book_stadium/stadium_detail.html',
@@ -42,7 +48,7 @@ class StadiumDetail(LoginRequiredMixin, View):
 
     def post(self, request, pk):
         form_name = request.POST.get('form_type')
-        stadium = Stadium.objects.get(pk=pk)
+        stadium = get_object_or_404(Stadium, pk=pk)
         owner = request.user
 
         if form_name == 'form_detail':

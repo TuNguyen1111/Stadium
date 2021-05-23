@@ -135,3 +135,12 @@ class StarRating(models.Model):
 
     def __str__(self):
         return f'Star rate of {self.user}'
+
+
+class StarRatingPermission(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    stadium = models.ForeignKey(Stadium, on_delete=models.CASCADE)
+    can_rate = models.BooleanField(default=True)
+
+    def __str__(self):
+        return f'{self.user}-{self.stadium}'

@@ -41,6 +41,8 @@ urlpatterns = [
          views.NotificationDetail.as_view(), name='notification_detail'),
     path('doanh-thu/<int:pk>', views.OwnerProfit.as_view(), name='owner_profit'),
     path('danh-gia/', views.StadiumRating.as_view(), name='stadium_rating'),
+    path('sua-danh-gia/', views.StadiumRatingEdit.as_view(),
+         name='stadium_rating_edit'),
 ]
 
 urlpatterns += staticfiles_urlpatterns()

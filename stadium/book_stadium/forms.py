@@ -1,12 +1,11 @@
+from crispy_forms.helper import FormHelper
+
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import User, Order, Stadium, StadiumTimeFrame
-from crispy_forms.helper import FormHelper
 from django.contrib.auth.hashers import make_password
-from .models import User, Stadium, StadiumTimeFrame, TimeFrame, Order, StarRating
-from django.contrib import messages
 from django.core.exceptions import ValidationError
-from random import choice
+
+from .models import User, Stadium, StadiumTimeFrame, TimeFrame, Order, StarRating, TypeOfStadium
 
 
 class UserCreationForm(UserCreationForm):
@@ -116,7 +115,7 @@ class OrderForm(forms.ModelForm):
             stadium_time_frame=stadium_timeframe, order_date=order_date, is_accepted=True)
         all_fields = list(range(1, stadium_of_timeframe_field_count + 1))
         for order in orders:
-            if order.type_stadium == '7players':
+            if order.type_stadium == TypeOfStadium.SMALL:
                 field_number_accepted = order.field_numbers
                 if field_number_accepted in all_fields:
                     all_fields.remove(field_number_accepted)
@@ -136,20 +135,15 @@ class OrderForm(forms.ModelForm):
 
 
 class StadiumForm(forms.ModelForm):
-    # sửa lại class form theo kiểu t quen. M thích thì sửa lại như cũ cũng đc
-    # viết thế này để t check có instance truyền vào không. Do dùng chung form để add với edit
     def __init__(self, *args, **kwargs):
         super(StadiumForm, self).__init__(*args, **kwargs)
-        # check xem có truyền instance vào không
         self._newly_created = kwargs.get('instance')
-        # cái này để set input cho ảnh trông đỡ xấu, xoá thử đi để trải nghiệm nếu muốn
         self.fields['image'] = forms.FileField(
             label='Ảnh', widget=forms.FileInput)
-        # update input ảnh tự động tìm ảnh. Sau phải validate lại bằng JS đấy
         self.fields['image'].widget.attrs.update({
             'accept': '.png, .jpg, .jpeg"'
         })
-        # nếu mà có instance thì disable input
+
         if self._newly_created:
             for name in self.fields.keys():
                 self.fields[name].widget.attrs.update({
@@ -232,7 +226,7 @@ class UserProfileForm(forms.ModelForm):
 class ChangeNumberOfStadium7Form(forms.Form):
     order_id = forms.IntegerField(widget=forms.HiddenInput(), required=False)
     stadium_type = forms.CharField(widget=forms.HiddenInput(
-        attrs={'value': '7players'}), required=False)
+        attrs={'value': TypeOfStadium.SMALL}), required=False)
     field_number = forms.IntegerField(
         label='Nhập vị trí sân: ', widget=forms.NumberInput(attrs={'class': 'field_number'}))
 

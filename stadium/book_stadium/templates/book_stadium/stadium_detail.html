@@ -12,6 +12,7 @@
         </div>
     {% endfor %}
     <div class="container stadium-detail">
+        <input type="hidden" id="user-id" value="{{ user.pk }}">
         <h1 class="stadium-name pt-2">{{ stadium.name }}</h1>
         <input type="hidden" id="stadium-id" value="{{ stadium.pk }}">
         <h2 class="col-5">
@@ -96,6 +97,8 @@
                             <td>
                                 {% if stadium.owner == user %}
                                     <i data-name="{{ form.price.auto_id }}" data-check="{{ form.is_open.auto_id }}" class="fas fa-pen-square"></i>
+                                {% else %}
+                                    <i hidden data-name="{{ form.price.auto_id }}" data-check="{{ form.is_open.auto_id }}" class="fas fa-pen-square"></i>
                                 {% endif %}
                             </td>
                         </tr>
@@ -119,33 +122,19 @@
     <hr>
     <div class="comments-section">
         <div class="average-users-rating">
-            <button class="btn btn-primary star-rate-btn" id="all_users_rated">Tất cả</button>
+            <button class="btn btn-primary star-rate-btn" id="users_rated">Tất cả</button>
             <button class="btn btn-primary star-rate-btn" id="five_star" star-type="5">5 sao</button>
             <button class="btn btn-primary star-rate-btn" id="four_star" star-type="4">4 sao</button>
             <button class="btn btn-primary star-rate-btn" id="three_star" star-type="3">3 sao</button>
             <button class="btn btn-primary star-rate-btn" id="two_star" star-type="2">2 sao</button>
             <button class="btn btn-primary star-rate-btn" id="one_star" star-type="1">1 sao</button>
         </div>
+        
         <div class="all-comments" id="all-comments">
-            {% for comment in comments_of_stadium %}
-                <div class="comment-infor">
-                    <a class="mr-2" href="#">{{ comment.user.username}}</a>
-                    <h4>{{ comment.comment }}</h4>
-                    <div class="user-star-rating" id="user-star-rating">
-                        <span class="fa fa-star" id="user-1-star"></span>
-                        <span class="fa fa-star" id="user-2-star"></span>
-                        <span class="fa fa-star" id="user-3-star"></span>
-                        <span class="fa fa-star" id="user-4-star"></span>
-                        <span class="fa fa-star" id="user-5-star"></span>
-                        <input type="hidden" id="user-star-point-rating" value="{{ comment.star_point }}">
-                    </div>
-                </div>
-                <hr>
-            {% endfor %}
-
         </div>
-        {% if stadium.owner != user %}
-            <div class="stadium-comments">
+    
+        {% if user_vote_permission.can_rate %}
+            <div id="stadium-rate" class="stadium-comments">
                 <form class="shadow" id="comment-form" method="POST">
                     <h4>Đánh giá sân</h4>
                     {% csrf_token %}
@@ -157,7 +146,7 @@
                         <span class="fa fa-2x fa-star" id="one-star"></span>
                     </div>
                     {{ comment_form.comment|as_crispy_field }}
-                    <input type="hidden" name="form_type" value="form-comment">
+                    <input type="hidden" name="post" value="form-comment">
                     <button id="comment-btn" class="btn btn-primary" type="submit">Bình luận</button>
                 </form>
             </div>
@@ -181,6 +170,38 @@
                         <input type="hidden" name="form_type" value="delete_input">
                         <input type="submit" class="btn btn-danger" value="Có">
                     </form>
+                    <input type="submit" class="btn btn-secondary" data-bs-dismiss="modal" value="Hủy">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="edit-rate-form-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Lưu ý</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form class="" id="edit-rated-form" method="POST">
+                        <h4>Đánh giá sân</h4>
+                        {% csrf_token %}
+                        <div class="star-rated" id="star-rated">
+                            <span class="fa fa-2x fa-star" id="five-star-rated"></span>
+                            <span class="fa fa-2x fa-star" id="four-star-rated"></span>
+                            <span class="fa fa-2x fa-star" id="three-star-rated"></span>
+                            <span class="fa fa-2x fa-star" id="two-star-rated"></span>
+                            <span class="fa fa-2x fa-star" id="one-star-rated"></span>
+                        </div>
+                        {{ comment_form.comment|as_crispy_field }}
+                        <input type="hidden" name="put" value="form-comment">
+                        <button id="edit-comment-btn" class="btn btn-primary" type="submit">Chỉnh sửa</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
                     <input type="submit" class="btn btn-secondary" data-bs-dismiss="modal" value="Hủy">
                 </div>
             </div>

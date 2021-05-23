@@ -1,9 +1,10 @@
 from django.contrib import messages
-from django.shortcuts import redirect
-from book_stadium.models import Roles, Stadium
-from django.views import View
 from django.contrib.auth import login
+from django.shortcuts import redirect
+from django.views import View
+
 from book_stadium.myBackend import CustomAuthenticatedBackend
+from book_stadium.models import Roles, Stadium
 
 CustomAuthenticatedBackend = CustomAuthenticatedBackend()
 

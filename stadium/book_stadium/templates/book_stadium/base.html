@@ -25,7 +25,7 @@
   <div class="container-1">
     <header>
       <div class="navbar">
-        <img class='logo' src="{% static 'images/ball.png' %}" alt="">
+        <a class="logo" href="{% url 'book_stadium' %}"><img src="{% static 'images/ball.png' %}" alt=""></a>
         <ul>
             <li><a href="{% url 'book_stadium' %}">Đặt sân ngay</a></li>
             <li><a href="{% url 'search_stadium' %}">Tìm sân</a></li>
@@ -59,12 +59,20 @@
                 </a>
                 <div class="dropdown-menu dropdown-menu-right username-dropdown">
                     <a href="{% url 'user_profile' user.id %}" class="dropdown-item" type="button">Thông tin tài khoản</a>
+                   
                     {% if user.role == "owner" %}
-                    <a href="{% url 'stadium_detail' fields.first.id %}" class="dropdown-item" type="button">Sân bóng của tôi</a>
-                    <a href="{% url 'owner' fields.first.id %}" class="dropdown-item" type="button">Trạng thái đặt sân</a>
+                      {% if fields %}
+                        <a href="{% url 'stadium_detail' fields.first.id %}" class="dropdown-item" type="button">Sân bóng của tôi</a>
+                        <a href="{% url 'owner' fields.first.id %}" class="dropdown-item" type="button">Trạng thái đặt sân</a>
+                      {% else %}
+                        <a href="" class="dropdown-item" type="button">Sân bóng của tôi</a>
+                        <a href="" class="dropdown-item" type="button">Trạng thái đặt sân</a>
+                      {% endif %}
+                     
                     {% else %}
-                    <a href="{% url 'history_booked' user.id %}" class="dropdown-item" type="button">Lịch sử đặt sân</a>
+                      <a href="{% url 'history_booked' user.id %}" class="dropdown-item" type="button">Lịch sử đặt sân</a>
                     {% endif %}
+                    
                     <a class="dropdown-item" href="{% url 'password_change' %}">Đổi mật khẩu</a>
                     <a class="dropdown-item" href="{% url 'logout' %}">Đăng xuất</a>
                 </div>
@@ -91,13 +99,13 @@
                         <ul class="stadium-manage">
                             {% for field in fields %}
                                 {% url 'stadium_detail' field.id as url %}
-                                <li class="nav-item {% if request.path == url %}active{% endif %}">
+                                <li class="nav-item {% if request.path == url %} active {% endif %}">
                                     <a class="field-name" href="{{ url }}">{{ field.name }}</a>
                                 </li>
                             {% endfor %}
 
                                 {% url 'create_stadium' as url %}
-                                <li class="nav-item {% if request.path == url %}active{% endif %}">
+                                <li class="nav-item {% if request.path == url %} active {% endif %}">
                                     <a class="field-name" href="{{ url }}">Thêm sân</a>
                                 </li>
                         </ul>
@@ -118,9 +126,9 @@
                             {% endfor %}
                         </ul>
                     </li>
-
-                    <li>
-                      <a href="{% url 'owner_profit' user.pk %}" class="manage-btn">
+                    {% url 'owner_profit' user.pk as url %}
+                    <li class="nav-item {% if request.path == url %} active {% endif %}">
+                      <a href="{{ url }}" class="manage-btn">
                         Doanh thu
                       </a>
                     </li>
@@ -199,7 +207,7 @@
         <div class="modal-body">
           <form action="{% url 'register' %}" method="POST">
             {% csrf_token %}
-            {%for input in register_form%}
+            {% for input in register_form %}
             <div class="inputs">
               <div class="mb-3">
                 {{input|as_crispy_field }}
