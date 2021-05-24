@@ -15,8 +15,7 @@ function initScreen() {
     setEventForStars()
     setUserStarRating()
     getAverageUsersRating()
-    editUserRated()
-    
+    // editUserRated()
 }
 
 function getInput() {
@@ -225,13 +224,13 @@ function sendData() {
                     csrfmiddlewaretoken: csrf[0].value
                 },
                 success: (data) => {
-                    let totalOfStarTypeRated = data.stars_type_rated_numbers
                     let allCommentsDiv = document.getElementById('all-comments')
 
                     handleDataRespone(data, allCommentsDiv)
                     // clearInputAndStar(commentContent)
-                    getTotalOfStarType(totalOfStarTypeRated)
+                    getTotalOfStarType(data)
                     setEventForStarTypeBtn(data, allCommentsDiv)
+                    showEditModal()
                 },
                 error: (error) => {
                     console.log(error)
@@ -333,7 +332,6 @@ function getTotalOfStarType(data) {
     console.log('totalOfStarTypeRated', totalOfStarTypeRated)
     let starRateBtns = document.querySelectorAll('.star-rate-btn')
 
-    
     for (let starRateBtn of starRateBtns) {
         let typeOfStar = starRateBtn.getAttribute('star-type')
         starRateBtn.innerHTML = `${typeOfStar} sao`
@@ -357,7 +355,7 @@ function getTotalOfStarType(data) {
 function setEventForStarTypeBtn(data, allCommentsDiv) {
     let summaryOfStarsType = data.summary_of_stars_type
     let allStarRateTypeBtns = document.querySelectorAll('.star-rate-btn')
-    console.log("asef", summaryOfStarsType)
+
     for (let starRateTypeBtn of allStarRateTypeBtns) {
         starRateTypeBtn.addEventListener('click', function() {
             let starRateTypeBtnId = starRateTypeBtn.id
@@ -517,6 +515,7 @@ function showEditModal() {
     const fiveStarId = fiveStar.id
     
     setEventForEachStar(starType, spanChildrens, oneStarId, twoStarId, threeStarId, fourStarId, fiveStarId)
+
     spanChildrens = Array.from(spanChildrens).reverse()
     
     editRatedIcon.addEventListener('click', function(e) {
@@ -533,7 +532,7 @@ function showEditModal() {
                 spanChildren.classList.remove('checked')
             }
         }
-
+        editUserRated()
         modalEditForm.show()
     })
 }
