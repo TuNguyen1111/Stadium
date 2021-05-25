@@ -16,6 +16,13 @@ class Notifications(View):
         notifications = user.notifications.all()
         stadiums_by_owner = Stadium.objects.filter(owner=request.user)
 
+        # REVIEW:
+        #   1. Đoạn này có phải là tự động chuyển trạng thái thành "đã đọc" khi người dùng vào trang danh sách noti không?
+        #       Anh nghĩ chỉ nên chuyển trạng thái khi người dùng vào xem chi tiết noti thôi
+        #   2. Trường hợp cần update thuộc tính của nhiều objects cùng một lúc, sử dụng hàm .update() sẽ hiệu quả hơn:
+        #       `user.notifications.all().update(unread=False)`
+        #       Câu hỏi 1: Tại sao như thế hiệu quả hơn?
+        #       Câu hỏi 2: Hàm .update() có nhược điểm gì so với hàm .save()?
         for notification in notifications:
             if notification.unread:
                 notification.unread = False
@@ -30,6 +37,7 @@ class Notifications(View):
 
 class NotificationDetail(View):
     def get(self, request, pk):
+        # REVIEW: chú ý thống nhất cách đặt tên, bên trên là "notification", ở đây lại là "notify"
         notify = Notification.objects.get(pk=pk)
         stadiums_by_owner = Stadium.objects.filter(owner=request.user)
 
