@@ -19,6 +19,7 @@ env = environ.Env(
     SECRET_KEY=(str, 'nothingtoseehere'),
     DATABASE_URL=(str, 'mysql://root:admin123@localhost:3306/stadium_db_2'),
     ALLOWED_HOSTS=(list, ['testserver', 'localhost', '127.0.0.1']),
+    SELENIUM_TESTING=(bool, False),
     SELENIUM_CHROME_DRIVER_PATH=(str, ''),
 )
 
@@ -91,8 +92,21 @@ AUTH_USER_MODEL = 'book_stadium.User'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
+SELENIUM_TESTING = env('SELENIUM_TESTING')
+
+_db_config = env.db()
+if SELENIUM_TESTING:
+    test_db_name = f'test_{_db_config["NAME"]}'
+    _db_config.update({
+        'NAME': test_db_name,
+        'TEST': {
+            'NAME': test_db_name,
+            'MIGRATE': False,
+        }
+    })
+
 DATABASES = {
-    'default': env.db(),
+    'default': _db_config,
 }
 
 
