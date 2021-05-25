@@ -16,7 +16,6 @@ class StadiumRating(View):
 
             stars_type_rated_numbers = self.get_stars_type_rated_numbers(
                 stars_rate_of_stadium)
-            print(stars_type_rated_numbers)
             summary_of_stars_type = self.set_current_user_rated_to_the_top(
                 current_user, stars_rate_of_stadium)
 

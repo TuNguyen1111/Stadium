@@ -13,33 +13,22 @@ class OwnerProfit(LoginRequiredMixin, UserPassesTestMixin, View):
     login_url = 'home'
 
     def get(self, request, pk):
-        # REVIEW: Ở đây nên tách thành 2 view riêng biệt chứ không nên phân biệt bằng request.is_ajax()
-        # Lý do: 2 view này cần các thông tin khác nhau:
-        #   - View ajax cần 'sales_information_in_lastest_12_months', 'sales_of_this_month_by_timeframes'
-        #   - View thường cần 'stadium_sales_of_two_recent_months'
-        #   => Tách ra sẽ hiệu quả hơn, mỗi view chỉ cần gọi hàm tương ứng để lấy đủ data cần thiết
-        # Hoặc có viết cùng view thì cũng nên tách ra kiểu:
-        # if request.is_ajax():
-        #   return self.get_ajax_response()
-        # else:
-        #   return self.get_normal_response()
-
         user = get_object_or_404(User, pk=pk)
         stadiums_by_owner = Stadium.objects.filter(owner=user)
 
-        stadium_sales_of_two_recent_months = self.get_stadium_sales_of_two_recent_months(
-            stadiums_by_owner)
-        sales_information_in_lastest_12_months = self.general_stadium_sales_information_in_lastest_12_months(
-            stadiums_by_owner)
-        sales_of_this_month_by_timeframes = self.get_stadiums_sales_of_this_month_by_timeframes(
-            stadiums_by_owner)
-        print(json.dumps(sales_information_in_lastest_12_months, indent=4))
         if request.is_ajax():
+            sales_information_in_lastest_12_months = self.general_stadium_sales_information_in_lastest_12_months(
+                stadiums_by_owner)
+            sales_of_this_month_by_timeframes = self.get_stadiums_sales_of_this_month_by_timeframes(
+                stadiums_by_owner)
             json_respone = {
                 'sales_information_in_lastest_12_months': sales_information_in_lastest_12_months,
                 'sales_of_this_month_by_timeframes': sales_of_this_month_by_timeframes
             }
             return JsonResponse(json_respone)
+        else:
+            stadium_sales_of_two_recent_months = self.get_stadium_sales_of_two_recent_months(
+                stadiums_by_owner)
 
         context = {
             'fields': stadiums_by_owner,

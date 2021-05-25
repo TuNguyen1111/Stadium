@@ -21,7 +21,6 @@ class BookStadium(ListView):
         order_form = self.form_class
         stadium_timeframes = StadiumTimeFrame.objects.filter(
             is_open=True).order_by('time_frame__start_time')
-        all_stadiums = []
         all_stadiums = self.put_out_null_stadiums_and_timesframe(
             stadium_timeframes)
         paginator = Paginator(all_stadiums, 2)
@@ -76,7 +75,7 @@ class BookStadium(ListView):
             messages.success(request, 'Đặt sân thành công!')
 
         else:
-            messages.warning(request, 'Vui long chon khung gio khac!')
+            messages.warning(request, 'Vui lòng chọn khung giờ khác!')
 
         return redirect('book_stadium')
 

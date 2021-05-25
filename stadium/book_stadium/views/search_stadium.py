@@ -9,9 +9,9 @@ class SearchStadium(BookStadium):
     def get(self, request):
         order_form = self.form_class
         user = request.user
-        all_stadiums = Stadium.objects.all()
+        stadiums = Stadium.objects.all()
         stadium_search_result = []
-        paginator = Paginator(all_stadiums, 20)
+        paginator = Paginator(stadiums, 20)
 
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
@@ -24,7 +24,6 @@ class SearchStadium(BookStadium):
             day_search, time_frame_search, address_search, stadium_name_search)
 
         context = {
-            'stadiums': all_stadiums,
             'page_obj': page_obj,
             'order_form': order_form,
             'stadium_search_result': stadium_search_result,

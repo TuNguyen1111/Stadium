@@ -79,6 +79,9 @@ class Stadium(models.Model):
     time_frames = models.ManyToManyField(
         'TimeFrame', through='StadiumTimeFrame')
 
+    class Meta:
+        ordering = ['-pk']
+
     def __str__(self):
         return f'{self.name}-{self.address}'
 

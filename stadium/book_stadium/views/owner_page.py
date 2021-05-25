@@ -26,15 +26,15 @@ class OwnerPage(LoginRequiredMixin, UserPassesTestMixin, View):
         update_stadium_7players_form = ChangeNumberOfStadium7Form()
         update_stadium_11players_form = ChangeNumberOfStadium11Form()
 
-        all_orders = self.general_orders(orders, stadium)
+        orders_of_stadium = self.general_orders(orders, stadium)
         # tao dict voi moi ngay co order
         for order in orders:
             order_date = order.order_date
             is_same_day = False
 
-            if all_orders:
+            if orders_of_stadium:
                 # lay ra order cuoi va check xem co cung ngay hay khong
-                last_order = all_orders[-1]
+                last_order = orders_of_stadium[-1]
                 if last_order['ngay'] == 'Hôm nay':
                     last_order['ngay'] = today.strftime(date_format)
                 elif last_order['ngay'] == 'Ngày mai':
@@ -43,7 +43,7 @@ class OwnerPage(LoginRequiredMixin, UserPassesTestMixin, View):
                     date_format)
 
             if is_same_day:
-                current_order = all_orders[-1]
+                current_order = orders_of_stadium[-1]
             else:
                 current_order = {
                     'ngay': order_date.strftime(date_format),
@@ -54,7 +54,7 @@ class OwnerPage(LoginRequiredMixin, UserPassesTestMixin, View):
                     current_order['ngay'] = 'Hôm nay'
                 elif order_date == tomorrow:
                     current_order['ngay'] = 'Ngày mai'
-                all_orders.append(current_order)
+                orders_of_stadium.append(current_order)
 
             time_frames = current_order['khung_gio']
 
@@ -95,7 +95,7 @@ class OwnerPage(LoginRequiredMixin, UserPassesTestMixin, View):
 
                     current_timeframe['nguoi_dat'].append(customer)
         # dem xem khung gio con bao nhieu san trong dua tren so nguoi da duyet
-        for order in all_orders:
+        for order in orders_of_stadium:
             for key, time_frame in order['khung_gio'].items():
                 count_accept_user = 0
                 for user in time_frame['nguoi_dat']:
@@ -107,10 +107,9 @@ class OwnerPage(LoginRequiredMixin, UserPassesTestMixin, View):
                 total_stadium = stadium.field_count - count_accept_user
                 time_frame['con_trong'] = total_stadium
 
-        # print(all_orders)
         context = {
             'fields': stadiums_by_owner,
-            'all_orders': all_orders,
+            'orders_of_stadium': orders_of_stadium,
             'update_stadium_7players_form': update_stadium_7players_form,
             'update_stadium_11players_form': update_stadium_11players_form
         }
@@ -120,25 +119,25 @@ class OwnerPage(LoginRequiredMixin, UserPassesTestMixin, View):
                       )
 
     def general_orders(self, orders, stadium):
-        all_orders = []
+        orders_of_stadium = []
         all_time_frames = TimeFrame.objects.all()
         today = datetime.date.today()
         tomorrow = today + datetime.timedelta(days=1)
-        is_today_in_all_orders = False
+        is_today_in_orders_of_stadium = False
 
         for order in orders:
             order_date = order.order_date
             if today == order_date:
-                is_today_in_all_orders = True
+                is_today_in_orders_of_stadium = True
                 break
 
-        if not is_today_in_all_orders:
+        if not is_today_in_orders_of_stadium:
             first_order = {
                 'ngay': 'Hôm nay',
                 'khung_gio': {}
             }
-            all_orders.append(first_order)
-            time_frames = all_orders[0]['khung_gio']
+            orders_of_stadium.append(first_order)
+            time_frames = orders_of_stadium[0]['khung_gio']
 
             for time_frame in all_time_frames:
                 time = str(time_frame)
@@ -151,7 +150,7 @@ class OwnerPage(LoginRequiredMixin, UserPassesTestMixin, View):
                         'nguoi_dat': []
                     }
                     time_frames[time] = current_timeframe
-        return all_orders
+        return orders_of_stadium
 
     def test_func(self):
         return self.request.user.role == Roles.OWNER

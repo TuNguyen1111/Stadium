@@ -23,39 +23,38 @@ class HistoryBookedOfUser(View):
 
         user_orders = user_orders.filter(**conditions).order_by('order_date')
 
-        all_orders_of_user = self.general_order_of_user(user_orders)
+        orders_of_user = self.general_order_of_user(user_orders)
 
         context = {
-            'all_orders_of_user': all_orders_of_user
+            'orders_of_user': orders_of_user
         }
         return render(request, 'book_stadium/history_booked_of_user.html', context)
 
     def post(self, request, pk):
         user = request.user
         order = get_object_or_404(Order, pk=pk)
-
         order.delete()
         return redirect('history_booked', user.pk)
 
     def general_order_of_user(self,  user_orders):
-        all_orders_of_user = []
-
+        orders_of_user = []
+        order_date_format = '%Y/%m/%d'
         for order in user_orders:
             is_same_day = False
 
-            if all_orders_of_user:
-                last_order = all_orders_of_user[-1]
+            if orders_of_user:
+                last_order = orders_of_user[-1]
                 is_same_day = last_order['ngay'] == order.order_date.strftime(
-                    '%Y/%m/%d')
+                    order_date_format)
 
             if is_same_day:
-                current_order = all_orders_of_user[-1]
+                current_order = orders_of_user[-1]
             else:
                 current_order = {
-                    'ngay':  order.order_date.strftime('%Y/%m/%d'),
+                    'ngay':  order.order_date.strftime(order_date_format),
                     'khung_gio': {}
                 }
-                all_orders_of_user.append(current_order)
+                orders_of_user.append(current_order)
 
             timeframe_of_order = order.stadium_time_frame.time_frame
             stadium_of_timeframe = order.stadium_time_frame.stadium
@@ -74,4 +73,4 @@ class HistoryBookedOfUser(View):
                 'order_id': order.pk
             }
             current_timeframe.append(stadium_obj)
-        return all_orders_of_user
+        return orders_of_user

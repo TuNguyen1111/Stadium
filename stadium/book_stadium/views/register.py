@@ -3,7 +3,7 @@ from django.views import View
 from django.contrib.auth import login
 
 from book_stadium.forms import UserCreationForm
-from book_stadium.models import Roles, Stadium, StarRatingPermission
+from book_stadium.models import Roles
 
 
 class Register(View):
@@ -21,11 +21,6 @@ class Register(View):
             if user.role == Roles.OWNER:
                 return redirect('create_stadium')
             else:
-                stadiums = Stadium.objects.all()
-                for stadium in stadiums:
-                    user_rate_permission = StarRatingPermission.objects.create(
-                        user=user, stadium=stadium)
-
                 if user.is_missing_information():
                     return redirect('user_profile', user.pk)
                 return redirect('home')
