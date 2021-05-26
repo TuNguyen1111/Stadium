@@ -260,6 +260,11 @@ function getStarsPoint(spanChildrens) {
 
 function handleDataRespone(data, allCommentsDiv) {
     let userRated = data.user_rated_information
+    let noRatedTitle = document.getElementById('no-rated-title')
+    
+    if (noRatedTitle !== null) {
+        noRatedTitle.innerHTML = ''
+    }
 
     createElementForUserRated(userRated, allCommentsDiv)
     checkUserRatePermission(userRated)
@@ -270,7 +275,7 @@ function checkUserRatePermission(userRated) {
     let stadiumRate = document.getElementById('stadium-rate')
 
     if (userRatePermission === false) {
-        stadiumRate.innerHTML = '<h3>Bạn đã hết lượt đánh giá</h3>'
+        stadiumRate.innerHTML = '<h3 class="notification-title">Bạn đã hết lượt đánh giá!</h3>'
     }
 }
 
@@ -329,7 +334,6 @@ function getAverageUsersRating() {
 
 function getTotalOfStarType(data) {
     let totalOfStarTypeRated = data.stars_type_rated_numbers
-    console.log('totalOfStarTypeRated', totalOfStarTypeRated)
     let starRateBtns = document.querySelectorAll('.star-rate-btn')
 
     for (let starRateBtn of starRateBtns) {
@@ -377,11 +381,16 @@ function setEventForStarTypeBtn(data, allCommentsDiv) {
 
 function getUsersRated(data, allCommentsDiv) {
     let usersRated = data.summary_of_stars_type.users_rated
-
-    for (userRated of usersRated) {
-        createElementForUserRated(userRated, allCommentsDiv)
+    
+    if(usersRated.length) {
+        for (userRated of usersRated) {
+            createElementForUserRated(userRated, allCommentsDiv)
+        }
+        showEditModal()
+    } else {
+        allCommentsDiv.innerHTML = '<h3 id="no-rated-title">Hiện tại chưa có lượt đánh giá nào!</h3>'
     }
-    showEditModal()
+    
 }
 
 function createElementForUserRated(userRated, allCommentsDiv) {

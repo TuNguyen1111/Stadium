@@ -14,10 +14,6 @@ $(document).ready(function() {
         $('.search-btn-dropdown').click(function() {
             $('.search-show').slideToggle();
         });
-
-        $('.order-btn-dropdown').click(function() {
-            $('.order-show').slideToggle();
-        });
     }
 
     toggleSearchAndOrderForm();
@@ -33,7 +29,7 @@ $(document).ready(function() {
         let userNameInput = $('#id_customer_name');
         let userPhoneNumberInput = $('#id_customer_phone_number');
         let timeframeInput = $('.form-order #time_frame');
-        console.log(timeframeInput)
+        
         stadiumInput.val(stadiumName);
         userNameInput.val(userName);
         userPhoneNumberInput.val(userPhoneNumber);
@@ -46,8 +42,8 @@ $(document).ready(function() {
             userNameInput.val(userName);
             userPhoneNumberInput.val(userPhoneNumber);
         }
-
-        $('.order-show').slideDown();
+        
+        $('#book-stadium').modal('show')
     })
 
     $('.select').addClass('form-select')

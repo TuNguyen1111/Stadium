@@ -90,10 +90,13 @@
     align-items: center;
 }
 
-.form-search,
-.form-order {
-    width: 75%;
+.form-search {
+    width: 65%;
     margin-bottom: 2%;
+}
+
+.form-order {
+    width: 100%;
 }
 
 .form-search {
@@ -115,7 +118,7 @@
 }
 
 .form-search form button {
-    width: 40%;
+    width: 30%;
 }
 
 .submit-btn {
@@ -125,13 +128,6 @@
 .form-style {
     width: 80%;
     margin: auto;
-}
-
-.form-search .search-show,
-.form-order .order-show {
-    padding: 5%;
-    margin-bottom: 5%;
-    display: none;
 }
 
 .book-stadium-btn {
