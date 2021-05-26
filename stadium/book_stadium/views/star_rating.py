@@ -138,8 +138,6 @@ class StadiumRatingEdit(StadiumRating):
             user_rated.star_point = new_star_point
             user_rated.save()
 
-            print(user_rated.star_point, new_star_point)
-
             user_rate_permission = get_object_or_404(
                 StarRatingPermission, user=current_user, stadium=stadium)
 

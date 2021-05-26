@@ -14,15 +14,17 @@ class StadiumDetail(LoginRequiredMixin, View):
         Stadium, StadiumTimeFrame, form=StadiumTimeFrameForm, extra=0)
 
     def get(self, request, pk):
-        stadiums_by_owner = Stadium.objects.filter(owner=request.user)
         current_stadium = get_object_or_404(Stadium, pk=pk)
+
+        stadiums_by_owner = Stadium.objects.filter(owner=request.user)
         times_and_prices = StadiumTimeFrame.objects.filter(
             stadium=current_stadium)
+        star_rating_of_stadiums = StarRating.objects.filter(
+            stadium=current_stadium).order_by('-star_point')
+
         form_detail = StadiumForm(instance=current_stadium)
         form_time_frame = self.formset(instance=current_stadium)
         form_detail_for_user = StadiumFormForUser(instance=current_stadium)
-        star_rating_of_stadiums = StarRating.objects.filter(
-            stadium=current_stadium).order_by('-star_point')
         comment_form = StarRatingForm()
 
         user_vote_permission = get_object_or_404(

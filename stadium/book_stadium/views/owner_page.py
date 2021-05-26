@@ -14,20 +14,63 @@ class OwnerPage(LoginRequiredMixin, UserPassesTestMixin, View):
     template_name = 'book_stadium/owner.html'
 
     def get(self, request, pk):
-        stadiums_by_owner = Stadium.objects.filter(owner=request.user)
-        stadium = get_object_or_404(Stadium, pk=pk)
-        all_time_frames = TimeFrame.objects.all()
-        today = datetime.date.today()
-        tomorrow = today + datetime.timedelta(days=1)
-        date_format = '%Y/%m/%d'
-        orders = Order.objects.filter(stadium_time_frame__stadium=stadium, order_date__gte=today)\
-                              .order_by('order_date')
-
         update_stadium_7players_form = ChangeNumberOfStadium7Form()
         update_stadium_11players_form = ChangeNumberOfStadium11Form()
 
-        orders_of_stadium = self.general_orders(orders, stadium)
+        stadiums_by_owner = Stadium.objects.filter(owner=request.user)
+        stadium = get_object_or_404(Stadium, pk=pk)
+
+        orders_of_stadium = self.general_orders(stadium)
         # tao dict voi moi ngay co order
+
+        context = {
+            'fields': stadiums_by_owner,
+            'orders_of_stadium': orders_of_stadium,
+            'update_stadium_7players_form': update_stadium_7players_form,
+            'update_stadium_11players_form': update_stadium_11players_form
+        }
+        return render(request,
+                      'book_stadium/owner.html',
+                      context,
+                      )
+
+    def general_orders(self, stadium):
+        orders_of_stadium = list()
+        today = datetime.date.today()
+        tomorrow = today + datetime.timedelta(days=1)
+        is_today_in_orders_of_stadium = False
+        date_format = '%Y/%m/%d'
+
+        all_time_frames = TimeFrame.objects.all()
+        orders = Order.objects.filter(stadium_time_frame__stadium=stadium, order_date__gte=today)\
+                              .order_by('order_date')
+
+        for order in orders:
+            order_date = order.order_date
+            if today == order_date:
+                is_today_in_orders_of_stadium = True
+                break
+
+        if not is_today_in_orders_of_stadium:
+            first_order = {
+                'ngay': 'Hôm nay',
+                'khung_gio': {}
+            }
+            orders_of_stadium.append(first_order)
+            time_frames = orders_of_stadium[0]['khung_gio']
+
+            for time_frame in all_time_frames:
+                time = str(time_frame)
+                is_same_timeframe = time in time_frames
+                if is_same_timeframe:
+                    current_timeframe = time_frames[time]
+                else:
+                    current_timeframe = {
+                        'con_trong': None,
+                        'nguoi_dat': []
+                    }
+                    time_frames[time] = current_timeframe
+
         for order in orders:
             order_date = order.order_date
             is_same_day = False
@@ -95,6 +138,12 @@ class OwnerPage(LoginRequiredMixin, UserPassesTestMixin, View):
 
                     current_timeframe['nguoi_dat'].append(customer)
         # dem xem khung gio con bao nhieu san trong dua tren so nguoi da duyet
+        orders_of_stadium = self.get_remaining_fields(
+            orders_of_stadium, stadium)
+
+        return orders_of_stadium
+
+    def get_remaining_fields(self, orders_of_stadium, stadium):
         for order in orders_of_stadium:
             for key, time_frame in order['khung_gio'].items():
                 count_accept_user = 0
@@ -104,52 +153,8 @@ class OwnerPage(LoginRequiredMixin, UserPassesTestMixin, View):
                             count_accept_user += 1
                         else:
                             count_accept_user += 3
-                total_stadium = stadium.field_count - count_accept_user
-                time_frame['con_trong'] = total_stadium
-
-        context = {
-            'fields': stadiums_by_owner,
-            'orders_of_stadium': orders_of_stadium,
-            'update_stadium_7players_form': update_stadium_7players_form,
-            'update_stadium_11players_form': update_stadium_11players_form
-        }
-        return render(request,
-                      'book_stadium/owner.html',
-                      context,
-                      )
-
-    def general_orders(self, orders, stadium):
-        orders_of_stadium = []
-        all_time_frames = TimeFrame.objects.all()
-        today = datetime.date.today()
-        tomorrow = today + datetime.timedelta(days=1)
-        is_today_in_orders_of_stadium = False
-
-        for order in orders:
-            order_date = order.order_date
-            if today == order_date:
-                is_today_in_orders_of_stadium = True
-                break
-
-        if not is_today_in_orders_of_stadium:
-            first_order = {
-                'ngay': 'Hôm nay',
-                'khung_gio': {}
-            }
-            orders_of_stadium.append(first_order)
-            time_frames = orders_of_stadium[0]['khung_gio']
-
-            for time_frame in all_time_frames:
-                time = str(time_frame)
-                is_same_timeframe = time in time_frames
-                if is_same_timeframe:
-                    current_timeframe = time_frames[time]
-                else:
-                    current_timeframe = {
-                        'con_trong': None,
-                        'nguoi_dat': []
-                    }
-                    time_frames[time] = current_timeframe
+                remaining_fields = stadium.field_count - count_accept_user
+                time_frame['con_trong'] = remaining_fields
         return orders_of_stadium
 
     def test_func(self):
