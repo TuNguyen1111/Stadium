@@ -156,7 +156,7 @@
                                 </div>
 
                                 <div class="submit-btn">
-                                    <button type="submit" class="btn btn-secondary mt-3">Tìm kiếm</button>
+                                    <button type="submit" class="btn btn-secondary mt-3 mb-3">Tìm kiếm</button>
                                 </div>
                             </div>
                         </form>
@@ -164,7 +164,7 @@
                 </div>
             </div>
 
-            <div class="form-order">
+            <!-- <div class="form-order">
                 <div id="dropdown-btn" class="dropdown search dropdown-style">
                     <button class="btn btn-secondary order-btn-dropdown" type="button" id="dropdownMenuButton">
                         <a>Đặt sân</a>
@@ -182,46 +182,78 @@
                         </form>
                     </div>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
 
     <div class="modal fade " id="notification-success" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-            <h5 class="modal-title" id="staticBackdropLabel">Thông báo</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Thông báo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Đặt sân thành công, vui lòng chờ chủ sân duyệt!</p>
+                    <p>Hãy gọi điện đến chủ sân để đảm bảo lịch đặt của bạn đã được tiếp nhận và được duyệt nhanh hơn!</p>
+                    <p>Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!</p>
+                </div>
+                <div class="modal-footer book_stadium">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
             </div>
-            <div class="modal-body">
-                <p>Đặt sân thành công, vui lòng chờ chủ sân duyệt!</p>
-                <p>Hãy gọi điện đến chủ sân để đảm bảo lịch đặt của bạn đã được tiếp nhận và được duyệt nhanh hơn!</p>
-                <p>Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi!</p>
-            </div>
-            <div class="modal-footer book_stadium">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-            </div>
-        </div>
         </div>
     </div>
 
     <div class="modal fade " id="notification-failed" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-            <h5 class="modal-title" id="staticBackdropLabel">Thông báo</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Khung giờ bạn chọn đã hết sân!</p>
-                <p>Vui lòng chọn khung giờ khác!</p>
-            </div>
-            <div class="modal-footer book_stadium">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Thông báo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Khung giờ bạn chọn đã hết sân!</p>
+                    <p>Vui lòng chọn khung giờ khác!</p>
+                </div>
+                <div class="modal-footer book_stadium">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
             </div>
         </div>
+    </div>
+
+    <div class="modal fade " id="book-stadium" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Đặt sân</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body background">
+                    <div class="form-order">
+                        <div id="dropdown-btn" class="dropdown search dropdown-style">
+                            <div id="dropdown-form" class="order-show" >
+                                <form method="POST" action="">
+                                    {% csrf_token %}
+                                    <div class="form-style">
+                                        {{order_form|crispy}}
+                                            <div class="submit-btn">
+                                                <button type="submit" class="btn btn-secondary mt-3">Đặt</button>
+                                            </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer book_stadium">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
         </div>
     </div>
 
