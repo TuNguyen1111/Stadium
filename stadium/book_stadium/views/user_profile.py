@@ -4,7 +4,7 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.views import View
 
 from book_stadium.forms import UserProfileForm
-from book_stadium.models import Stadium, User
+from book_stadium.models import Stadium, User, TimeFrame
 
 
 class UserProfile(LoginRequiredMixin, View):
@@ -25,7 +25,6 @@ class UserProfile(LoginRequiredMixin, View):
     def post(self, request, pk):
         user = get_object_or_404(User, pk=pk)
         form = self.form_class(request.POST, instance=user)
-
         if form.is_valid():
             form.save()
 
