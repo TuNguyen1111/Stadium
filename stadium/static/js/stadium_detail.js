@@ -18,6 +18,71 @@ function initScreen() {
     // editUserRated()
 }
 
+// AJAX REQUEST
+function sendData() {
+    let commentContent = document.getElementById('comment-input')
+    let csrf = document.getElementsByName('csrfmiddlewaretoken')
+    let stadiumId = document.getElementById('stadium-id').value
+
+    try {
+        let commentBtn = document.getElementById('comment-btn')
+        commentBtn.addEventListener('click', (e) => {
+            e.preventDefault() 
+
+            let spanChildrens = document.getElementById('star-rating').children
+            spanChildrens = [].slice.call(spanChildrens, 0).reverse()
+
+            let starPoint = getStarsPoint(spanChildrens)
+            $.ajax({
+                type: 'post',
+                url: '/danh-gia/',
+                data: {
+                    commentData: commentContent.value,
+                    starPoint: starPoint,
+                    stadiumId: stadiumId,
+                    csrfmiddlewaretoken: csrf[0].value
+                },
+                success: (data) => {
+                    let allCommentsDiv = document.getElementById('all-comments')
+
+                    handleDataRespone(data, allCommentsDiv)
+                    // clearInputAndStar(commentContent)
+                    getTotalOfStarType(data)
+                    setEventForStarTypeBtn(data, allCommentsDiv)
+                    showEditModal()
+                },
+                error: (error) => {
+                    console.log(error)
+                }
+            })
+        })
+    } catch(error) {
+        console.log(error)
+    }
+    
+}
+
+function getAverageUsersRating() {
+    let stadiumId = document.getElementById('stadium-id').value
+    let allCommentsDiv = document.getElementById('all-comments')
+    $.ajax({
+        type: 'get',
+        url: '/danh-gia/',
+        data: {
+            stadiumId: stadiumId
+        },
+        success: function(data) {
+            getTotalOfStarType(data)
+            setEventForStarTypeBtn(data, allCommentsDiv)
+            getUsersRated(data, allCommentsDiv) 
+        },
+        error: function(error) {
+            console.log(error)
+        }
+    })
+}
+
+// FUNCTIONS
 function getInput() {
     let getData = this.getAttribute('data-name')
     let dataCheck = this.getAttribute('data-check')
@@ -200,49 +265,6 @@ function addOrRemoveCheckedClass(size, spanChildrens) {
     }
 }
 
-function sendData() {
-    let commentContent = document.getElementById('comment-input')
-    let csrf = document.getElementsByName('csrfmiddlewaretoken')
-    let stadiumId = document.getElementById('stadium-id').value
-
-    try {
-        let commentBtn = document.getElementById('comment-btn')
-        commentBtn.addEventListener('click', (e) => {
-            e.preventDefault() 
-
-            let spanChildrens = document.getElementById('star-rating').children
-            spanChildrens = [].slice.call(spanChildrens, 0).reverse()
-
-            let starPoint = getStarsPoint(spanChildrens)
-            $.ajax({
-                type: 'post',
-                url: '/danh-gia/',
-                data: {
-                    commentData: commentContent.value,
-                    starPoint: starPoint,
-                    stadiumId: stadiumId,
-                    csrfmiddlewaretoken: csrf[0].value
-                },
-                success: (data) => {
-                    let allCommentsDiv = document.getElementById('all-comments')
-
-                    handleDataRespone(data, allCommentsDiv)
-                    // clearInputAndStar(commentContent)
-                    getTotalOfStarType(data)
-                    setEventForStarTypeBtn(data, allCommentsDiv)
-                    showEditModal()
-                },
-                error: (error) => {
-                    console.log(error)
-                }
-            })
-        })
-    } catch(error) {
-        console.log(error)
-    }
-    
-}
-
 function getStarsPoint(spanChildrens) {
     let starPoint = 0
     for (let item of spanChildrens) {
@@ -312,25 +334,7 @@ function clearInputAndStar(commentContent) {
     commentContent.value = ''
 }
 
-function getAverageUsersRating() {
-    let stadiumId = document.getElementById('stadium-id').value
-    let allCommentsDiv = document.getElementById('all-comments')
-    $.ajax({
-        type: 'get',
-        url: '/danh-gia/',
-        data: {
-            stadiumId: stadiumId
-        },
-        success: function(data) {
-            getTotalOfStarType(data)
-            setEventForStarTypeBtn(data, allCommentsDiv)
-            getUsersRated(data, allCommentsDiv) 
-        },
-        error: function(error) {
-            console.log(error)
-        }
-    })
-}
+
 
 function getTotalOfStarType(data) {
     let totalOfStarTypeRated = data.stars_type_rated_numbers
