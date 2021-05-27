@@ -21,7 +21,8 @@ class HistoryBookedOfUser(View):
             end_day = end_day.replace('/', '-')
             conditions['order_date__lte'] = end_day
 
-        user_orders = user_orders.filter(**conditions).order_by('order_date')
+        user_orders = user_orders.filter(
+            **conditions).select_related('stadium_time_frame').order_by('order_date')
 
         orders_of_user = self.general_order_of_user(user_orders)
 

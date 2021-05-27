@@ -62,7 +62,7 @@ class AcceptOrderView(View):
             if not list_field_number:
                 users_list = list()
                 orders_not_accepted = Order.objects.filter(
-                    stadium_time_frame=stadium_timeframe, order_date=order_date, is_accepted=False)
+                    stadium_time_frame=stadium_timeframe, order_date=order_date, is_accepted=False).select_related('user')
 
                 for order in orders_not_accepted:
                     user_order = order.user
@@ -71,7 +71,7 @@ class AcceptOrderView(View):
                 receiver = users_list
                 notify.send(sender, recipient=receiver, verb=f'Thông báo từ {sender}',
                             description=(f'Sân {order.stadium_time_frame.stadium.name} bạn đặt vào ngày {order.order_date}, '
-                                         'khung giờ {order.stadium_time_frame.time_frame} đã hết sân! '
+                                         f'khung giờ {order.stadium_time_frame.time_frame} đã hết sân! '
                                          'Vui lòng chọn khung giờ khác! '))
             messages.success(request, 'Đã duyệt!')
 
