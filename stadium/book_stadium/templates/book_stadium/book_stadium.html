@@ -5,6 +5,17 @@
     <link rel="stylesheet" href="{% static 'css/book_stadium.css' %}">
 {% endblock %}
 {% block content %}
+    {% for message in messages %}	
+        {% if message.tags == 'warning' %}	
+            <div id="warning" class="alert alert-warning" role="alert" hidden>	
+                {{ message }}	
+            </div>	
+        {% else %}	
+            <div id="success" class="alert alert-success" role="alert" hidden>	
+                {{ message }}	
+            </div>	
+        {% endif %}	
+    {% endfor %}
     <div class="container content">
         <div class="overview">
             {% if stadium_search_result %}
