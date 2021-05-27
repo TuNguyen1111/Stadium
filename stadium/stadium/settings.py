@@ -51,7 +51,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'crispy_forms',
-    'book_stadium',
+    'book_stadium.apps.BookStadiumConfig',
     'social_django',
     'notifications',
     'behave_django',
