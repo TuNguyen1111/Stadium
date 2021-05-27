@@ -7,7 +7,7 @@ from .models import User, Stadium, StarRatingPermission
 @receiver(post_save, sender=User)
 def create_user_rating_permission(sender, instance, created, **kwargs):
     if created:
-        stadiums = Stadium.objects.all().select_related('owner')
+        stadiums = Stadium.objects.all()
         for stadium in stadiums:
             user_permissions = StarRatingPermission.objects.create(
                 user=instance, stadium=stadium)
