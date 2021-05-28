@@ -88,14 +88,14 @@
     </div>
 
     </header>
-    <section class="shadow">
+    <section class="">
         {% if user.role == "owner" %}
         <label class="show-sidebar" for="check">
           <i class="fas fa-bars" id="show-sidebar-btn"></i>
         </label>
         <input type="checkbox" id="check" class="checkbox">
 
-          <nav class="sidebar">
+          <nav class="sidebar" id="sidebar">
             <label for="check">
               <i class="fas fa-times" id="times-icon"></i>
             </label>
