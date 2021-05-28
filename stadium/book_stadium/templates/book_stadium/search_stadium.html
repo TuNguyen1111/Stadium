@@ -44,7 +44,7 @@
                                                         <p class="card-text">Địa chỉ: {{ stadiumInfor.dia_chi }}</p>
                                                         <hr>
                                                     </div>
-                                                    <button stadium-name="{{stadiumInfor.ten}}" onclick="focusForm(event)">Đặt sân</button>
+                                                    <button stadium-name="{{stadiumInfor.ten}}" id="order-btn" onclick="">Đặt sân</button>
                                                 </div>
                                             </div>
                                             <div class="card-body">
@@ -81,7 +81,7 @@
                                             <hr>
                                             <p class="card-text">Địa chỉ: {{ stadium.address }}</p>
                                             <hr>
-                                            <button class="order-btn" stadium-name="{{ stadium.name }}" user-name="{{ user.username }}" user-phone-number="{{ user.phone_number }}">Đặt sân</button>
+                                            <button id="order-btn" class="order-btn" stadium-name="{{ stadium.name }}" user-name="{{ user.username }}" user-phone-number="{{ user.phone_number }}">Đặt sân</button>
                                         </div>
                                     </div>
                                 </div>

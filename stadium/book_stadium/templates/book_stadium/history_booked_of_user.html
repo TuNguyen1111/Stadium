@@ -59,7 +59,7 @@
                         <td class="last-td">
                             {% for timeframe, stadium_obj in order.khung_gio.items %}
                                 {% for stadium in stadium_obj %}
-                                    <button class="btn btn-danger" onclick="turnOnDeleteModal()">Hủy</button>
+                                    <button id="delete-order-btn" class="btn btn-danger" onclick="">Hủy</button>
                                     <hr>
                                     <div class="modal fade " id="delete-order" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
                                     aria-labelledby="staticBackdropLabel" aria-hidden="true">

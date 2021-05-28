@@ -1,29 +1,33 @@
 $(document).ready(function() {
-    function showNotificationModal() {
-        if ( $('#success').length ) {
-            $('#notification-success').modal('show');
-        }
-        else if ( $('#warning').length ) {
-            $('#notification-failed').modal('show');
-        };
-    }
-
     showNotificationModal();
-
-    function toggleSearchAndOrderForm() {
-        $('.search-btn-dropdown').click(function() {
-            $('.search-show').slideToggle();
-        });
-    }
-
     toggleSearchAndOrderForm();
+    $('.select').addClass('form-select')
+    setEventForOrderBtn() 
+})
 
 
-    $('.order-btn').click(function() {
-        let stadiumName = $(this).attr('stadium-name');
-        let userName = $(this).attr('user-name');
-        let userPhoneNumber = $(this).attr('user-phone-number');
-        let timeframe = $(this).attr('time-frame');
+function showNotificationModal() {
+    if ( $('#success').length ) {
+        $('#notification-success').modal('show');
+    }
+    else if ( $('#warning').length ) {
+        $('#notification-failed').modal('show');
+    };
+}
+
+function toggleSearchAndOrderForm() {
+    $('.search-btn-dropdown').click(function() {
+        $('.search-show').slideToggle();
+    });
+}
+
+function setEventForOrderBtn() {
+    $('.order-btn').click(function(e) {
+        let currentItem = $(e.target)
+        let stadiumName = currentItem.attr('stadium-name');
+        let userName = currentItem.attr('user-name');
+        let userPhoneNumber = currentItem.attr('user-phone-number');
+        let timeframe = currentItem.attr('time-frame');
 
         let stadiumInput = $('#stadium-name');
         let userNameInput = $('#id_customer_name');
@@ -45,9 +49,4 @@ $(document).ready(function() {
         
         $('#book-stadium').modal('show')
     })
-
-    $('.select').addClass('form-select')
-})
-
-
-
+}

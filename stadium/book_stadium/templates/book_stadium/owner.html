@@ -80,7 +80,8 @@
                             <div class="crud-btn">
                                 <p>Sân số {{users.vi_tri}}</p>
                                 <input type="submit" class="btn btn-warning delete-btn" onclick="turnOnModalUpdate(event, {{ users.order_id }})" order-id="{{ users.order_id}}" max-number="{{ users.tong_san }}" value="Sửa">
-                                <div class="modal fade " id="update {{ users.order_id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+                                
+                                <div class="modal fade " id="update-{{ users.order_id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
                                     aria-labelledby="staticBackdropLabel" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered">
                                     <div class="modal-content">
@@ -131,7 +132,8 @@
                                 <div class="crud-btn accepted">
                                     <p id="accepted">Đã duyệt</p>
                                     <p><i class="fas fa-times" onclick="turnOnModalDelete({{ users.order_id }})"></i></p>
-                                    <div class="modal fade " id="delete {{ users.order_id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+                                    
+                                    <div class="modal fade " id="delete-{{ users.order_id}}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
                                         aria-labelledby="staticBackdropLabel" aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered">
                                         <div class="modal-content">
@@ -164,8 +166,7 @@
                                         <p>Không đủ sân để duyệt</p>
                                     {% endif %}
 
-
-                                    <div class="modal fade " id="accept {{ users.order_id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+                                    <div class="modal fade" id="accept-{{ users.order_id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
                                     aria-labelledby="staticBackdropLabel" aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered">
                                             <div class="modal-content">

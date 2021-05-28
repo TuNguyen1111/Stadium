@@ -20,6 +20,7 @@
         <div class="overview">
             {% if stadium_search_result %}
                 <h1 id="title">Kết quả tìm kiếm</h1>
+
                 {% for stadium in stadium_search_result %}
                     <div class="day shadow">
                         <h2>Ngày: {{ stadium.ngay }}</h2>
@@ -39,7 +40,7 @@
                                                         <p class="card-text">Địa chỉ: {{ stadiumInfor.dia_chi }}</p>
                                                         <hr>
                                                     </div>
-                                                    <button  class="order-btn" stadium-name="{{stadiumInfor.ten}}" onclick="">Đặt sân</button>
+                                                    <button id="order-btn" class="order-btn" stadium-name="{{stadiumInfor.ten}}" onclick="">Đặt sân</button>
                                                 </div>
                                             </div>
                                             <div class="card-body">
@@ -62,6 +63,7 @@
                         {% endfor %}
                     </div>
                 {% endfor %}
+                
             {% else %}
                 <h1 id="title">Các sân và khung giờ còn trống</h1>
                 {% for stadium in page_obj %}
@@ -84,7 +86,7 @@
                                                         <hr>
                                                     </div>
 
-                                                    <button class="order-btn" stadium-name="{{ stadiumInfor.ten }}" user-name="{{ user.username }}" user-phone-number="{{ user.phone_number }}" time-frame="{{ stadiumInfor.khung_gio_dat }}" onclick="">Đặt sân</button>
+                                                    <button id="order-btn" class="order-btn" stadium-name="{{ stadiumInfor.ten }}" user-name="{{ user.username }}" user-phone-number="{{ user.phone_number }}" time-frame="{{ stadiumInfor.khung_gio_dat }}" onclick="">Đặt sân</button>
 
                                                 </div>
                                             </div>

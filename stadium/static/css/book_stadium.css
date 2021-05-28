@@ -45,12 +45,13 @@
     margin-right: 40px;
 }
 
-.card.style {
+.style {
     margin-right: 20px;
     margin-bottom: 20px;
+    z-index: 1;
 }
 
-.card.style button {
+.style button {
     width: 35%;
     height: 35px;
     border-radius: 7px;

@@ -1,18 +1,25 @@
-$.ajax({
-    type: 'get',
-    url: '',
-    data: {
-        datasend: "Sended"
-    },
-    success: function(json) {
-        console.log(json)
-        createChartForLastest12MonthsSales(json)
-        createChartForSalesOfThisMonthByTimeframes(json)
-    },
-    error: function(error) {
-        console.log(error)
-    }
+$(document).ready(function(){
+    renderChart()
+    setEventForShowChartBtn()
 })
+
+
+function renderChart() {
+    $.ajax({
+        type: 'get',
+        url: '',
+        data: {
+            datasend: "Sended"
+        },
+        success: function(json) {
+            createChartForLastest12MonthsSales(json)
+            createChartForSalesOfThisMonthByTimeframes(json)
+        },
+        error: function(error) {
+            console.log(error)
+        }
+    })
+}
 
 function createChartForSalesOfThisMonthByTimeframes(json) {
     stadiums = json.sales_of_this_month_by_timeframes
@@ -20,31 +27,26 @@ function createChartForSalesOfThisMonthByTimeframes(json) {
         stadiumName = stadium.stadium_name
         stadiumNameConverted = stadiumName.replace(/ /g, '_')
 
-        let canvas =  document.createElement('CANVAS')
-        console.log(canvas)
-        let chartsDiv = document.getElementById('this-month-charts')
-        let newDiv = document.createElement('div')
-        newDiv.className = 'col-sm-11'
-
-        canvas.id = `this-month-charts-of-${stadiumNameConverted}`
-        canvas.width = 400
-        canvas.height = 400
+        let canvasId = `this-month-charts-of-${stadiumNameConverted}`
+        let canvas = $(`<canvas id="${canvasId}" width="400" height="400"></canvas>`)
+        let chartsDiv = $('#this-month-charts')
+        let newDiv = $('<div class="col-sm-11"></div>')
 
         data = stadium.sales_and_number_of_orders
         dataOfSales = data.sales
         dataOfNumberOfOrder = data.number_of_orders
         labelsOfChart = stadium.timeframes
-        chartId = canvas.id
+        chartId = canvasId
 
-        newDiv.appendChild(canvas)
-        chartsDiv.appendChild(newDiv)
+        chartsDiv.append(newDiv)
+        newDiv.append(canvas)
 
         createDoubleColumnChart(dataOfSales, dataOfNumberOfOrder, labelsOfChart, chartId, stadiumName)
     }
 }
 
 function createDoubleColumnChart(dataOfSales, dataOfNumberOfOrder, labelsOfChart, chartId, stadiumName) {
-    var canvas = document.getElementById(chartId);
+    var canvas = $(`#${chartId}`)
     var myChart = new Chart(canvas, {
         type: 'bar',
         data: {
@@ -97,27 +99,24 @@ function createChartForLastest12MonthsSales(json) {
             }
             stadiumNameConverted = stadiumName.replace(/ /g, '_')
 
-            let canvas =  document.createElement('CANVAS')
-            let chartsDiv = document.getElementById('twelve-months-charts')
-            let newDiv = document.createElement('div')
-            newDiv.className = 'col-sm-6'
+            let canvasId = `chart-of-${stadiumNameConverted}`
+            let canvas = $(`<canvas id="${canvasId}" width="400" height="400"></canvas>`)
+            let chartsDiv = $('#twelve-months-charts')
+            let newDiv = $('<div class="col-sm-6"></div>')
 
-            canvas.id = `chart-of-${stadiumNameConverted}`
-            canvas.width = 400
-            canvas.height = 400
             labels = stadium.months_and_year
             data = stadium.sales
-            chartId = canvas.id
+            chartId = canvasId
 
-            newDiv.appendChild(canvas)
-            chartsDiv.appendChild(newDiv)
+            chartsDiv.append(newDiv)
+            newDiv.append(canvas)
 
             createChart(chartId, labels, data, stadiumName)
         }
 }
 
 function createChart(chartId, labels, data, stadiumName){
-    var ctx = document.getElementById(chartId).getContext('2d');
+    var ctx = $(`#${chartId}`)[0].getContext('2d')
     var chartId = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -152,21 +151,16 @@ function createChart(chartId, labels, data, stadiumName){
 }
 
 function setEventForShowChartBtn() {
-    thisMonthShowBtn = document.getElementById('this-month-show')
-    twelveMonthsShowBtn = document.getElementById('twelve-months-show')
-    thisMonthCharts = document.getElementById('this-month-charts')
-    twelveMonthsCharts = document.getElementById('twelve-months-charts')
-
-    thisMonthShowBtn.addEventListener('click', function() {
-        twelveMonthsCharts.style.display = 'none'
-        thisMonthCharts.style.display = 'flex'
+    $('#this-month-show').click(function() {
+        $('#twelve-months-charts').css('display', 'none')
+        $('#this-month-charts').css('display', 'flex')
     })
-
-    twelveMonthsShowBtn.addEventListener('click', function() {
-        twelveMonthsCharts.style.display = 'flex'
-        thisMonthCharts.style.display = 'none'
+    
+    $('#twelve-months-show').click(function() {
+        $('#twelve-months-charts').css('display', 'flex')
+        $('#this-month-charts').css('display', 'none')
     })
 }
 
-setEventForShowChartBtn()
+
 

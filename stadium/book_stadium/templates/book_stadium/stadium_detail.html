@@ -21,7 +21,7 @@
         <img class="stadium-img" src="{{ stadium.image.url }}" alt="stadium-image">
         <div class="form-info">
             <div class="save-or-delete-form">
-                <form action="" method="POST" class="stadium-form-detail" enctype="multipart/form-data">
+                <form action="" method="POST" class="stadium-form-detail" id="stadium-form-detail" enctype="multipart/form-data">
                     {% csrf_token %}
 
                     {% if stadium.owner == user %}
