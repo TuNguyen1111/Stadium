@@ -7,7 +7,6 @@
 .col {
     display: flex;
     flex-direction: column;
-    height: auto;
 }
 
 .overview {

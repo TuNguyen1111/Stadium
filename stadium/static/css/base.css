@@ -168,7 +168,6 @@ section {
 
 .col {
     display: flex;
-    height: 100vh;
     margin-left: 300px;
     margin-top: 75px;
     transition: 1s;
