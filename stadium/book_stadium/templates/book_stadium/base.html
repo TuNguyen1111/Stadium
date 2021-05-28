@@ -23,7 +23,9 @@
 
 <body>
   <div class="container-1">
+    
     <header>
+      
       <div class="navbar">
         <a class="logo" href="{% url 'book_stadium' %}"><img src="{% static 'images/ball.png' %}" alt=""></a>
         <ul>
@@ -88,51 +90,59 @@
     </header>
     <section class="shadow">
         {% if user.role == "owner" %}
-            <nav class="sidebar">
-                <ul>
-                    <li>
-                        <a href="#" class="manage-btn">
-                            Quản lý sân
-                            <span class="fas fa-caret-up first"></span>
-                        </a>
+        <label class="show-sidebar" for="check">
+          <i class="fas fa-bars" id="show-sidebar-btn"></i>
+        </label>
+        <input type="checkbox" id="check" class="checkbox">
 
-                        <ul class="stadium-manage">
-                            {% for field in fields %}
-                                {% url 'stadium_detail' field.id as url %}
-                                <li class="nav-item {% if request.path == url %} active {% endif %}">
+          <nav class="sidebar">
+            <label for="check">
+              <i class="fas fa-times" id="times-icon"></i>
+            </label>
+            <ul>
+                <li>
+                    <a href="#" class="manage-btn">
+                        Quản lý sân
+                        <span class="fas fa-caret-up first"></span>
+                    </a>
+
+                    <ul class="stadium-manage">
+                        {% for field in fields %}
+                            {% url 'stadium_detail' field.id as url %}
+                            <li class="nav-item {% if request.path == url %} active {% endif %}">
+                                <a class="field-name" href="{{ url }}">{{ field.name }}</a>
+                            </li>
+                        {% endfor %}
+
+                            {% url 'create_stadium' as url %}
+                            <li class="nav-item {% if request.path == url %} active {% endif %}">
+                                <a class="field-name" href="{{ url }}">Thêm sân</a>
+                            </li>
+                    </ul>
+                </li>
+
+                <li>
+                    <a href="#" class="state-btn">
+                        Trạng thái sân
+                        <span class="fas fa-caret-up second"></span>
+                    </a>
+
+                    <ul class="stadium-state">
+                        {% for field in fields %}
+                            {% url 'owner' field.id as url %}
+                                <li class="nav-item {% if request.path == url %}active{% endif %}">
                                     <a class="field-name" href="{{ url }}">{{ field.name }}</a>
                                 </li>
-                            {% endfor %}
-
-                                {% url 'create_stadium' as url %}
-                                <li class="nav-item {% if request.path == url %} active {% endif %}">
-                                    <a class="field-name" href="{{ url }}">Thêm sân</a>
-                                </li>
-                        </ul>
-                    </li>
-
-                    <li>
-                        <a href="#" class="state-btn">
-                            Trạng thái sân
-                            <span class="fas fa-caret-up second"></span>
-                        </a>
-
-                        <ul class="stadium-state">
-                            {% for field in fields %}
-                                {% url 'owner' field.id as url %}
-                                    <li class="nav-item {% if request.path == url %}active{% endif %}">
-                                        <a class="field-name" href="{{ url }}">{{ field.name }}</a>
-                                    </li>
-                            {% endfor %}
-                        </ul>
-                    </li>
-                    {% url 'owner_profit' user.pk as url %}
-                    <li class="nav-item {% if request.path == url %} active {% endif %}">
-                      <a href="{{ url }}" class="manage-btn">
-                        Doanh thu
-                      </a>
-                    </li>
-                </ul>
+                        {% endfor %}
+                    </ul>
+                </li>
+                {% url 'owner_profit' user.pk as url %}
+                <li class="nav-item {% if request.path == url %} active {% endif %}">
+                  <a href="{{ url }}" class="manage-btn">
+                    Doanh thu
+                  </a>
+                </li>
+              </ul>
             </nav>
         {% endif %}
       <div class="col">

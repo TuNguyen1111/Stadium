@@ -11,6 +11,12 @@ body {
     font-family: "Roboto Condensed", sans-serif;
 }
 
+header {
+    position: fixed;
+    width: 100%;
+    z-index: 2;
+}
+
 .container-1 {
     width: 100%;
     margin: auto;
@@ -100,11 +106,15 @@ section {
 }
 
 .sidebar {
-    /* position: fixed; */
-
+    position: fixed;
+    height: 100%;
     width: 300px;
+    left: 0;
+    top: 76px;
     background: rgb(104, 103, 103);
     color: rgb(255, 255, 255);
+    transition: 1s;
+    z-index: 2;
 }
 
 .sidebar ul {
@@ -159,6 +169,9 @@ section {
 .col {
     display: flex;
     height: 100vh;
+    margin-left: 300px;
+    margin-top: 75px;
+    transition: 1s;
 }
 
 .dropdown-menu.show {
@@ -195,4 +208,50 @@ a#all-notification-link {
 .alert {
     width: 100%;
     text-align: center;
+}
+
+.show-sidebar {
+    z-index: 1;
+    color: #000000;
+    position: fixed;
+    top: 75px;
+    left: 0;
+    padding: 20px;
+}
+
+#show-sidebar-btn {
+    cursor: pointer;
+    font-size: 40px;
+}
+
+#show-sidebar-btn:hover {
+    color: #76797c;
+}
+
+.checkbox {
+    display: none;
+    position: absolute;
+}
+
+.checkbox:checked ~ .sidebar {
+    left: -300px;
+}
+
+.checkbox:checked ~ .col {
+    margin-left: 0;
+}
+
+.checkbox:not(:checked) ~ .sidebar {
+    left: 0;
+}
+
+#times-icon {
+    position: absolute;
+    right: 18px;
+    top: 7px;
+}
+
+#times-icon:hover {
+    cursor: pointer;
+    color: #000000;
 }
