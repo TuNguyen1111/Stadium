@@ -1,4 +1,12 @@
 $(document).ready(function(){
+    setEventForButtonInSidebar()
+    setEventForLoginAndRegisterBtn()
+    showModalIfHaveError() 
+    addClassForSelectType()
+    setPropertyIfNoSidebar()
+})
+
+function setEventForButtonInSidebar() {
     $('.manage-btn').on('click', function() {
         $('ul li .first').toggleClass('rotate');
         $('.stadium-manage').slideToggle();
@@ -8,7 +16,9 @@ $(document).ready(function(){
         $('ul li .second').toggleClass('rotate');
         $('.stadium-state').slideToggle();
     });
+}
 
+function setEventForLoginAndRegisterBtn() {
     $('.toggle-login-modal').on('click', function() {
         $('#login-modal').modal('show');
     });
@@ -17,7 +27,9 @@ $(document).ready(function(){
         $('#login-modal').modal('hide');
         $('#register-modal').modal('show');
     });
+}
 
+function showModalIfHaveError() {
     if ( $('#error_1_id_email_or_phone').length ) {
         $('#register-modal').modal('show');
     }
@@ -25,13 +37,14 @@ $(document).ready(function(){
     if ( $(`#message-error`).length ) {
         $('#login-modal').modal('show');
     }
+}
 
-    console.log($('#sidebar').length)
+function addClassForSelectType() {
+    $('.select').addClass('form-select')
+}
+
+function setPropertyIfNoSidebar() {
     if (!$('#sidebar').length) {
-        console.log('dsdfsdf')
         $('.col').css('marginLeft', '0')
     }
-
-    $('#id_role').addClass('form-select')
-})
-
+}

@@ -1,7 +1,6 @@
 $(document).ready(function() {
     showNotificationModal();
     toggleSearchAndOrderForm();
-    $('.select').addClass('form-select')
     setEventForOrderBtn() 
 })
 

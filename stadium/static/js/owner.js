@@ -1,7 +1,3 @@
-$(document).ready(function() {
-
-})
-
 function turnOnModalDelete(id) {
     $(`#delete-${id}`).modal('show')
 }
