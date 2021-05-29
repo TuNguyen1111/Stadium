@@ -124,3 +124,8 @@ h1 {
 .notification-title {
     padding: 2%;
 }
+
+table.timeframes th,
+table.timeframes td {
+    text-align: center;
+}
