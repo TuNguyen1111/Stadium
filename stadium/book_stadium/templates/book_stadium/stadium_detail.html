@@ -6,14 +6,19 @@
 <link rel="stylesheet" href="{% static 'css/stadium_detail.css' %}">
 {% endblock %}
 {% block content %}
-    {% for message in messages %}
-        <div class="alert alert-success" role="alert">
-            {{message}}
-        </div>
-    {% endfor %}
+    <div id="message">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success" role="alert">
+                    {{message}}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
     <div class="container stadium-detail">
         {% if stadium.owner != user %}
-            <input type="hidden" id="user-check" value="is not owner">
+            <input type="hidden" id="current-user" value="is not owner">
         {% endif %}
         <input type="hidden" id="user-id" value="{{ user.pk }}">
         <h1 class="stadium-name pt-2">{{ stadium.name }}</h1>
@@ -63,7 +68,7 @@
                 id="stadium-form-time-frames">
                 {{ form_time_frame.management_form }}
                 {% csrf_token %}
-                <table class="table">
+                <table class="table timeframes">
                     <thead class="thead-dark">
                     <tr>
                         <th>Khung giờ</th>
@@ -158,40 +163,7 @@
             {% endif %}
         </div>
     </div>
-
     <hr>
-    <!-- <div class="comments-section">
-        <div class="average-users-rating">
-            <button class="btn btn-primary star-rate-btn" id="users_rated">Tất cả</button>
-            <button class="btn btn-primary star-rate-btn" id="five_star" star-type="5">5 sao</button>
-            <button class="btn btn-primary star-rate-btn" id="four_star" star-type="4">4 sao</button>
-            <button class="btn btn-primary star-rate-btn" id="three_star" star-type="3">3 sao</button>
-            <button class="btn btn-primary star-rate-btn" id="two_star" star-type="2">2 sao</button>
-            <button class="btn btn-primary star-rate-btn" id="one_star" star-type="1">1 sao</button>
-        </div>
-
-        <div class="all-comments" id="all-comments">
-        </div>
-
-        {% if user_vote_permission.can_rate %}
-            <div id="stadium-rate" class="stadium-comments">
-                <form class="shadow" id="comment-form" method="POST">
-                    <h4>Đánh giá sân</h4>
-                    {% csrf_token %}
-                    <div class="star-rating" id="star-rating">
-                        <span class="fa fa-2x fa-star" id="five-star"></span>
-                        <span class="fa fa-2x fa-star" id="four-star"></span>
-                        <span class="fa fa-2x fa-star" id="three-star"></span>
-                        <span class="fa fa-2x fa-star" id="two-star"></span>
-                        <span class="fa fa-2x fa-star" id="one-star"></span>
-                    </div>
-                    {{ comment_form.comment|as_crispy_field }}
-                    <input type="hidden" name="post" value="form-comment">
-                    <button id="comment-btn" class="btn btn-primary" type="submit">Bình luận</button>
-                </form>
-            </div>
-        {% endif %}
-    </div> -->
 
     <div class="modal fade " id="delete-form-modal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
     aria-labelledby="staticBackdropLabel" aria-hidden="true">
