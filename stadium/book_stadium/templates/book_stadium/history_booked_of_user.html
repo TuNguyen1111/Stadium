@@ -6,6 +6,15 @@
 {% endblock %}
 
 {% block content %}
+    <div class="message" id="message">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-success" role="alert">
+                    {{message}}
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
     <div class="overview">
         <h1>Lịch sử đặt sân</h1>
         <div class="history-booked">
