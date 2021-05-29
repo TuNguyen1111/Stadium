@@ -74,7 +74,7 @@ button {
     color: green;
 }
 
-.fa-times {
+.fa-times .delete-order{
     color: red;
 }
 
