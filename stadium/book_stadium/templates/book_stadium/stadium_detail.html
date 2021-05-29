@@ -12,6 +12,9 @@
         </div>
     {% endfor %}
     <div class="container stadium-detail">
+        {% if stadium.owner != user %}
+            <input type="hidden" id="user-check" value="is not owner">
+        {% endif %}
         <input type="hidden" id="user-id" value="{{ user.pk }}">
         <h1 class="stadium-name pt-2">{{ stadium.name }}</h1>
         <input type="hidden" id="stadium-id" value="{{ stadium.pk }}">
@@ -34,7 +37,12 @@
                             </div>
                         {% endfor %}
                         <input type="hidden" name="form_type" value="form_detail">
-                        <button type="submit" id="saveDetailBtn" class="btn btn-primary mt-5" disabled="true">Lưu thông tin</button>
+                        <div class="save-and-delete-btn">
+                            <input type="submit" id="saveDetailBtn" class="btn btn-primary" disabled="true" value="Lưu thông tin" />
+                            {% if stadium.owner == user %}
+                                <input class="stadium-form-delete-btn btn btn-danger" onclick="turnOnDeleteModal()" value="Xóa" />
+                            {% endif %}
+                        </div>
                     {% else %}
                         {% for input in form_detail_for_user.visible_fields %}
                             <div class="form-group mt-4">
@@ -46,9 +54,6 @@
                         {% endfor %}
                     {% endif %}
                 </form>
-                {% if stadium.owner == user %}
-                    <button class="stadium-form-delete btn btn-danger" onclick="turnOnDeleteModal()">Xóa</button>
-                {% endif %}
             </div>
             <div class="form-timeframe">
                 <h2>
@@ -117,7 +122,7 @@
                 <a class="btn btn-secondary" href="{% url 'book_stadium' %}">Quay lại</a>
             </div>
         {% endif %}
-        
+
         <div class="comments-section mt-5">
             <h3 class="rating-title">Đánh giá sân</h3>
             <hr>
@@ -129,10 +134,10 @@
                 <button class="btn btn-primary star-rate-btn" id="two_star" star-type="2">2 sao</button>
                 <button class="btn btn-primary star-rate-btn" id="one_star" star-type="1">1 sao</button>
             </div>
-            
+
             <div class="all-comments" id="all-comments">
             </div>
-        
+
             {% if user_vote_permission.can_rate %}
                 <div id="stadium-rate" class="stadium-comments">
                     <form class="shadow" id="comment-form" method="POST">
@@ -164,10 +169,10 @@
             <button class="btn btn-primary star-rate-btn" id="two_star" star-type="2">2 sao</button>
             <button class="btn btn-primary star-rate-btn" id="one_star" star-type="1">1 sao</button>
         </div>
-        
+
         <div class="all-comments" id="all-comments">
         </div>
-    
+
         {% if user_vote_permission.can_rate %}
             <div id="stadium-rate" class="stadium-comments">
                 <form class="shadow" id="comment-form" method="POST">
