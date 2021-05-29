@@ -17,6 +17,10 @@ header {
     z-index: 2;
 }
 
+.message {
+    width: 100%;
+}
+
 .container-1 {
     width: 100%;
     margin: auto;
@@ -170,7 +174,7 @@ section {
     display: flex;
     margin-left: 300px;
     margin-top: 75px;
-    transition: 1s;
+    /* transition: 0.5s; */
 }
 
 .dropdown-menu.show {
