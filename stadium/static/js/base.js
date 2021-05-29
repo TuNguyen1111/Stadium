@@ -4,6 +4,7 @@ $(document).ready(function(){
     showModalIfHaveError() 
     addClassForSelectType()
     setPropertyIfNoSidebar()
+    addPropertyForOwner()
     clearMessage()
 })
 
@@ -13,6 +14,12 @@ function clearMessage() {
         setTimeout(function() {
             message.remove()
         }, 2000)
+    }
+}
+
+function addPropertyForOwner() {
+    if ($('input#owner').length) {
+        $('.col').css('transition', '1s')
     }
 }
 
