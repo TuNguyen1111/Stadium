@@ -44,10 +44,13 @@ h1 {
     position: relative;
 }
 
-.stadium-form-delete {
-    position: absolute;
-    top: 91%;
-    right: 43%;
+.save-and-delete-btn {
+    padding: 2%;
+    text-align: center;
+}
+
+.stadium-form-delete-btn {
+    width: 20%;
 }
 
 .stadium-form-detail button {
