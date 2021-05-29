@@ -23,9 +23,10 @@
 
 <body>
   <div class="container-1">
-    
+    {% if user.role == 'owner' %}
+      <input type="hidden" id="owner">
+    {% endif %}
     <header>
-      
       <div class="navbar">
         <a class="logo" href="{% url 'book_stadium' %}"><img src="{% static 'images/ball.png' %}" alt=""></a>
         <ul>
