@@ -68,13 +68,15 @@
                 id="stadium-form-time-frames">
                 {{ form_time_frame.management_form }}
                 {% csrf_token %}
-                <table class="table timeframes">
+                <table class="table table-bordered timeframes">
                     <thead class="thead-dark">
                     <tr>
                         <th>Khung giờ</th>
                         <th class="col-2">Giá tiền</th>
-                        <th>Trạng thái phục vụ</th>
-                        <th></th>
+                        <th id="serve-state">Trạng thái phục vụ</th>
+                        {% if stadium.owner == user %}
+                            <th></th>
+                        {% endif %}
                     </tr>
                     </thead>
                     <tbody>
@@ -88,7 +90,7 @@
                                 {{ form.time_frame }}
                             </td>
                             <td>
-                                <div class="inputField text-center">
+                                <div class="text-center">
                                     {{ form.price }}
                                     <!-- <input type="text" class="form-control" id="{{forloop.counter0}}" name="price" disabled="true" value="{{ form.price.value|intcomma }}"> -->
                                 </div>
@@ -104,13 +106,11 @@
                                     {% endif %}
                                 {% endif %}
                             </td>
-                            <td>
-                                {% if stadium.owner == user %}
+                            {% if stadium.owner == user %}
+                                <td>
                                     <i data-name="{{ form.price.auto_id }}" data-check="{{ form.is_open.auto_id }}" class="fas fa-pen-square"></i>
-                                {% else %}
-                                    <i hidden data-name="{{ form.price.auto_id }}" data-check="{{ form.is_open.auto_id }}" class="fas fa-pen-square"></i>
-                                {% endif %}
-                            </td>
+                                </td>
+                            {% endif %}
                         </tr>
                     {% endfor %}
                     </tbody>
