@@ -26,15 +26,6 @@ header {
     margin: auto;
 }
 
-.navbar a.logo {
-    width: 60px;
-    margin-left: 5%;
-}
-
-.navbar a.logo img {
-    width: 100%;
-}
-
 .navbar {
     background-image: linear-gradient(
         to right,
@@ -257,4 +248,25 @@ a#all-notification-link {
 #times-icon:hover {
     cursor: pointer;
     color: #000000;
+}
+
+.navbar a.logo {
+    width: 60px;
+    margin-left: 5%;
+}
+
+.navbar a.logo img {
+    width: 100%;
+    /* transition: all 3s ease; */
+}
+
+.navbar a.logo img:hover {
+    /* transform: rotate(360deg); */
+    animation: rotate-ball 3s ease;
+}
+
+@keyframes rotate-ball {
+    100% {
+        transform: rotate(360deg);
+    }
 }
