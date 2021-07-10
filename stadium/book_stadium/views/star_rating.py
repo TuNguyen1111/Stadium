@@ -128,18 +128,17 @@ class StadiumRatingEdit(StadiumRating):
             new_star_point = request.POST.get('starPoint')
             new_comment = request.POST.get('commentData')
             stadium_id = request.POST.get('stadiumId')
-            stadium = get_object_or_404(Stadium, pk=stadium_id)
             current_user = request.user
 
+            stadium = get_object_or_404(Stadium, pk=stadium_id)
+            user_rate_permission = get_object_or_404(
+                StarRatingPermission, user=current_user, stadium=stadium)
             user_rated = get_object_or_404(
                 StarRating, user=current_user, stadium=stadium)
 
             user_rated.comment = new_comment
             user_rated.star_point = new_star_point
             user_rated.save()
-
-            user_rate_permission = get_object_or_404(
-                StarRatingPermission, user=current_user, stadium=stadium)
 
             stars_rate_of_stadium = StarRating.objects.filter(
                 stadium=stadium).order_by('-star_point')
