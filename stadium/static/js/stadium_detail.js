@@ -6,7 +6,7 @@ var modalEditForm = new bootstrap.Modal(document.getElementById('edit-rate-form-
 
 initScreen()
 
-function initScreen() { 
+function initScreen() {
     setEventForPencilsIcon()
     addEventInput()
     changeSelectTag()
@@ -26,7 +26,7 @@ function sendData() {
 
     try {
         $('#comment-btn').click( (e) => {
-            e.preventDefault() 
+            e.preventDefault()
             let spanChildrens = $('#star-rating').children().toArray().reverse()
             let starPoint = getStarsPoint(spanChildrens)
 
@@ -55,7 +55,7 @@ function sendData() {
         })
     } catch(error) {
         console.log(error)
-    } 
+    }
 }
 
 function getAverageUsersRating() {
@@ -70,7 +70,7 @@ function getAverageUsersRating() {
         success: function(data) {
             getTotalOfStarType(data)
             setEventForStarTypeBtn(data, allCommentsDiv)
-            getUsersRated(data, allCommentsDiv) 
+            getUsersRated(data, allCommentsDiv)
         },
         error: function(error) {
             console.log(error)
@@ -84,7 +84,7 @@ function getInput() {
     let dataCheck = $(this).attr('data-check')
     let checkBox = $(`#${dataCheck}`)
     let input = $(`#${getData}`)
-    
+
     if (input.attr('disabled')) {
         input.attr('disabled', false)
     } else {
@@ -111,8 +111,8 @@ function getStadiumInformation() {
 
     for (let item of stadiumFormDetail) {
         oldValuesDetail[item.id] = item.value
-    } 
-    return oldValuesDetail      
+    }
+    return oldValuesDetail
 }
 
 function getStadiumTimeFramesInformation() {
@@ -121,7 +121,7 @@ function getStadiumTimeFramesInformation() {
     for (let item of stadiumFormTimeFrames) {
         if (item.checked || !item.checked) {
             oldValuesTimeFrames[item.id] = item.checked
-        } else {  
+        } else {
             oldValuesTimeFrames[item.id] = item.value
         }
     }
@@ -131,7 +131,7 @@ function getStadiumTimeFramesInformation() {
 function checkValueOfDetailInput(e) {
     let currentValue = $(e.target).val()
     let saveBtn = $('#saveDetailBtn')
-    
+
     if (currentValue != oldValuesDetail[$(e.target).attr('id')]) {
         saveBtn.attr('disabled', false)
         stadiumFormDetail.attr('disabled', false)
@@ -151,7 +151,7 @@ function checkValueOfTimeFrameInput(e) {
 
     if (currentValue != oldValuesTimeFrames[$(e.target).attr('id')]) {
         saveBtn.attr('disabled', false)
-        
+
         stadiumFormTimeFrames.attr('disabled', false)
     } else {
         saveBtn.attr('disabled', true)
@@ -173,8 +173,8 @@ function tunrOndeleteTimeFrameModal(id) {
 }
 
 function changeSelectTag() {
-    let inputTags = $('select')
-    for (let item of inputTags) {
+    let inputSelectTags = $('select')
+    for (let item of inputSelectTags) {
         let value = item.options[item.selectedIndex].text;
         let pTag = $(`<p>${value}</p>`)
         $(item).replaceWith(pTag)
@@ -190,7 +190,7 @@ function setEventForStars() {
         const fourStar = $('#four-star')
         const fiveStar = $('#five-star')
         const starType = [oneStar, twoStar, threeStar, fourStar, fiveStar]
-    
+
         const oneStarId = oneStar.attr('id')
         const twoStarId = twoStar.attr('id')
         const threeStarId = threeStar.attr('id')
@@ -198,7 +198,7 @@ function setEventForStars() {
         const fiveStarId = fiveStar.attr('id')
 
         setEventForEachStar(starType, spanChildrens, oneStarId, twoStarId, threeStarId, fourStarId, fiveStarId)
-        
+
     } catch(error) {
         console.log(error)
     }
@@ -239,7 +239,7 @@ function handleStarSelect(starId, spanChildrens, oneStarId, twoStarId, threeStar
 
 function addOrRemoveCheckedClass(size, spanChildrens) {
     spanChildrens = spanChildrens.toArray().reverse()
-    
+
     for (let [index, children] of spanChildrens.entries()) {
         let childrenItem = $(children)
         if (index < size) {
@@ -271,7 +271,7 @@ function getStarsPoint(spanChildrens) {
 function handleDataRespone(data, allCommentsDiv) {
     let userRated = data.user_rated_information
     let noRatedTitle = $('#no-rated-title')
-    
+
     if (noRatedTitle.length) {
         noRatedTitle.html('')
     }
@@ -303,7 +303,7 @@ function setUserStarRating() {
                 $(childrenElement).removeClass('checked')
             }
         }
-    }  
+    }
 }
 
 function clearInputAndStar(commentContent) {
@@ -357,13 +357,13 @@ function setEventForStarTypeBtn(data, allCommentsDiv) {
                 }
                 showEditModal()
             }
-        } 
+        }
     })
 }
 
 function getUsersRated(data, allCommentsDiv) {
     let usersRated = data.summary_of_stars_type.users_rated
-    
+
     if(usersRated.length) {
         for (userRated of usersRated) {
             createElementForUserRated(userRated, allCommentsDiv)
@@ -412,14 +412,14 @@ function createElementForUserRated(userRated, allCommentsDiv) {
 }
 
 function editUserRated() {
-    
+
     let commentContent = $('#comment-input')
     let csrf = $('input[name=csrfmiddlewaretoken]').val()
     let stadiumId = $('#stadium-id').val()
     let spanChildrens = $('#star-rated').children().toArray().reverse()
     let editCommentBtn = $('#edit-comment-btn')
     let allCommentsDiv = $('#all-comments')
-    
+
     editCommentBtn.on('click', function(e) {
         e.preventDefault()
 
@@ -451,15 +451,15 @@ function editUserRated() {
                 editRatedIcon.attr({
                     'point': userPointEdited,
                     'comment': userCommentEdited
-                }) 
+                })
 
                 setUserStarRating()
                 setEventForStarTypeBtn(data, allCommentsDiv)
-                getTotalOfStarType(data) 
+                getTotalOfStarType(data)
                 modalEditForm.hide()
-            }   
+            }
         })
-        
+
     })
 }
 
@@ -479,9 +479,9 @@ function showEditModal() {
     const threeStarId = threeStar.attr('id')
     const fourStarId = fourStar.attr('id')
     const fiveStarId = fiveStar.attr('id')
-    
+
     setEventForEachStar(starType, spanChildrens, oneStarId, twoStarId, threeStarId, fourStarId, fiveStarId)
-    
+
     spanChildrens = spanChildrens.toArray().reverse()
     editRatedIcon.on('click', function(e) {
         let starPoint = $(e.target).attr('point')
@@ -489,7 +489,7 @@ function showEditModal() {
         let commentInput = $('#comment-input')
 
         commentInput.val(commentContent)
-        
+
         for (const [index, spanChildren] of spanChildrens.entries()) {
             if (index < starPoint) {
                 $(spanChildren).addClass('checked')
