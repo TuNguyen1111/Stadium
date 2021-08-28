@@ -1,9 +1,9 @@
 $(document).ready(function(){
     setEventForButtonInSidebar()
     setEventForLoginAndRegisterBtn()
-    showModalIfHaveError() 
+    showModalIfHaveError()
     addClassForSelectType()
-    setPropertyIfNoSidebar()
+    // setPropertyIfNoSidebar()
     addPropertyForOwner()
     clearMessage()
 })

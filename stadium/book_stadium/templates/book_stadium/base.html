@@ -27,67 +27,70 @@
       <input type="hidden" id="owner">
     {% endif %}
     <header>
-      <div class="navbar">
-        <a class="logo" href="{% url 'book_stadium' %}"><img src="{% static 'images/ball.png' %}" alt=""></a>
-        <ul>
-            <li><a href="{% url 'book_stadium' %}">Đặt sân ngay</a></li>
-            <li><a href="{% url 'search_stadium' %}">Tìm sân</a></li>
-            {% if user.is_authenticated %}
-            <li>
-                <div class="dropdown">
-                    <a href="#" class="notification dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true">
-                      <i class="fa fa-bell" style="font-size:24px"></i>
-                      <span class="badge">{% live_notify_badge %}</span>
-                    </a>
-                        <div class="dropdown-menu notification-dropdown" aria-labelledby="dropdownMenu2">
-                            <div class="notification">
-                                {% for notification in user.notifications.all %}
-                                    <div>
-                                        <a href="{% url 'notification_detail' notification.id %}" class="dropdown-item" type="button">{{ notification.verb }}</a>
-                                    </div>
-                                    <div class="dropdown-divider"></div>
-                                {% endfor %}
+        <div class="navbar">
+            <div class="logo">
+                <a class="logo" href="{% url 'book_stadium' %}"><img src="{% static 'images/ball.png' %}" alt=""></a>
+                <a href="{% url 'book_stadium' %}">Home</a>
+            </div>
 
+            <ul>
+                <li><a href="{% url 'book_stadium' %}">Đặt sân ngay</a></li>
+                <li><a href="{% url 'search_stadium' %}">Tìm sân</a></li>
+                {% if user.is_authenticated %}
+                <li>
+                    <div class="dropdown">
+                        <a href="#" class="notification dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true">
+                        <i class="fa fa-bell" style="font-size:24px"></i>
+                        <span class="badge">{% live_notify_badge %}</span>
+                        </a>
+                            <div class="dropdown-menu notification-dropdown" aria-labelledby="dropdownMenu2">
+                                <div class="notification">
+                                    {% for notification in user.notifications.all %}
+                                        <div>
+                                            <a href="{% url 'notification_detail' notification.id %}" class="dropdown-item" type="button">{{ notification.verb }}</a>
+                                        </div>
+                                        <div class="dropdown-divider"></div>
+                                    {% endfor %}
+
+                                </div>
+
+                                <a id="all-notification-link" href="{% url 'notifications' %}">Xem tất cả</a>
                             </div>
 
-                            <a id="all-notification-link" href="{% url 'notifications' %}">Xem tất cả</a>
-                        </div>
+                    </div>
+                        {% live_notify_list list_class="dropdown-menu" %}
+                </li>
+                <li>
+                    <a href="" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {{user.username}}
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right username-dropdown">
+                        <a href="{% url 'user_profile' user.id %}" class="dropdown-item" type="button">Thông tin tài khoản</a>
 
-                </div>
-                    {% live_notify_list list_class="dropdown-menu" %}
-            </li>
-            <li>
-                <a href="" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    {{user.username}}
-                </a>
-                <div class="dropdown-menu dropdown-menu-right username-dropdown">
-                    <a href="{% url 'user_profile' user.id %}" class="dropdown-item" type="button">Thông tin tài khoản</a>
-                   
-                    {% if user.role == "owner" %}
-                      {% if fields %}
-                        <a href="{% url 'stadium_detail' fields.first.id %}" class="dropdown-item" type="button">Sân bóng của tôi</a>
-                        <a href="{% url 'owner' fields.first.id %}" class="dropdown-item" type="button">Trạng thái đặt sân</a>
-                      {% else %}
-                        <a href="" class="dropdown-item" type="button">Sân bóng của tôi</a>
-                        <a href="" class="dropdown-item" type="button">Trạng thái đặt sân</a>
-                      {% endif %}
-                     
-                    {% else %}
-                      <a href="{% url 'history_booked' user.id %}" class="dropdown-item" type="button">Lịch sử đặt sân</a>
-                    {% endif %}
-                    
-                    <a class="dropdown-item" href="{% url 'password_change' %}">Đổi mật khẩu</a>
-                    <a class="dropdown-item" href="{% url 'logout' %}">Đăng xuất</a>
-                </div>
+                        {% if user.role == "owner" %}
+                        {% if fields %}
+                            <a href="{% url 'stadium_detail' fields.first.id %}" class="dropdown-item" type="button">Sân bóng của tôi</a>
+                            <a href="{% url 'owner' fields.first.id %}" class="dropdown-item" type="button">Trạng thái đặt sân</a>
+                        {% else %}
+                            <a href="" class="dropdown-item" type="button">Sân bóng của tôi</a>
+                            <a href="" class="dropdown-item" type="button">Trạng thái đặt sân</a>
+                        {% endif %}
 
-            </li>
+                        {% else %}
+                        <a href="{% url 'history_booked' user.id %}" class="dropdown-item" type="button">Lịch sử đặt sân</a>
+                        {% endif %}
 
-            {% else %}
-            <li><button type="button" class="btn btn-secondary toggle-login-modal" onclick="">Đăng nhập</button></li>
-            {% endif %}
-        </ul>
-    </div>
+                        <a class="dropdown-item" href="{% url 'password_change' %}">Đổi mật khẩu</a>
+                        <a class="dropdown-item" href="{% url 'logout' %}">Đăng xuất</a>
+                    </div>
 
+                </li>
+
+                {% else %}
+                <li><button type="button" class="btn btn-secondary toggle-login-modal" onclick="">Đăng nhập</button></li>
+                {% endif %}
+            </ul>
+        </div>
     </header>
     <section class="">
         {% if user.role == "owner" %}

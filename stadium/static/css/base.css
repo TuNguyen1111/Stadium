@@ -29,10 +29,10 @@ header {
 .navbar {
     background-image: linear-gradient(
         to right,
-        rgb(121, 119, 119),
-        rgb(163, 163, 163),
-        rgb(163, 163, 163),
-        rgb(121, 119, 119)
+        #3aa0ef,
+        #3aa0ef,
+        #3aa0ef,
+        #3aa0ef
     );
 }
 
@@ -106,7 +106,7 @@ section {
     width: 300px;
     left: 0;
     top: 76px;
-    background: rgb(104, 103, 103);
+    background: #2c3e50;
     color: rgb(255, 255, 255);
     transition: 1s;
     z-index: 2;
@@ -126,7 +126,7 @@ section {
 
 .sidebar ul li a {
     text-decoration: none;
-    color: rgb(255, 255, 255);
+    /* color: rgb(255, 255, 255); */
     padding-left: 40px;
     display: block;
     width: 100%;
@@ -157,13 +157,13 @@ section {
 }
 
 .sidebar ul li a:hover {
-    color: rgb(51, 50, 50);
+    color: black;
+    background-color: white;
     border-left: 3px solid rgb(34, 33, 33);
 }
 
 .col {
     display: flex;
-    margin-left: 300px;
     margin-top: 75px;
     /* transition: 0.5s; */
 }
@@ -174,8 +174,13 @@ section {
 }
 
 .active {
-    background-color: rgb(135, 134, 134);
-    border-left: 3px solid rgb(167, 167, 167);
+    color: black;
+    background-color: white;
+    border-left: 3px solid rgb(26, 26, 26);
+}
+
+.active > a {
+    color: black;
 }
 
 .username-dropdown a {
@@ -250,17 +255,17 @@ a#all-notification-link {
     color: #000000;
 }
 
-.navbar a.logo {
-    width: 60px;
+.navbar .logo {
+    width: 200px;
     margin-left: 5%;
 }
 
-.navbar a.logo img {
-    width: 100%;
+.navbar .logo > img {
+    width: 30%;
     /* transition: all 3s ease; */
 }
 
-.navbar a.logo img:hover {
+.navbar .logo > img:hover {
     /* transform: rotate(360deg); */
     animation: rotate-ball 3s ease;
 }

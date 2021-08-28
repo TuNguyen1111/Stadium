@@ -117,12 +117,20 @@
     width: 100%;
 }
 
+.search-btn-dropdown {
+    background: #2c3e50;
+}
+
 .form-search form button {
     width: 30%;
 }
 
 .submit-btn {
     text-align: center;
+}
+
+.submit-btn > button {
+    background: #2c3e50;
 }
 
 .form-style {
