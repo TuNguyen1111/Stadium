@@ -124,3 +124,18 @@ h1 {
 .notification-title {
     padding: 2%;
 }
+
+table.timeframes th,
+table.timeframes td,
+table.timeframes input[type="number"],
+table.timeframes p {
+    text-align: center;
+}
+
+table.timeframes p {
+    width: 100%;
+}
+
+table.timeframes th {
+    width: 15%;
+}

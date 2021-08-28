@@ -101,9 +101,7 @@ function getInput() {
 }
 
 function setEventForPencilsIcon() {
-    $('i').each((index, pencil) => {
-        $(pencil).click(getInput)
-    })
+    $('i').on('click', getInput)
 }
 
 function getStadiumInformation() {
@@ -172,12 +170,31 @@ function tunrOndeleteTimeFrameModal(id) {
     $(`#delete-timeframe-${id}`).modal('show')
 }
 
+function checkUserRole() {
+    let customer = $('#current-user')
+    if (customer.is(':empty')) {
+        return true
+    }
+    return false
+}
+
 function changeSelectTag() {
+    let isCustomer = checkUserRole()
     let inputSelectTags = $('select')
+    let inputNumberTags = $('#stadium-form-time-frames input[type=number]')
+
     for (let item of inputSelectTags) {
-        let value = item.options[item.selectedIndex].text;
+        let value = $(item).find(':selected').text();
         let pTag = $(`<p>${value}</p>`)
         $(item).replaceWith(pTag)
+    }
+
+    if (isCustomer) {
+        for (let item of inputNumberTags) {
+            let value = $(item).val()
+            let pTag = $(`<p>${value}</p>`)
+            $(item).replaceWith(pTag)
+        }
     }
 }
 
@@ -306,16 +323,16 @@ function setUserStarRating() {
     }
 }
 
-function clearInputAndStar(commentContent) {
-    let starRatingInput = $('#star-rating')
-    let childrenElements = starRatingInput.children().toArray()
+// function clearInputAndStar(commentContent) {
+//     let starRatingInput = $('#star-rating')
+//     let childrenElements = starRatingInput.children().toArray()
 
-    childrenElements.forEach( (childrenElement) => {
-        $(childrenElement).removeClass('checked')
-    })
+//     childrenElements.forEach( (childrenElement) => {
+//         $(childrenElement).removeClass('checked')
+//     })
 
-    commentContent.val('')
-}
+//     commentContent.val('')
+// }
 
 
 function getTotalOfStarType(data) {

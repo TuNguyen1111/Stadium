@@ -8,18 +8,19 @@
 {% endblock %}
 
 {% block content %}
-
-    {% for message in messages %}
-        {% if message.tags == 'error' %}
-            <div id="error" class="alert alert-danger" role="alert" hidden>
-                {{ message }}
-            </div>
-        {% else %}
-            <div id="success" class="alert alert-success" role="alert" hidden>
-                {{ message }}
-            </div>
-        {% endif %}
-    {% endfor %}
+    <div id="message">
+        {% for message in messages %}
+            {% if message.tags == 'error' %}
+                <div id="error" class="alert alert-danger" role="alert" hidden>
+                    {{ message }}
+                </div>
+            {% else %}
+                <div id="success" class="alert alert-success" role="alert" hidden>
+                    {{ message }}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
 
     <div class="container content">
         <div class="overview">

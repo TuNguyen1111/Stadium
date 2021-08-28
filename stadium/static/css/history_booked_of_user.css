@@ -1,3 +1,7 @@
+.col {
+    display: block;
+}
+
 .overview {
     width: 100%;
     padding: 2%;

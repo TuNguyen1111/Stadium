@@ -30,4 +30,4 @@ class Login(View):
                     return redirect('user_profile', user.pk)
         else:
             messages.error(request, 'Tên đăng nhập hoặc mật khẩu không đúng!')
-        return redirect('home')
+        return redirect('book_stadium')
