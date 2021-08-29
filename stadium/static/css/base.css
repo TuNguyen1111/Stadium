@@ -104,7 +104,6 @@ section {
     position: fixed;
     height: 100%;
     width: 300px;
-    left: 0;
     top: 76px;
     background: #2c3e50;
     color: rgb(255, 255, 255);
@@ -233,7 +232,7 @@ a#all-notification-link {
 }
 
 .checkbox:checked ~ .sidebar {
-    left: -300px;
+    left: 0;
 }
 
 .checkbox:checked ~ .col {
@@ -241,7 +240,7 @@ a#all-notification-link {
 }
 
 .checkbox:not(:checked) ~ .sidebar {
-    left: 0;
+    left: -300px;
 }
 
 #times-icon {
