@@ -1,16 +1,53 @@
-.form-group {
-    width: 100%;
-    margin-bottom: 20px;
+.content-table {
+    border-collapse: collapse;
+    min-width: 1100px;
+    border-radius: 5px 5px 0 0;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    margin: 20px 415px;
 }
 
-button {
-    margin-top: 20px;
+.content-table thead tr {
+    background-color: #2c3e50;
+    color: #dddddd;
 }
 
-.card {
-    height: 600px;
-    margin-left: 60px;
-    margin-top: 40px;
+.content-table th,
+.content-table td {
+    padding: 12px 15px;
+}
+
+.content-table tbody tr {
+    border-bottom: 1px solid #dddddd;
+}
+
+.content-table tbody tr:last-of-type {
+    border-bottom: 5px solid #2c3e50;
+}
+
+.fas {
+    cursor: pointer;
+}
+
+.fa-check {
+    color: #3aa0ef;
+}
+
+i.delete-order {
+    color: #ec1515;
+    margin-left: 20px;
+}
+
+.crud-btn {
+    display: flex;
+}
+
+p#accepted {
+    background-color: #2c3e50;
+    color: white;
+    border-radius: 10px 10px;
+    width: 70px;
+    text-align: center;
 }
 
 .accepted-btn {
@@ -25,59 +62,14 @@ button {
     margin-left: 24px;
 }
 
-.col {
+.update-btn {
+    padding: 10px 10px;
+}
+
+.update-position {
     display: flex;
-    flex-direction: column;
 }
 
-.table {
-    width: 90%;
-    margin: auto;
-}
-
-.order-date {
-    margin-top: 40px;
-    margin-left: 20px;
-}
-
-.form {
-    margin-bottom: 10px;
-}
-
-.crud-btn {
-    display: flex;
-    justify-content: space-between;
-}
-
-.accepted input {
-    margin-left: 10px;
-}
-
-.form-confirm {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-around;
-}
-
-.modal-footer {
-    display: flex;
-    align-items: baseline;
-    justify-content: flex-end;
-}
-
-.fas {
-    cursor: pointer;
-}
-
-.fa-check {
-    color: green;
-}
-
-.fa-times .delete-order{
-    color: red;
-}
-
-p#accepted {
-    background-color: bisque;
+h1.order-date {
+    text-align: center;
 }

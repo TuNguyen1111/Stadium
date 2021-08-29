@@ -35,7 +35,7 @@
 
             </h1>
             <hr>
-        <table class="table table-bordered">
+        <table class="content-table">
         <thead>
             <tr>
                 <th scope="col">Khung giờ</th>
@@ -44,7 +44,7 @@
                 <th scope="col">Đặt áo tập</th>
                 <th scope="cole">Vị trí sân</th>
                 <th scope="col">Loại sân</th>
-                <th scope="col"></th>
+                <th scope="col">Trạng thái</th>
 
             </tr>
         </thead>
@@ -81,7 +81,7 @@
                         {% for users in value.nguoi_dat %}
 
                             {% if users.da_duyet %}
-                            <div class="crud-btn">
+                            <div class="update-position">
                                 <p>Sân số {{users.vi_tri}}</p>
                                 <input type="submit" class="btn btn-warning delete-btn" onclick="turnOnModalUpdate(event, {{ users.order_id }})" order-id="{{ users.order_id}}" max-number="{{ users.tong_san }}" value="Sửa">
 
@@ -104,8 +104,8 @@
                                                 {% endif %}
 
                                                 <div class="update-btn">
-                                                    <input type="submit" class="btn btn-success" value="Sửa">
-                                                    <input type="submit" class="btn btn-danger" data-bs-dismiss="modal" value="Hủy">
+                                                    <input type="submit" class="btn btn-primary" value="Sửa">
+                                                    <input type="submit" class="btn btn-secondary" data-bs-dismiss="modal" value="Hủy">
                                                 </div>
                                             </form>
                                         </div>
@@ -152,9 +152,9 @@
                                                 <form class="form-delete" method="POST" action="{% url 'accepted' users.order_id %}">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="form_type" value="accept-delete">
-                                                    <input type="submit" class="btn btn-success" value="Xóa">
+                                                    <input type="submit" class="btn btn-danger" value="Xóa">
                                                 </form>
-                                                <input type="submit" class="btn btn-danger" data-bs-dismiss="modal" value="Hủy">
+                                                <input type="submit" class="btn btn-secondary" data-bs-dismiss="modal" value="Hủy">
                                             </div>
                                         </div>
                                         </div>
@@ -185,7 +185,7 @@
                                                     <form class="form-accept" method="POST" action="{% url 'accepted' users.order_id %}">
                                                         {% csrf_token %}
                                                         <input type="hidden" name="form_type" value="accept-input">
-                                                        <input type="submit" class="btn btn-success" value="Có">
+                                                        <input type="submit" class="btn btn-primary" value="Có">
                                                     </form>
                                                     <input type="submit" class="btn btn-secondary" data-bs-dismiss="modal" value="Hủy">
                                                 </div>
@@ -196,7 +196,7 @@
                                     <p>Hết sân</p>
                                 {% endif %}
                                 <p><i class="fas fa-times delete-order" onclick="turnOnModalDelete({{ users.order_id }})"></i></p>
-                                <div class="modal fade " id="delete {{ users.order_id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+                                <div class="modal fade " id="delete-{{ users.order_id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
                                 aria-labelledby="staticBackdropLabel" aria-hidden="true">
                                     <div class="modal-dialog modal-dialog-centered">
                                         <div class="modal-content">
@@ -211,7 +211,7 @@
                                                 <form class="form" method="POST" action="{% url 'accepted' users.order_id %}">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="form_type" value="accept-delete">
-                                                    <input type="submit" class="btn btn-success" value="Xóa">
+                                                    <input type="submit" class="btn btn-danger" value="Xóa">
                                                 </form>
                                                 <input type="submit" class="btn btn-secondary" data-bs-dismiss="modal" value="Hủy">
                                             </div>
