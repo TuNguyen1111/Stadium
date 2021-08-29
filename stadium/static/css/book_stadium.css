@@ -11,7 +11,7 @@
 
 .overview {
     width: 80%;
-    padding: 2%;
+    margin: auto;
 }
 
 .content {
@@ -74,68 +74,11 @@
     justify-content: center;
 }
 
-.form-submit {
-    width: 30%;
-    position: fixed;
-    right: 2%;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-}
-
 .btn.style-btn {
     width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
-}
-
-.form-search {
-    width: 65%;
-    margin-bottom: 2%;
-}
-
-.form-order {
-    width: 100%;
-}
-
-.form-search {
-    margin-top: 60px;
-}
-
-.form-search form {
-    display: flex;
-    flex-direction: column;
-    align-items: initial;
-}
-
-.form-search .search-btn-dropdown,
-.form-order .order-btn-dropdown {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-}
-
-.search-btn-dropdown {
-    background: #2c3e50;
-}
-
-.form-search form button {
-    width: 30%;
-}
-
-.submit-btn {
-    text-align: center;
-}
-
-.submit-btn > button {
-    background: #2c3e50;
-}
-
-.form-style {
-    width: 80%;
-    margin: auto;
 }
 
 .book-stadium-btn {
@@ -162,4 +105,34 @@
 
 .view-all-stadium {
     text-align: end;
+}
+
+.search {
+    width: 70%;
+    height: 150px;
+    padding:30px;
+    margin: 20px auto;
+    border-radius: 10px 10px
+}
+
+form#search-form {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.form-style {
+    display: flex;
+    justify-content: space-around;
+    width: 77%;
+}
+
+.submit-btn {
+    position: relative;
+    top: 12px;
+    left: 10px;
+}
+
+.submit-btn button {
+    background: #2c3e50;
 }

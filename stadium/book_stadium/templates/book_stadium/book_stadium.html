@@ -16,7 +16,7 @@
             </div>
         {% endif %}
     {% endfor %}
-    <div class="container content">
+    <div class="content">
         <div class="overview">
             {% if stadium_search_result %}
                 <h1 id="title">Kết quả tìm kiếm</h1>
@@ -65,7 +65,34 @@
                 {% endfor %}
 
             {% else %}
-                <h1 id="title">Các sân và khung giờ còn trống</h1>
+                <!-- <h1 id="title">Các sân và khung giờ còn trống</h1> -->
+                <div class="search shadow">
+                    <form id="search-form" method="GET" action="">
+                        <div class="form-style">
+                            <div class="form-group">
+                                <label for="stadium-name-search">Tên sân </label>
+                                <input type="text" name="stadium-name-search" class="form-control" id="stadium-name-search" placeholder="Tên sân" value="">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="address">Địa chỉ</label>
+                                <input type="text" name="address-search" class="form-control" id="address" placeholder="Địa chỉ" value="">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="day">Ngày</label>
+                                <input type="text" name="day-search" class="form-control" id="day" placeholder="Nhập ngày" value="{{page_obj.0.ngay}}">
+                            </div>
+
+                            <div class="form-group">
+                                {{ order_form.time_frame|as_crispy_field }}
+                            </div>
+                        </div>
+                        <div class="submit-btn">
+                            <button type="submit" class="btn btn-secondary mt-3 mb-3">Tìm kiếm</button>
+                        </div>
+                    </form>
+                </div>
                 {% for stadium in page_obj %}
                     <div class="day shadow">
                         <h2>Ngày: {{ stadium.ngay }}</h2>
@@ -135,68 +162,7 @@
             {% endif %}
 
         </div>
-        <div class="form-submit">
-            <div class="form-search">
-                <div class="dropdown search dropdown-style">
-                    <button class="btn btn-secondary search-btn-dropdown" type="button" id="dropdownMenuButton">
-                        <a>Tìm kiếm</a>
-                        <span class="fas fa-caret-down first"></span>
-                    </button>
-                    <div class="search-show shadow" aria-labelledby="dropdownMenuButton">
-                        <form method="GET" action="">
-                            <div class="form-style">
-
-                                <div class="form-group">
-                                    <label for="stadium-name-search">Tên sân </label>
-                                    <input type="text" name="stadium-name-search" class="form-control" id="stadium-name-search" placeholder="Tên sân" value="">
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="address">Địa chỉ</label>
-                                    <input type="text" name="address-search" class="form-control" id="address" placeholder="Địa chỉ" value="">
-                                </div>
-
-                                <div class="form-group">
-                                    <label for="day">Ngày</label>
-                                    <input type="text" name="day-search" class="form-control" id="day" placeholder="Nhập ngày" value="{{page_obj.0.ngay}}">
-                                </div>
-
-                                <div class="form-group">
-                                    {{ order_form.time_frame|as_crispy_field }}
-                                </div>
-
-                                <div class="submit-btn">
-                                    <button type="submit" class="btn btn-secondary mt-3 mb-3">Tìm kiếm</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <!-- <div class="form-order">
-                <div id="dropdown-btn" class="dropdown search dropdown-style">
-                    <button class="btn btn-secondary order-btn-dropdown" type="button" id="dropdownMenuButton">
-                        <a>Đặt sân</a>
-                        <span class="fas fa-caret-down first"></span>
-                    </button>
-                    <div id="dropdown-form" class="order-show shadow" >
-                        <form method="POST" action="">
-                            {% csrf_token %}
-                            <div class="form-style">
-                                {{order_form|crispy}}
-                                    <div class="submit-btn">
-                                        <button type="submit" class="btn btn-secondary mt-3">Đặt</button>
-                                    </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div> -->
-        </div>
     </div>
-
-
 
     <div class="modal fade " id="notification-success" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
