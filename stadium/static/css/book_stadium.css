@@ -27,11 +27,9 @@
 }
 
 .list-of-stadium {
-    display: flex;
-}
-
-.list-of-stadium {
-    padding-left: 1%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 10px 10px;
 }
 
 .stadium-timeframe h3 {
@@ -40,32 +38,31 @@
     color: rgb(221, 183, 137);
 }
 
-.stadium-detail {
-    margin-right: 40px;
+.stadiums {
+    display: grid;
+    grid-template-columns: 40% 60%;
+    grid-template-rows: 200px;
+    border-radius: 20px 20px;
+    grid-gap: 15px;
 }
 
-.style {
-    margin-right: 20px;
-    margin-bottom: 20px;
-    z-index: 1;
-}
-
-.style button {
-    width: 35%;
-    height: 35px;
-    border-radius: 7px;
-    background: white;
-    margin-bottom: 20px;
-    margin-left: 10px;
-}
-
-.card.style button:hover {
-    background-color: #e4e3e3;
+.stadiums img {
+    height: 100%;
+    border-radius: inherit;
 }
 
 #title {
     text-align: start;
     margin-bottom: 3%;
+}
+
+.stadium-detail {
+    width: 90%;
+    text-align: end;
+}
+
+.stadium-detail a {
+    color: #2c3e50;
 }
 
 .pagination {
@@ -79,24 +76,6 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-}
-
-.book-stadium-btn {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    color: white;
-    background: rgba(0, 0, 0, 0.5);
-    transition: 0.5s easy;
-    opacity: 0;
-}
-
-.hover-img {
-    position: relative;
-}
-
-.hover-img:hover .book-stadium-btn {
-    opacity: 1;
 }
 
 .modal-footer.book_stadium {
@@ -121,16 +100,41 @@ form#search-form {
     justify-content: center;
 }
 
-.form-style {
+.search-form-style {
     display: flex;
     justify-content: space-around;
     width: 77%;
 }
 
-.submit-btn {
+.search-btn {
     position: relative;
     top: 12px;
     left: 10px;
+}
+
+.search-btn button {
+    background: #2c3e50;
+}
+
+button#order-btn {
+    width: 75px;
+    height: 40px;
+    border-radius: 10px;
+    background: #2c3e50;
+    color: white;
+}
+
+.modal-header {
+    background: #2c3e50;
+    color: white;
+}
+
+.modal-header button {
+    color: #dddddd !important;
+}
+
+.submit-btn {
+    text-align: center;
 }
 
 .submit-btn button {
