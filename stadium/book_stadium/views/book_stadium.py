@@ -100,21 +100,18 @@ class BookStadium(ListView):
                 timeframes_of_day[timeframe_fixed] = []
 
             for timeframe in stadium_timeframes:
-                orders = Order.objects.filter(stadium_time_frame=timeframe)
+                stadium_of_timeframe = timeframe.stadium
+                total_stadium_fields = stadium_of_timeframe.field_count
+                orders = Order.objects.filter(stadium_time_frame=timeframe, order_date=current_day, is_accepted=True)
                 is_in_6_to_17 = (
                     timeframe.time_frame.start_time >= datetime.time(6) and
                     timeframe.time_frame.end_time <= datetime.time(17)
                 )
-                stadium_of_timeframe = timeframe.stadium
 
                 if orders:
-                    count_order_accepted = 0
+                    total_order_accepted = len(orders)
 
-                    for order in orders:
-                        if order.order_date == current_day and order.is_accepted:
-                            count_order_accepted += 1
-
-                    if count_order_accepted < stadium_of_timeframe.field_count:
+                    if total_order_accepted < total_stadium_fields:
                         if is_in_6_to_17:
                             current_timeframe = timeframes_of_day[timeframe_fixed]
                         else:

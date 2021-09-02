@@ -36,7 +36,7 @@
                                                 <p class="card-text">Tên: {{ stadiumInfor.ten }}</p>
                                                 <p class="card-text">Địa chỉ: {{ stadiumInfor.dia_chi }}</p>
                                                 <p class="card-text">Số điện thoại: {{ stadiumInfor.sdt }}</p>
-                                                <button id="order-btn" class="order-btn" stadium-name="{{ stadiumInfor.ten }}" user-name="{{ user.username }}" user-phone-number="{{ user.phone_number }}" time-frame="{{ stadiumInfor.khung_gio_dat }}" onclick="">Đặt sân</button>
+                                                <button id="order-btn" class="order-btn" stadium-id="{{ stadiumInfor.id }}" stadium-name="{{ stadiumInfor.ten }}" user-name="{{ user.username }}" user-phone-number="{{ user.phone_number }}" time-frame="{{ stadiumInfor.khung_gio_dat }}" onclick="">Đặt sân</button>
                                                 <div class="stadium-detail">
                                                     <a id="stadium-detail" href="{% url 'stadium_detail' stadiumInfor.id %}">Chi tiết...</a>
                                                 </div>
@@ -94,7 +94,7 @@
                                                 <p class="card-text">Tên: {{ stadiumInfor.ten }}</p>
                                                 <p class="card-text">Địa chỉ: {{ stadiumInfor.dia_chi }}</p>
                                                 <p class="card-text">Số điện thoại: {{ stadiumInfor.sdt }}</p>
-                                                <button id="order-btn" class="order-btn" stadium-name="{{ stadiumInfor.ten }}" user-name="{{ user.username }}" user-phone-number="{{ user.phone_number }}" time-frame="{{ stadiumInfor.khung_gio_dat }}" onclick="">Đặt sân</button>
+                                                <button id="order-btn" class="order-btn" stadium-id="{{ stadiumInfor.id }}" stadium-name="{{ stadiumInfor.ten }}" user-name="{{ user.username }}" user-phone-number="{{ user.phone_number }}" time-frame="{{ stadiumInfor.khung_gio_dat }}" onclick="">Đặt sân</button>
                                                 <div class="stadium-detail">
                                                     <a id="stadium-detail" href="{% url 'stadium_detail' stadiumInfor.id %}">Chi tiết...</a>
                                                 </div>

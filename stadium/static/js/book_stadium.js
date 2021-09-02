@@ -1,7 +1,7 @@
 $(document).ready(function() {
     showNotificationModal()
     toggleSearchAndOrderForm()
-    setEventForOrderBtn() 
+    setEventForOrderBtn()
 })
 
 
@@ -30,25 +30,22 @@ function setEventForOrderBtn() {
         let userName = currentItem.attr('user-name')
         let userPhoneNumber = currentItem.attr('user-phone-number')
         let timeframe = currentItem.attr('time-frame')
-
-        let stadiumInput = $('#stadium-name')
-        let userNameInput = $('#id_customer_name')
-        let userPhoneNumberInput = $('#id_customer_phone_number')
+        let stadiumId = currentItem.attr('stadium-id')
         let timeframeInput = $('.form-order #time_frame')
-        
-        stadiumInput.val(stadiumName)
-        userNameInput.val(userName)
-        userPhoneNumberInput.val(userPhoneNumber)
+
+        $('#stadium-name').val(stadiumName)
+        $('#id_customer_name').val(userName)
+        $('#id_customer_phone_number').val(userPhoneNumber)
+        $('#id_stadium_id').val(stadiumId)
 
         if (timeframe) {
             timeframeInput.val(timeframe)
         }
 
         if (userName) {
-            userNameInput.val(userName)
-            userPhoneNumberInput.val(userPhoneNumber)
+            $('#id_customer_name').val(userName)
+            $('#id_customer_phone_number').val(userPhoneNumber)
         }
-        
         $('#book-stadium').modal('show')
     })
 }

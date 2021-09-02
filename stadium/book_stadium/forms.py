@@ -70,13 +70,14 @@ class UserCreationForm(UserCreationForm):
 class OrderForm(forms.ModelForm):
     stadium_name = forms.CharField(label="Tên sân", max_length=100, widget=forms.TextInput(
         attrs={'id': 'stadium-name', 'readonly': True}))
+    stadium_id = forms.IntegerField(widget=forms.HiddenInput())
     time_frame = forms.ModelChoiceField(label="Khung giờ", queryset=TimeFrame.objects.all(
     ), widget=forms.Select(attrs={'id': 'time_frame'}))
 
     class Meta:
         model = Order
         fields = ['stadium_name', 'order_date', 'time_frame', 'pitch_clothes',
-                  'type_stadium', 'customer_name', 'customer_phone_number']
+                  'type_stadium', 'customer_name', 'customer_phone_number', 'stadium_id']
         labels = {
             'order_date': 'Ngày đặt',
             'customer_phone_number': 'Số điện thoại',
@@ -96,8 +97,9 @@ class OrderForm(forms.ModelForm):
             customer_name = self.cleaned_data.get('customer_name')
             customer_phone_number = self.cleaned_data.get(
                 'customer_phone_number')
-            stadium_timeframe = StadiumTimeFrame.objects.get(
-                time_frame=time_frame, stadium__name=stadium_name)
+            stadium_id = self.cleaned_data.get('stadium_id')
+            stadium = Stadium.objects.get(pk=stadium_id)
+            stadium_timeframe = StadiumTimeFrame.objects.get(stadium__id=stadium_id, time_frame=time_frame, stadium__name=stadium_name)
             order = Order.objects.create(order_date=order_date, stadium_time_frame=stadium_timeframe, pitch_clothes=pitch_clothes,
                                          type_stadium=type_stadium, customer_phone_number=customer_phone_number, customer_name=customer_name)
             order.save()
@@ -108,8 +110,9 @@ class OrderForm(forms.ModelForm):
         stadium_name = self.cleaned_data.get('stadium_name')
         order_date = self.cleaned_data.get('order_date')
         type_stadium = self.cleaned_data.get('type_stadium')
-        stadium_timeframe = StadiumTimeFrame.objects.get(
-            time_frame=time_frame, stadium__name=stadium_name)
+        stadium_id = self.cleaned_data.get('stadium_id')
+
+        stadium_timeframe = StadiumTimeFrame.objects.get(stadium__id=stadium_id, time_frame=time_frame, stadium__name=stadium_name)
         stadium_of_timeframe_field_count = stadium_timeframe.stadium.field_count
         orders = Order.objects.filter(
             stadium_time_frame=stadium_timeframe, order_date=order_date, is_accepted=True)
