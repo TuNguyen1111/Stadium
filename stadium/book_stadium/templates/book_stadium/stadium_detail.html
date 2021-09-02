@@ -68,12 +68,12 @@
                 id="stadium-form-time-frames">
                 {{ form_time_frame.management_form }}
                 {% csrf_token %}
-                <table class="table table-bordered timeframes">
-                    <thead class="thead-dark">
+                <table class="content-table">
+                    <thead class="">
                     <tr>
                         <th>Khung giờ</th>
-                        <th class="col-2">Giá tiền</th>
-                        <th id="serve-state">Trạng thái phục vụ</th>
+                        <th class="">Giá tiền</th>
+                        <th id="">Trạng thái phục vụ</th>
                         {% if stadium.owner == user %}
                             <th></th>
                         {% endif %}
@@ -85,19 +85,18 @@
                         {% for hidden in form.hidden_fields %}
                             {{ hidden }}
                         {% endfor %}
-                        <tr class="time-frames">
+                        <tr class="">
                             <td>
                                 {{ form.time_frame }}
                             </td>
                             <td>
-                                <div class="text-center">
+                                <div class="">
                                     {{ form.price }}
-                                    <!-- <input type="text" class="form-control" id="{{forloop.counter0}}" name="price" disabled="true" value="{{ form.price.value|intcomma }}"> -->
                                 </div>
                             </td>
                             <td>
                                 {% if stadium.owner == user %}
-                                    <span class="timeframe-state">{{ form.is_open }}</span>
+                                    <span class="">{{ form.is_open }}</span>
                                 {% else %}
                                     {% if form.is_open.value == False %}
                                         <span>Đóng cửa</span>

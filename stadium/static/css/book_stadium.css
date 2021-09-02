@@ -40,7 +40,7 @@
 
 .stadiums {
     display: grid;
-    grid-template-columns: 40% 60%;
+    grid-template-columns: 1fr 1fr;
     grid-template-rows: 200px;
     border-radius: 20px 20px;
     grid-gap: 15px;

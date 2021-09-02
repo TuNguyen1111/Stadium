@@ -22,7 +22,7 @@
         {% endfor %}
     </div>
 
-    <div class="container content">
+    <div class="content">
         <div class="overview">
             {% if stadium_search_result %}
                 <h1 id="title">Kết quả tìm kiếm</h1>
@@ -35,32 +35,18 @@
                                 <h3>{{ key }}</h3>
                                 <div class="list-of-stadium">
                                     {% for stadiumInfor in stadiumTimeframe %}
-                                        <div class="card shadow style" style="width: 18rem;">
-                                            <div class="hover-img">
-                                                <img class="card-img-top" src="{{ stadiumInfor.anh }}" alt="Card image cap">
-                                                <div class="book-stadium-btn">
-                                                    <div class="card-body">
-                                                        <p class="card-text">Tên: {{ stadiumInfor.ten }}</p>
-                                                        <hr>
-                                                        <p class="card-text">Địa chỉ: {{ stadiumInfor.dia_chi }}</p>
-                                                        <hr>
-                                                    </div>
-                                                    <button stadium-name="{{stadiumInfor.ten}}" id="order-btn" onclick="">Đặt sân</button>
-                                                </div>
+                                    <div class="stadiums shadow">
+                                        <img class="card-img-top" src="{{ stadium.image.url }}" alt="Card image cap">
+                                        <div class="stadium-infor">
+                                            <p class="card-text">Tên: {{ stadium.name }}</p>
+                                            <p class="card-text">Địa chỉ: {{ stadium.address }}</p>
+                                            <p class="card-text">Số điện thoại: {{ stadium.owner.phone_number }}</p>
+                                            <button id="order-btn" class="order-btn" stadium-name="{{ stadium.name }}" user-name="{{ user.username }}" user-phone-number="{{ user.phone_number }}" onclick="">Đặt sân</button>
+                                            <div class="stadium-detail">
+                                                <a id="stadium-detail" href="{% url 'stadium_detail' stadium.id %}">Chi tiết...</a>
                                             </div>
-                                            <div class="card-body">
-                                            <p class="card-text">Tên: {{ stadiumInfor.ten }}</p>
-                                            <hr>
-                                            <p class="card-text">Địa chỉ: {{ stadiumInfor.dia_chi }}</p>
-                                            <hr>
-                                            <p class="card-text">Số điện thoại: {{ stadiumInfor.sdt }}</p>
-                                            <hr>
-                                            </div>
-                                            <button>
-                                                <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
-                                                Chi tiết
-                                            </button>
                                         </div>
+                                    </div>
                                     {% endfor %}
                                 </div>
                             </div>
@@ -70,37 +56,49 @@
                 {% endfor %}
             {% else %}
                 <h1 id="title">Tìm kiếm sân</h1>
-
-                    <div class="stadiums">
-                        {% for stadium in page_obj %}
-                            <div class="card shadow style" style="width: 18rem;">
-                                <div class="hover-img">
-                                    <img class="card-img-top" src="{{ stadium.image.url }}" alt="Card image cap">
-                                    <div class="book-stadium-btn">
-                                        <div class="card-body">
-                                            <p class="card-text">Tên: {{ stadium.name }}</p>
-                                            <hr>
-                                            <p class="card-text">Địa chỉ: {{ stadium.address }}</p>
-                                            <hr>
-                                            <button id="order-btn" class="order-btn" stadium-name="{{ stadium.name }}" user-name="{{ user.username }}" user-phone-number="{{ user.phone_number }}">Đặt sân</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                <p class="card-text">Tên: {{ stadium.name }}</p>
-                                <hr>
-                                <p class="card-text">Địa chỉ: {{ stadium.address }}</p>
-                                <hr>
-                                <p class="card-text">Số điện thoại: {{ stadium.owner.phone_number }}</p>
-                                <hr>
-                                </div>
-                                <button>
-                                    <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
-                                    <a href="{% url 'stadium_detail' stadium.id %}">Chi tiết</a>
-                                </button>
+                <div class="search shadow">
+                    <form id="search-form" method="GET" action="">
+                        <div class="search-form-style">
+                            <div class="form-group">
+                                <label for="stadium-name-search">Tên sân </label>
+                                <input type="text" name="stadium-name-search" class="form-control" id="stadium-name-search" placeholder="Tên sân" value="">
                             </div>
-                        {% endfor %}
-                    </div>
+
+                            <div class="form-group">
+                                <label for="address">Địa chỉ</label>
+                                <input type="text" name="address-search" class="form-control" id="address" placeholder="Địa chỉ" value="">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="day">Ngày</label>
+                                <input type="text" name="day-search" class="form-control" id="day" placeholder="Nhập ngày" value="{{page_obj.0.ngay}}">
+                            </div>
+
+                            <div class="form-group">
+                                {{ order_form.time_frame|as_crispy_field }}
+                            </div>
+                        </div>
+                        <div class="search-btn">
+                            <button type="submit" class="btn btn-secondary mt-3 mb-3">Tìm kiếm</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="stadiums">
+                    {% for stadium in page_obj %}
+                        <div class="stadiums shadow">
+                            <img class="card-img-top" src="{{ stadium.image.url }}" alt="Card image cap">
+                            <div class="stadium-infor">
+                                <p class="card-text">Tên: {{ stadium.name }}</p>
+                                <p class="card-text">Địa chỉ: {{ stadium.address }}</p>
+                                <p class="card-text">Số điện thoại: {{ stadium.owner.phone_number }}</p>
+                                <button id="order-btn" class="order-btn" stadium-name="{{ stadium.name }}" user-name="{{ user.username }}" user-phone-number="{{ user.phone_number }}" onclick="">Đặt sân</button>
+                                <div class="stadium-detail">
+                                    <a id="stadium-detail" href="{% url 'stadium_detail' stadium.id %}">Chi tiết...</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
 
 
                 <div class="pagination mt-5">
@@ -126,7 +124,7 @@
             {% endif %}
 
         </div>
-        <div class="form-submit">
+        <!-- <div class="form-submit">
             <div class="form-search">
                 <div class="dropdown search dropdown-style">
                     <button class="btn btn-secondary search-btn-dropdown" type="button" id="dropdownMenuButton">
@@ -164,27 +162,7 @@
                     </div>
                 </div>
             </div>
-
-            <!-- <div class="form-order">
-                <div id="dropdown-btn" class="dropdown search dropdown-style">
-                    <button class="btn btn-secondary order-btn-dropdown" type="button" id="dropdownMenuButton">
-                        <a>Đặt sân</a>
-                        <span class="fas fa-caret-down first"></span>
-                    </button>
-                    <div id="dropdown-form" class="order-show shadow" >
-                        <form method="POST" action="">
-                            {% csrf_token %}
-                            <div class="form-style">
-                                {{order_form|crispy}}
-                                    <div class="submit-btn">
-                                        <button type="submit" class="btn btn-secondary mt-3">Đặt</button>
-                                    </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div> -->
-        </div>
+        </div> -->
     </div>
 
     <div class="modal fade " id="notification-success" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"

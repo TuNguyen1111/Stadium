@@ -30,31 +30,17 @@
                                 <h3>{{ key }}</h3>
                                 <div class="list-of-stadium">
                                     {% for stadiumInfor in stadiumTimeframe %}
-                                        <div class="card shadow style" style="width: 18rem;">
-                                            <div class="hover-img">
-                                                <img class="card-img-top" src="{{stadiumInfor.anh}}" alt="Card image cap">
-                                                <div class="book-stadium-btn">
-                                                    <div class="card-body">
-                                                        <p class="card-text">Tên: {{ stadiumInfor.ten }}</p>
-                                                        <hr>
-                                                        <p class="card-text">Địa chỉ: {{ stadiumInfor.dia_chi }}</p>
-                                                        <hr>
-                                                    </div>
-                                                    <button id="order-btn" class="order-btn" stadium-name="{{stadiumInfor.ten}}" onclick="">Đặt sân</button>
+                                        <div class="stadiums shadow">
+                                            <img class="card-img-top" src="{{ stadiumInfor.anh }}" alt="Card image cap">
+                                            <div class="stadium-infor">
+                                                <p class="card-text">Tên: {{ stadiumInfor.ten }}</p>
+                                                <p class="card-text">Địa chỉ: {{ stadiumInfor.dia_chi }}</p>
+                                                <p class="card-text">Số điện thoại: {{ stadiumInfor.sdt }}</p>
+                                                <button id="order-btn" class="order-btn" stadium-name="{{ stadiumInfor.ten }}" user-name="{{ user.username }}" user-phone-number="{{ user.phone_number }}" time-frame="{{ stadiumInfor.khung_gio_dat }}" onclick="">Đặt sân</button>
+                                                <div class="stadium-detail">
+                                                    <a id="stadium-detail" href="{% url 'stadium_detail' stadiumInfor.id %}">Chi tiết...</a>
                                                 </div>
                                             </div>
-                                            <div class="card-body">
-                                            <p class="card-text">Tên: {{ stadiumInfor.ten }}</p>
-                                            <hr>
-                                            <p class="card-text">Địa chỉ: {{ stadiumInfor.dia_chi }}</p>
-                                            <hr>
-                                            <p class="card-text">Số điện thoại: {{ stadiumInfor.sdt }}</p>
-                                            <hr>
-                                            </div>
-                                            <button>
-                                                <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
-                                                Chi tiết
-                                            </button>
                                         </div>
                                     {% endfor %}
                                 </div>

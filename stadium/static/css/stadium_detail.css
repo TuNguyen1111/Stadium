@@ -91,10 +91,6 @@ h1 {
     background: #e4e3e3;
 }
 
-.timeframe-state input {
-    margin-top: 1.7%;
-}
-
 .checked {
     color: orange;
 }
@@ -120,22 +116,35 @@ h1 {
     margin: auto;
     text-align: center;
 }
+
 .rating-title,
 .notification-title {
     padding: 2%;
 }
 
-table.timeframes th,
-table.timeframes td,
-table.timeframes input[type="number"],
-table.timeframes p {
-    text-align: center;
+.content-table {
+    border-collapse: collapse;
+    min-width: 870px;
+    border-radius: 5px 5px 0 0;
+    overflow: hidden;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    margin: 20px 415px;
 }
 
-table.timeframes p {
-    width: 100%;
+.content-table thead tr {
+    background-color: #2c3e50;
+    color: #dddddd;
 }
 
-table.timeframes th {
-    width: 15%;
+.content-table th,
+.content-table td {
+    padding: 12px 15px;
+}
+
+.content-table tbody tr {
+    border-bottom: 1px solid #dddddd;
+}
+
+.content-table tbody tr:last-of-type {
+    border-bottom: 5px solid #2c3e50;
 }
