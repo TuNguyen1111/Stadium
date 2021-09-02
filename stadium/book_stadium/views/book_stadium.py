@@ -108,37 +108,30 @@ class BookStadium(ListView):
                     timeframe.time_frame.end_time <= datetime.time(17)
                 )
 
+                # Count how many order this timeframe have
                 if orders:
                     total_order_accepted = len(orders)
+                    if total_order_accepted >= total_stadium_fields:
+                        continue
 
-                    if total_order_accepted < total_stadium_fields:
-                        if is_in_6_to_17:
-                            current_timeframe = timeframes_of_day[timeframe_fixed]
-                        else:
-                            time = str(timeframe.time_frame)
-                            current_timeframe = []
-                            timeframes_of_day[time] = current_timeframe
-                        self.check_is_same_stadium(
-                            current_timeframe, stadium_of_timeframe, timeframe)
+                if is_in_6_to_17:
+                    current_timeframe = timeframes_of_day[timeframe_fixed]
                 else:
-                    if is_in_6_to_17:
-                        current_timeframe = timeframes_of_day[timeframe_fixed]
+                    time = str(timeframe.time_frame)
+                    is_same_timeframe = time in timeframes_of_day
+
+                    if is_same_timeframe:
+                        current_timeframe = timeframes_of_day[time]
                     else:
-                        time = str(timeframe.time_frame)
-                        is_same_timeframe = time in timeframes_of_day
+                        current_timeframe = []
+                        timeframes_of_day[time] = current_timeframe
 
-                        if is_same_timeframe:
-                            current_timeframe = timeframes_of_day[time]
-                        else:
-                            current_timeframe = []
-                            timeframes_of_day[time] = current_timeframe
-
-                    current_timeframe = self.check_is_same_stadium(
-                        current_timeframe, stadium_of_timeframe, timeframe)
+                current_timeframe = self.check_is_same_stadium(current_timeframe, stadium_of_timeframe, timeframe)
         return all_stadiums
 
     def check_is_same_stadium(self, current_timeframe, stadium_of_timeframe, timeframe):
-        if len(current_timeframe) < 3:
+        max_stadium = 4
+        if len(current_timeframe) < max_stadium:
             stadiums = []
 
             for single_stadium in current_timeframe:
@@ -156,7 +149,7 @@ class BookStadium(ListView):
                     'khung_gio_dat': timeframe.time_frame.pk
                 }
                 current_timeframe.append(stadium_detail)
-        return current_timeframe
+            return current_timeframe[:3]
 
     def search_stadium(self, day_search, time_frame_search, address_search, stadium_name_search):
         stadium_search_result = []
