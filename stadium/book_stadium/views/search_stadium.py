@@ -9,7 +9,7 @@ class SearchStadium(BookStadium):
     def get(self, request):
         order_form = self.form_class
         user = request.user
-        stadiums = Stadium.objects.all()
+        stadiums = Stadium.get_all_stadium()
         stadium_search_result = []
         paginator = Paginator(stadiums, 20)
 
@@ -30,7 +30,7 @@ class SearchStadium(BookStadium):
         }
 
         if user.is_authenticated:
-            stadiums_by_owner = Stadium.objects.filter(owner=user)
+            stadiums_by_owner = Stadium.get_stadium_by_owner(user)
             context['fields'] = stadiums_by_owner
         return render(request, 'book_stadium/search_stadium.html', context)
 

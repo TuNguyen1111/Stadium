@@ -17,7 +17,7 @@ class OwnerPage(LoginRequiredMixin, UserPassesTestMixin, View):
         update_stadium_7players_form = ChangeNumberOfStadium7Form()
         update_stadium_11players_form = ChangeNumberOfStadium11Form()
 
-        stadiums_by_owner = Stadium.objects.filter(owner=request.user)
+        stadiums_by_owner = Stadium.get_stadium_by_owner(request.user)
         stadium = get_object_or_404(Stadium, pk=pk)
 
         orders_of_stadium = self.general_orders(stadium)
@@ -40,10 +40,13 @@ class OwnerPage(LoginRequiredMixin, UserPassesTestMixin, View):
         tomorrow = today + datetime.timedelta(days=1)
         is_today_in_orders_of_stadium = False
         date_format = '%Y/%m/%d'
+        order_conditions = {
+            'stadium_time_frame__stadium': stadium,
+            'order_date__gte': today
+        }
 
-        all_time_frames = TimeFrame.objects.all()
-        orders = Order.objects.filter(stadium_time_frame__stadium=stadium, order_date__gte=today)\
-                              .order_by('order_date')
+        all_time_frames = TimeFrame.get_all_timeframe()
+        orders = Order.get_order_by_conditions(order_conditions, order_by='order_date')
 
         for order in orders:
             order_date = order.order_date

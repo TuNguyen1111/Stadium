@@ -14,7 +14,7 @@ class OwnerProfit(LoginRequiredMixin, UserPassesTestMixin, View):
 
     def get(self, request, pk):
         user = get_object_or_404(User, pk=pk)
-        stadiums_by_owner = Stadium.objects.filter(owner=user)
+        stadiums_by_owner = Stadium.get_stadium_by_owner(user)
 
         if request.is_ajax():
             sales_information_in_lastest_12_months = self.general_stadium_sales_information_in_lastest_12_months(
@@ -207,7 +207,7 @@ class OwnerProfit(LoginRequiredMixin, UserPassesTestMixin, View):
 
         orders = Order.objects.filter(
             stadium_time_frame__stadium=stadium).order_by('order_date')
-        stadium_timeframes = TimeFrame.objects.all()
+        stadium_timeframes = TimeFrame.get_all_timeframe()
 
         # initialization stadium_sales
         if 'timeframes' not in stadium_sales:

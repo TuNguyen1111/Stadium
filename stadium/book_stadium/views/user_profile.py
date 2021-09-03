@@ -13,7 +13,7 @@ class UserProfile(LoginRequiredMixin, View):
 
     def get(self, request, pk):
         user = get_object_or_404(User, pk=pk)
-        stadiums_by_owner = Stadium.objects.filter(owner=request.user)
+        stadiums_by_owner = Stadium.get_stadium_by_owner(request.user)
         form = self.form_class(instance=user)
 
         context = {

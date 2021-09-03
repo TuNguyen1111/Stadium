@@ -11,8 +11,7 @@ class StadiumRating(View):
             current_user = request.user
             stadium_id = request.GET.get('stadiumId')
             stadium = get_object_or_404(Stadium, pk=stadium_id)
-            stars_rate_of_stadium = StarRating.objects.filter(
-                stadium=stadium).order_by('-star_point')
+            stars_rate_of_stadium = StarRating.get_star_rating_by_stadium(stadium, order_by='-star_point')
 
             stars_type_rated_numbers = self.get_stars_type_rated_numbers(
                 stars_rate_of_stadium)
@@ -34,17 +33,14 @@ class StadiumRating(View):
             stadium = get_object_or_404(Stadium, pk=stadium_id)
             user = request.user
 
-            new_user_rate = StarRating.objects.create(
-                user=user, stadium=stadium, comment=comment, star_point=star_point)
-            new_user_rate.save()
+            new_user_rate = StarRating.create_user_star_rating(user, stadium, comment, star_point)
 
             user_rate_permission = get_object_or_404(
                 StarRatingPermission, user=user, stadium=stadium)
             user_rate_permission.can_rate = False
             user_rate_permission.save()
 
-            stars_rate_of_stadium = StarRating.objects.filter(
-                stadium=stadium).order_by('-star_point')
+            stars_rate_of_stadium = StarRating.get_star_rating_by_stadium(stadium, order_by='-star_point')
             stars_type_rated_numbers = self.get_stars_type_rated_numbers(
                 stars_rate_of_stadium)
             summary_of_stars_type = self.set_current_user_rated_to_the_top(
@@ -140,8 +136,7 @@ class StadiumRatingEdit(StadiumRating):
             user_rated.star_point = new_star_point
             user_rated.save()
 
-            stars_rate_of_stadium = StarRating.objects.filter(
-                stadium=stadium).order_by('-star_point')
+            stars_rate_of_stadium = StarRating.get_star_rating_by_stadium(stadium, order_by='-star_point')
             summary_of_stars_type = self.set_current_user_rated_to_the_top(
                 current_user, stars_rate_of_stadium)
             stars_type_rated_numbers = self.get_stars_type_rated_numbers(

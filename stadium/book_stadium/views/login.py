@@ -19,8 +19,7 @@ class Login(View):
         if user:
             login(request, user)
             if user.role == Roles.OWNER:
-                first_stadium = Stadium.objects.filter(
-                    owner=request.user).first()
+                first_stadium = Stadium.get_first_stadium_of_owner(request.user)
                 if first_stadium:
                     return redirect('owner', first_stadium.pk)
                 else:

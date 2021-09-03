@@ -10,7 +10,7 @@ class HistoryBookedOfUser(View):
         user = get_object_or_404(User, pk=pk)
         start_day = request.GET.get('start-day')
         end_day = request.GET.get('end-day')
-        user_orders = Order.objects.filter(user=user)
+        user_orders = Order.get_order_by_user(user)
 
         conditions = {}
 

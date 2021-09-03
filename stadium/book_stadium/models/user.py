@@ -56,3 +56,7 @@ class User(AbstractUser):
 
     def is_missing_information(self):
         return self.phone_number == '' or self.username == ''
+
+    @classmethod
+    def get_all_user(cls):
+        return cls.objects.all()

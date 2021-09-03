@@ -14,7 +14,7 @@ class Notifications(View):
     def get(self, request):
         user = request.user
         notifications = user.notifications.all()
-        stadiums_by_owner = Stadium.objects.filter(owner=request.user)
+        stadiums_by_owner = Stadium.get_stadium_by_owner(request.user)
         user.notifications.all().update(unread=False)
 
         context = {
@@ -27,7 +27,7 @@ class Notifications(View):
 class NotificationDetail(View):
     def get(self, request, pk):
         notification = get_object_or_404(Notification, pk=pk)
-        stadiums_by_owner = Stadium.objects.filter(owner=request.user)
+        stadiums_by_owner = Stadium.get_stadium_by_owner(request.user)
 
         Notification.objects.filter(pk=pk).update(unread=False)
 

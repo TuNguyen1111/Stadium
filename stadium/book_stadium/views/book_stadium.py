@@ -19,8 +19,8 @@ class BookStadium(ListView):
     def get(self, request):
         register_form = UserCreationForm
         order_form = self.form_class
-        stadium_timeframes = StadiumTimeFrame.objects.filter(
-            is_open=True).order_by('time_frame__start_time')
+
+        stadium_timeframes = StadiumTimeFrame.get_stadium_timeframe_by_conditions({"is_open": True}, order_by='time_frame__start_time')
         all_stadiums = self.put_out_null_stadiums_and_timesframe(
             stadium_timeframes)
         paginator = Paginator(all_stadiums, 2)
@@ -36,7 +36,7 @@ class BookStadium(ListView):
                                                     address_search, stadium_name_search)
 
         if request.user.is_authenticated:
-            stadiums_by_owner = Stadium.objects.filter(owner=request.user)
+            stadiums_by_owner = Stadium.get_stadium_by_owner(request.user)
         else:
             stadiums_by_owner = ''
 
@@ -155,42 +155,38 @@ class BookStadium(ListView):
         stadium_search_result = []
 
         if day_search:
+            conditions = {}
             day_search = day_search.replace('/', '-')
-            if not stadium_name_search:
-                stadiums_timeframe_search = StadiumTimeFrame.objects.filter(
-                    time_frame=time_frame_search, stadium__address=address_search)
 
-            elif not address_search:
-                stadiums_timeframe_search = StadiumTimeFrame.objects.filter(
-                    time_frame=time_frame_search, stadium__name=stadium_name_search)
+            if time_frame_search:
+                conditions['time_frame'] = time_frame_search
+            if address_search:
+                conditions['stadium__address'] = address_search
+            if stadium_name_search:
+                conditions['stadium__name'] = stadium_name_search
 
-            elif stadium_name_search and address_search:
-                stadiums_timeframe_search = StadiumTimeFrame.objects.filter(
-                    time_frame=time_frame_search, stadium__name=stadium_name_search, stadium__address=address_search)
+            stadiums_timeframe_search = StadiumTimeFrame.get_stadium_timeframe_by_conditions(conditions)
 
-            for timeframe in stadiums_timeframe_search:
-                orders = Order.objects.filter(
-                    stadium_time_frame=timeframe, order_date=day_search)
-                stadium_of_timeframe = timeframe.stadium
-
+            for stadium_timeframe in stadiums_timeframe_search:
+                # count how many order is accepted, if >= stadium field_count then no more field to order
+                order_conditions = {
+                    'stadium_time_frame': stadium_timeframe,
+                    'order_date': day_search,
+                    'is_accepted': True
+                }
+                orders = Order.get_order_by_conditions(order_conditions)
+                stadium = stadium_timeframe.stadium
                 if orders:
-                    count_order_accepted = 0
+                    if len(orders) >= stadium.field_count:
+                        continue
 
-                    for order in orders:
-                        if order.is_accepted:
-                            count_order_accepted += 1
-
-                    if count_order_accepted < stadium_of_timeframe.field_count:
-                        self.add_stadium_obj(
-                            stadium_search_result, day_search, stadium_of_timeframe, timeframe)
-                else:
-                    self.add_stadium_obj(
-                        stadium_search_result, day_search, stadium_of_timeframe, timeframe)
+                self.add_stadium_obj(
+                    stadium_search_result, day_search, stadium, stadium_timeframe)
 
         return stadium_search_result
 
-    def add_stadium_obj(self, stadium_search_result, day_search, stadium_of_timeframe, timeframe):
-        time = str(timeframe.time_frame)
+    def add_stadium_obj(self, stadium_search_result, day_search, stadium, stadium_timeframe):
+        time = str(stadium_timeframe.time_frame)
 
         if stadium_search_result:
             search_obj = stadium_search_result[-1]
@@ -204,11 +200,12 @@ class BookStadium(ListView):
             stadium_search_result.append(search_obj)
 
         stadium_obj = {}
-        stadium_obj['anh'] = stadium_of_timeframe.image.url
-        stadium_obj['ten'] = stadium_of_timeframe.name
-        stadium_obj['dia_chi'] = stadium_of_timeframe.address
-        stadium_obj['sdt'] = stadium_of_timeframe.owner.phone_number
-        stadium_obj['id'] = stadium_of_timeframe.pk
+        stadium_obj['anh'] = stadium.image.url
+        stadium_obj['ten'] = stadium.name
+        stadium_obj['dia_chi'] = stadium.address
+        stadium_obj['sdt'] = stadium.owner.phone_number
+        stadium_obj['id'] = stadium.pk
+        stadium_obj['khung_gio_dat'] = stadium_timeframe.time_frame.pk
         search_obj['khung_gio'][time].append(stadium_obj)
 
         return stadium_search_result

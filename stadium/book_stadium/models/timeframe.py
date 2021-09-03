@@ -7,3 +7,7 @@ class TimeFrame(models.Model):
 
     def __str__(self):
         return f'{self.start_time} - {self.end_time}'
+
+    @classmethod
+    def get_all_timeframe(cls):
+        return cls.objects.all()

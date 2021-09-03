@@ -12,3 +12,19 @@ class StadiumTimeFrame(models.Model):
 
     def __str__(self):
         return f'{self.time_frame}'
+
+    @classmethod
+    def get_stadium_timeframe_by_conditions(cls, conditions, order_by=None):
+        qs = cls.objects.filter(**conditions)
+        if order_by:
+            qs = qs.order_by(order_by)
+        return qs
+
+    @classmethod
+    def create_stadium_timeframe(cls, stadium, timeframe):
+        stadium_time_frame = StadiumTimeFrame.objects.create(
+                stadium=stadium,
+                time_frame=timeframe,
+                price=300_000,
+            )
+        stadium_time_frame.save()

@@ -16,11 +16,9 @@ class StadiumDetail(LoginRequiredMixin, View):
     def get(self, request, pk):
         current_stadium = get_object_or_404(Stadium, pk=pk)
 
-        stadiums_by_owner = Stadium.objects.filter(owner=request.user)
-        times_and_prices = StadiumTimeFrame.objects.filter(
-            stadium=current_stadium)
-        star_rating_of_stadiums = StarRating.objects.filter(
-            stadium=current_stadium).order_by('-star_point')
+        stadiums_by_owner = Stadium.get_stadium_by_owner(request.user)
+        times_and_prices = StadiumTimeFrame.get_stadium_timeframe_by_conditions({"stadium": current_stadium})
+        star_rating_of_stadiums = StarRating.get_star_rating_by_stadium(current_stadium, order_by='-star_point')
 
         form_detail = StadiumForm(instance=current_stadium)
         form_time_frame = self.formset(instance=current_stadium)

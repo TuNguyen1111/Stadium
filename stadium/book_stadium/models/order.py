@@ -30,3 +30,14 @@ class Order(models.Model):
 
     def __str__(self):
         return f'Booked by {self.customer_name}'
+
+    @classmethod
+    def get_order_by_conditions(cls, conditions, order_by=None):
+        qs = cls.objects.filter(**conditions)
+        if order_by:
+            qs = qs.order_by(order_by)
+        return qs
+
+    @classmethod
+    def get_order_by_user(cls, user):
+        return cls.objects.filter(user=user)

@@ -12,7 +12,7 @@ class CreateStadium(LoginRequiredMixin, UserPassesTestMixin, View):
     create_stadium_form = StadiumForm
 
     def get(self, request):
-        stadiums_by_owner = Stadium.objects.filter(owner=request.user)
+        stadiums_by_owner = Stadium.get_stadium_by_owner(request.user)
         form = self.create_stadium_form
 
         context = {
@@ -36,30 +36,20 @@ class CreateStadium(LoginRequiredMixin, UserPassesTestMixin, View):
             new_stadium.save()
 
         stadium = get_object_or_404(Stadium, pk=new_stadium.pk)
-        time_frames = TimeFrame.objects.all()
+        time_frames = TimeFrame.get_all_timeframe()
 
         for timeframe in time_frames:
-            stadium_time_frame = StadiumTimeFrame.objects.create(
-                stadium=stadium,
-                time_frame=timeframe,
-                price=300_000,
-            )
-            stadium_time_frame.save()
+            StadiumTimeFrame.create_stadium_timeframe(stadium, timeframe)
+
         self.create_permission_vote_for_user(stadium)
 
         messages.success(request, 'Tạo sân thành công!')
         return redirect('stadium_detail', pk=stadium.pk)
 
     def create_permission_vote_for_user(self, stadium):
-        users = User.objects.all()
+        users = User.get_all_user()
         for user in users:
-            if user.role == Roles.PLAYER:
-                user_permission_vote = StarRatingPermission.objects.create(
-                    user=user, stadium=stadium)
-            else:
-                user_permission_vote = StarRatingPermission.objects.create(
-                    user=user, stadium=stadium, can_rate=False)
-            user_permission_vote.save()
+            StarRatingPermission.create_user_rate_permission(user, stadium)
 
     def test_func(self):
         return self.request.user.role == Roles.OWNER
