@@ -14,7 +14,7 @@
                 <div id="error" class="alert alert-danger" role="alert" hidden>
                     {{ message }}
                 </div>
-            {% else %}
+            {% elif message.tags == 'success' %}
                 <div id="success" class="alert alert-success" role="alert" hidden>
                     {{ message }}
                 </div>
@@ -36,14 +36,14 @@
                                 <div class="list-of-stadium">
                                     {% for stadiumInfor in stadiumTimeframe %}
                                     <div class="stadiums shadow">
-                                        <img class="card-img-top" src="{{ stadium.image.url }}" alt="Card image cap">
+                                        <img class="card-img-top" src="{{ stadiumInfor.anh }}" alt="Card image cap">
                                         <div class="stadium-infor">
-                                            <p class="card-text">Tên: {{ stadium.name }}</p>
-                                            <p class="card-text">Địa chỉ: {{ stadium.address }}</p>
-                                            <p class="card-text">Số điện thoại: {{ stadium.owner.phone_number }}</p>
-                                            <button id="order-btn" class="order-btn" stadium-name="{{ stadium.name }}" user-name="{{ user.username }}" user-phone-number="{{ user.phone_number }}" onclick="">Đặt sân</button>
+                                            <p class="card-text">Tên: {{ stadiumInfor.ten }}</p>
+                                            <p class="card-text">Địa chỉ: {{ stadiumInfor.dia_chi }}</p>
+                                            <p class="card-text">Số điện thoại: {{ stadiumInfor.sdt }}</p>
+                                            <button id="order-btn" class="order-btn" stadium-id="{{ stadiumInfor.id }}" stadium-name="{{ stadiumInfor.ten }}" user-name="{{ user.username }}" user-phone-number="{{ user.phone_number }}" time-frame="{{ stadiumInfor.khung_gio_dat }}" onclick="">Đặt sân</button>
                                             <div class="stadium-detail">
-                                                <a id="stadium-detail" href="{% url 'stadium_detail' stadium.id %}">Chi tiết...</a>
+                                                <a id="stadium-detail" href="{% url 'stadium_detail' stadiumInfor.id %}">Chi tiết...</a>
                                             </div>
                                         </div>
                                     </div>
@@ -71,7 +71,7 @@
 
                             <div class="form-group">
                                 <label for="day">Ngày</label>
-                                <input type="text" name="day-search" class="form-control" id="day" placeholder="Nhập ngày" value="{{page_obj.0.ngay}}">
+                                <input type="text" name="day-search" class="form-control" id="day" placeholder="Nhập ngày" value="{{ today }}">
                             </div>
 
                             <div class="form-group">
