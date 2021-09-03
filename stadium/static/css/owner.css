@@ -1,3 +1,7 @@
+.col {
+    display: block;
+}
+
 .content-table {
     border-collapse: collapse;
     min-width: 1100px;

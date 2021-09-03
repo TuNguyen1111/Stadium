@@ -38,6 +38,8 @@ function setEventForOrderBtn() {
         $('#id_customer_phone_number').val(userPhoneNumber)
         $('#id_stadium_id').val(stadiumId)
 
+        console.log($('#id_stadium_id'))
+
         if (timeframe) {
             timeframeInput.val(timeframe)
         }
