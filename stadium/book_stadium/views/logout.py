@@ -6,4 +6,4 @@ from django.views import View
 class Logout(View):
     def get(self, request):
         logout(request)
-        return redirect('home')
+        return redirect('book_stadium')

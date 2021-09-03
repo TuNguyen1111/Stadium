@@ -87,7 +87,7 @@
                 </li>
 
                 {% else %}
-                <li><button type="button" class="btn btn-secondary toggle-login-modal" onclick="">Đăng nhập</button></li>
+                <li><button type="button" class="btn toggle-login-modal login-btn" onclick="">Đăng nhập</button></li>
                 {% endif %}
             </ul>
         </div>
@@ -177,7 +177,7 @@
                 <input type="password" name="password" class="form-control" id="exampleInputPassword1">
               </div>
             </div>
-            <button type="submit" class="btn btn-secondary" onclick="">Đăng nhập</button>
+            <button type="submit" class="btn login-btn" onclick="">Đăng nhập</button>
             <p>Hoặc đăng nhập với: </p>
             <div class="social-login">
               <a href="#">
@@ -198,9 +198,11 @@
 
 
         {% for message in messages %}
-            <div id="message-{{ message.tags }}" class="alert alert-danger" role="alert">
-                {{message}}
-            </div>
+            {% if message.tags == "error" %}
+                <div id="message-{{ message.tags }}" class="alert alert-danger" role="alert">
+                    {{message}}
+                </div>
+            {% endif %}
         {% endfor %}
         <div class="modal-footer base">
           <a href="{% url 'reset_password' %}">Quên mật khẩu</a>

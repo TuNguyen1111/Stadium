@@ -10,7 +10,7 @@
             <div id="warning" class="alert alert-warning" role="alert" hidden>
                 {{ message }}
             </div>
-        {% else %}
+        {% elif message.tags == 'success' %}
             <div id="success" class="alert alert-success" role="alert" hidden>
                 {{ message }}
             </div>
