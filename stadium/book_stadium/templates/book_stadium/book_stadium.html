@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="{% static 'css/book_stadium.css' %}">
 {% endblock %}
 {% block content %}
+    <input type="hidden" id="user-id" value="{{ user.id }}">
     {% for message in messages %}
         {% if message.tags == 'warning' %}
             <div id="warning" class="alert alert-warning" role="alert" hidden>

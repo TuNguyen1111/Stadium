@@ -2,6 +2,7 @@ $(document).ready(function() {
     showNotificationModal()
     toggleSearchAndOrderForm()
     setEventForOrderBtn()
+    checkUserIsAuthenticated()
 })
 
 
@@ -49,5 +50,15 @@ function setEventForOrderBtn() {
             $('#id_customer_phone_number').val(userPhoneNumber)
         }
         $('#book-stadium').modal('show')
+    })
+}
+
+function checkUserIsAuthenticated() {
+    $('#stadium-detail').click(function(e) {
+        if ($('#user-id').val() === 'None' ) {
+            e.preventDefault()
+            // console.log(typeof $('#user-id').val(), $('#user-id').val())
+            $('#login-modal').modal('show')
+        }
     })
 }

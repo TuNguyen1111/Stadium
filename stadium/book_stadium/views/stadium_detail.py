@@ -9,7 +9,7 @@ from book_stadium.models import Stadium, StadiumTimeFrame, StarRating, StarRatin
 
 
 class StadiumDetail(LoginRequiredMixin, View):
-    login_url = 'home'
+    login_url = 'book_stadium'
     formset = inlineformset_factory(
         Stadium, StadiumTimeFrame, form=StadiumTimeFrameForm, extra=0)
 
