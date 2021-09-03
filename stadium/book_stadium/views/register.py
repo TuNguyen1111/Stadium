@@ -7,7 +7,6 @@ from book_stadium.models import Roles
 
 
 class Register(View):
-    # t đã chỉnh username field của bảng user thành id rồi để đảm bảo nó duy nhất nên là phone_number với email có thể ko có cũng đc nha.
     form_class = UserCreationForm
 
     def post(self, request):
