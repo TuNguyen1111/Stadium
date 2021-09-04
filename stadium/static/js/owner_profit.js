@@ -12,6 +12,7 @@ function renderChart() {
             datasend: "Sended"
         },
         success: function(json) {
+            console.log(json)
             createChartForLastest12MonthsSales(json)
             createChartForSalesOfThisMonthByTimeframes(json)
         },
@@ -87,7 +88,7 @@ function createDoubleColumnChart(dataOfSales, dataOfNumberOfOrder, labelsOfChart
 
 function createChartForLastest12MonthsSales(json) {
     stadiums = json.sales_information_in_lastest_12_months
- 
+
         for (let [index, stadium] of stadiums.entries()) {
             if (index === (stadiums.length - 1)) {
                 break
@@ -155,7 +156,7 @@ function setEventForShowChartBtn() {
         $('#twelve-months-charts').css('display', 'none')
         $('#this-month-charts').css('display', 'flex')
     })
-    
+
     $('#twelve-months-show').click(function() {
         $('#twelve-months-charts').css('display', 'flex')
         $('#this-month-charts').css('display', 'none')

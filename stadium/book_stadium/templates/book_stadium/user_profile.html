@@ -22,8 +22,8 @@
         </div>
     {% endif %}
 
-    <h2 class="border-bottom mb-4">Thông tin người dùng</h2>
     <div class="content-section">
+        <h2 class="border-bottom mb-4">Thông tin người dùng</h2>
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             {{ form|crispy }}
