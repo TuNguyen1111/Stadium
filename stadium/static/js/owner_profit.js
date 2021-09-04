@@ -31,7 +31,7 @@ function createChartForSalesOfThisMonthByTimeframes(json) {
         let canvasId = `this-month-charts-of-${stadiumNameConverted}`
         let canvas = $(`<canvas id="${canvasId}" width="400" height="400"></canvas>`)
         let chartsDiv = $('#this-month-charts')
-        let newDiv = $('<div class="col-sm-11"></div>')
+        let newDiv = $('<div class="col-sm-6"></div>')
 
         data = stadium.sales_and_number_of_orders
         dataOfSales = data.sales

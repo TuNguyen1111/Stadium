@@ -45,8 +45,11 @@ class OwnerProfit(LoginRequiredMixin, UserPassesTestMixin, View):
         sales = {}
 
         for stadium in stadiums_by_owner:
-            orders = Order.objects.filter(
-                stadium_time_frame__stadium=stadium, is_accepted=True)
+            order_conditions = {
+                'stadium_time_frame__stadium': stadium,
+                'is_accepted': True
+            }
+            orders = Order.get_order_by_conditions(order_conditions)
             is_same_current_month = False
             is_same_last_month = False
 
@@ -71,8 +74,7 @@ class OwnerProfit(LoginRequiredMixin, UserPassesTestMixin, View):
         current_month, current_year = self.get_current_month_and_year()
         is_same_month = False
         is_same_year = False
-        orders = Order.objects.filter(
-            stadium_time_frame__stadium=stadium).order_by('-order_date')
+        orders = Order.get_order_by_conditions({'stadium_time_frame__stadium': stadium}, order_by='-order_date')
 
         if orders:
             for order in orders:
