@@ -13,7 +13,7 @@ function renderChart() {
         },
         success: function(json) {
             console.log(json)
-            createChartForLastest12MonthsSales(json)
+            // createChartForLastest12MonthsSales(json)
             createChartForSalesOfThisMonthByTimeframes(json)
         },
         error: function(error) {
