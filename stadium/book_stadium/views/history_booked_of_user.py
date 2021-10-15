@@ -59,21 +59,22 @@ class HistoryBookedOfUser(View):
                 }
                 orders_of_user.append(current_order)
 
-            timeframe_of_order = order.stadium_time_frame.time_frame
-            stadium_of_timeframe = order.stadium_time_frame.stadium
-            time = str(timeframe_of_order)
-            timeframes = current_order['khung_gio']
-            is_same_timeframe = time in timeframes
+            if order.stadium_time_frame:
+                timeframe_of_order = order.stadium_time_frame.time_frame
+                stadium_of_timeframe = order.stadium_time_frame.stadium
+                time = str(timeframe_of_order)
+                timeframes = current_order['khung_gio']
+                is_same_timeframe = time in timeframes
 
-            if is_same_timeframe:
-                current_timeframe = timeframes[time]
-            else:
-                current_timeframe = []
-                timeframes[time] = current_timeframe
-            stadium_obj = {
-                'san': stadium_of_timeframe.name,
-                'trang_thai': order.is_accepted,
-                'order_id': order.pk
-            }
-            current_timeframe.append(stadium_obj)
+                if is_same_timeframe:
+                    current_timeframe = timeframes[time]
+                else:
+                    current_timeframe = []
+                    timeframes[time] = current_timeframe
+                stadium_obj = {
+                    'san': stadium_of_timeframe.name,
+                    'trang_thai': order.is_accepted,
+                    'order_id': order.pk
+                }
+                current_timeframe.append(stadium_obj)
         return orders_of_user
