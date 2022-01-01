@@ -17,7 +17,7 @@ import environ
 env = environ.Env(
     DEBUG=(bool, True),
     SECRET_KEY=(str, 'nothingtoseehere'),
-    DATABASE_URL=(str, 'mysql://root:admin123@localhost:3306/stadium_db_2'),
+    DATABASE_URL=(str, 'mysql://root:root@localhost:33066/stadium_db'),
     ALLOWED_HOSTS=(list, ['testserver', 'localhost', '127.0.0.1']),
     SELENIUM_TESTING=(bool, False),
     SELENIUM_CHROME_DRIVER_PATH=(str, ''),
@@ -105,9 +105,21 @@ if SELENIUM_TESTING:
         }
     })
 
+# DATABASES = {
+#     'default': _db_config,
+# }
+
 DATABASES = {
-    'default': _db_config,
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'stadium_db',
+        'USER': 'root',
+        'PASSWORD': 'root',
+        'HOST': 'db',
+        'PORT': '3306'
+    },
 }
+
 
 
 # Password validation
