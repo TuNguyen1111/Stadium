@@ -5,7 +5,7 @@ from django.views import View
 
 from book_stadium.forms import StadiumForm
 from book_stadium.models import Stadium, StadiumTimeFrame, TimeFrame, Roles, StarRatingPermission, User
-
+from ..messages import *
 
 class CreateStadium(LoginRequiredMixin, UserPassesTestMixin, View):
     login_url = 'home'
@@ -43,7 +43,7 @@ class CreateStadium(LoginRequiredMixin, UserPassesTestMixin, View):
 
         self.create_permission_vote_for_user(stadium)
 
-        messages.success(request, 'Tạo sân thành công!')
+        messages.success(request, CREATED_STADIUM_SUCCESS)
         return redirect('stadium_detail', pk=stadium.pk)
 
     def create_permission_vote_for_user(self, stadium):

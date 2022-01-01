@@ -3,6 +3,7 @@ from django.contrib import messages
 from django.views import View
 
 from book_stadium.models import Order, User
+from ..messages import *
 
 
 class HistoryBookedOfUser(View):
@@ -36,7 +37,7 @@ class HistoryBookedOfUser(View):
         user = request.user
         order = get_object_or_404(Order, pk=pk)
         order.delete()
-        messages.success(request, 'Xóa thành công!')
+        messages.success(request, DELETE_SUCCESS)
         return redirect('history_booked', user.pk)
 
     def general_order_of_user(self,  user_orders):

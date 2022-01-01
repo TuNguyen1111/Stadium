@@ -5,6 +5,7 @@ from django.views import View
 
 from book_stadium.myBackend import CustomAuthenticatedBackend
 from book_stadium.models import Roles, Stadium
+from ..messages import *
 
 CustomAuthenticatedBackend = CustomAuthenticatedBackend()
 
@@ -28,5 +29,5 @@ class Login(View):
                 if user.is_missing_information():
                     return redirect('user_profile', user.pk)
         else:
-            messages.error(request, 'Tên đăng nhập hoặc mật khẩu không đúng!')
+            messages.error(request, WRONG_USER_OR_PASS)
         return redirect('book_stadium')

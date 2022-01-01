@@ -6,6 +6,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.views import View
 
 from book_stadium.models import Order, TypeOfStadium
+from ..messages import *
 
 
 class AcceptOrderView(View):
@@ -73,9 +74,9 @@ class AcceptOrderView(View):
                             description=(f'Sân {order.stadium_time_frame.stadium.name} bạn đặt vào ngày {order.order_date}, '
                                          f'khung giờ {order.stadium_time_frame.time_frame} đã hết sân! '
                                          'Vui lòng chọn khung giờ khác! '))
-            messages.success(request, 'Đã duyệt!')
+            messages.success(request, ACCEPTED_ORDER)
 
         elif form_type == 'accept-delete':
             order.delete()
-            messages.success(request, 'Xóa thành công!')
+            messages.success(request, DELETED_ORDER)
         return redirect('owner', stadium.pk)

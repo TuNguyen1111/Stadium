@@ -4,6 +4,8 @@ from django.contrib.auth.forms import PasswordChangeForm
 from django.shortcuts import redirect, render
 from django.views import View
 
+from ..messages import *
+
 
 class PasswordChange(View):
     form_class = PasswordChangeForm
@@ -21,5 +23,5 @@ class PasswordChange(View):
         if form.is_valid():
             user = form.save()
             update_session_auth_hash(request, user)
-            messages.success(request, 'Thay đổi mật khẩu thành công!')
+            messages.success(request, CHANGE_PASSWORD_SUCCESS)
         return redirect('password_change')

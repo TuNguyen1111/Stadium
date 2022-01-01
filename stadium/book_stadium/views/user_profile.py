@@ -5,6 +5,7 @@ from django.views import View
 
 from book_stadium.forms import UserProfileForm
 from book_stadium.models import Stadium, User, TimeFrame
+from ..messages import *
 
 
 class UserProfile(LoginRequiredMixin, View):
@@ -28,5 +29,5 @@ class UserProfile(LoginRequiredMixin, View):
         if form.is_valid():
             form.save()
 
-        messages.success(request, 'Cập nhật thông tin thành công!')
+        messages.success(request, UPDATE_INFOR_SUCCESS)
         return redirect('user_profile', user.pk)

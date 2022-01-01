@@ -6,6 +6,7 @@ from django.views import View
 
 from book_stadium.forms import StadiumForm, StadiumTimeFrameForm, StadiumFormForUser, StarRatingForm
 from book_stadium.models import Stadium, StadiumTimeFrame, StarRating, StarRatingPermission
+from ..messages import *
 
 
 class StadiumDetail(LoginRequiredMixin, View):
@@ -75,5 +76,5 @@ class StadiumDetail(LoginRequiredMixin, View):
             stadium.delete()
             return redirect('book_stadium')
 
-        messages.success(request, 'Cập nhật thành công!')
+        messages.success(request, UPDATE_INFOR_SUCCESS)
         return redirect('stadium_detail', pk=stadium.pk)

@@ -9,6 +9,7 @@ from django.core.paginator import Paginator
 
 from book_stadium.forms import OrderForm, UserCreationForm
 from book_stadium.models import Order, Stadium, StadiumTimeFrame
+from ..messages import *
 
 Notification = load_model('notifications', 'Notification')
 
@@ -21,33 +22,41 @@ class BookStadium(ListView):
         order_form = self.form_class
 
         stadium_timeframes = StadiumTimeFrame.get_stadium_timeframe_by_conditions({"is_open": True}, order_by='time_frame__start_time')
-        all_stadiums = self.put_out_null_stadiums_and_timesframe(
-            stadium_timeframes)
-        paginator = Paginator(all_stadiums, 2)
-
-        page_number = request.GET.get('page')
-        page_obj = paginator.get_page(page_number)
-        day_search = request.GET.get('day-search')
-        time_frame_search = request.GET.get('time_frame')
-        address_search = request.GET.get('address-search')
-        stadium_name_search = request.GET.get('stadium-name-search')
-
-        stadium_search_result = self.search_stadium(day_search, time_frame_search,
-                                                    address_search, stadium_name_search)
-
-        if request.user.is_authenticated:
-            stadiums_by_owner = Stadium.get_stadium_by_owner(request.user)
-        else:
-            stadiums_by_owner = ''
-
         context = {
-            'fields': stadiums_by_owner,
-            'stadiums': all_stadiums,
-            'page_obj': page_obj,
-            'order_form': order_form,
-            'stadium_search_result': stadium_search_result,
-            'register_form': register_form,
+            'have_available_stadium': True
         }
+
+        if stadium_timeframes:
+            all_stadiums = self.put_out_null_stadiums_and_timesframe(
+                stadium_timeframes)
+            paginator = Paginator(all_stadiums, 2)
+
+            page_number = request.GET.get('page')
+            page_obj = paginator.get_page(page_number)
+            day_search = request.GET.get('day-search')
+            time_frame_search = request.GET.get('time_frame')
+            address_search = request.GET.get('address-search')
+            stadium_name_search = request.GET.get('stadium-name-search')
+
+            stadium_search_result = self.search_stadium(day_search, time_frame_search,
+                                                        address_search, stadium_name_search)
+
+            if request.user.is_authenticated:
+                stadiums_by_owner = Stadium.get_stadium_by_owner(request.user)
+            else:
+                stadiums_by_owner = ''
+
+            context.update({
+                'fields': stadiums_by_owner,
+                'stadiums': all_stadiums,
+                'page_obj': page_obj,
+                'order_form': order_form,
+                'stadium_search_result': stadium_search_result,
+                'register_form': register_form,
+            })
+        else:
+            context['have_available_stadium'] = False
+
         return render(request, 'book_stadium/book_stadium.html', context)
 
     def post(self, request):
@@ -72,10 +81,10 @@ class BookStadium(ListView):
             else:
                 pass
 
-            messages.success(request, 'Đặt sân thành công!')
+            messages.success(request, ORDER_SUCCESS)
 
         else:
-            messages.warning(request, 'Vui lòng chọn khung giờ khác!')
+            messages.warning(request, CHOOSE_ANOTHER_TIMEFRAME)
 
         return redirect('book_stadium')
 

@@ -4,6 +4,7 @@ from django.views import View
 
 from book_stadium.forms import ChangeNumberOfStadium7Form, ChangeNumberOfStadium11Form
 from book_stadium.models import Order, TypeOfStadium
+from ..messages import *
 
 
 class ChangeNumberOfField(View):
@@ -18,9 +19,9 @@ class ChangeNumberOfField(View):
 
         if form.is_valid():
             form.save()
-            messages.success(request, 'Cập nhật vị trí thành công!')
+            messages.success(request, UPDATE_FIELD_SUCCESS)
         else:
             messages.error(
-                request, 'Vị trí này đã được duyệt! Vui lòng chọn vị trí khác!')
+                request, CHOOSE_ANOTHER_FIELD)
 
         return redirect('owner', pk=order.stadium_time_frame.stadium.pk)

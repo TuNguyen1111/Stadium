@@ -141,3 +141,7 @@ button#order-btn {
     background: #2c3e50;
     color: white;
 }
+
+.no-stadium-msg {
+    text-align: center;
+}
