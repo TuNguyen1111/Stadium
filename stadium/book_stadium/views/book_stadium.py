@@ -7,24 +7,22 @@ from django.shortcuts import redirect, render
 from django.views.generic import ListView
 from django.core.paginator import Paginator
 
-from book_stadium.forms import OrderForm, UserCreationForm
+from book_stadium.forms import OrderForm
 from book_stadium.models import Order, Stadium, StadiumTimeFrame
 from ..messages import *
+from .base import Base
 
 Notification = load_model('notifications', 'Notification')
 
 
-class BookStadium(ListView):
+class BookStadium(Base, ListView):
     form_class = OrderForm
 
     def get(self, request):
-        register_form = UserCreationForm
         order_form = self.form_class
 
         stadium_timeframes = StadiumTimeFrame.get_stadium_timeframe_by_conditions({"is_open": True}, order_by='time_frame__start_time')
-        context = {
-            'have_available_stadium': True
-        }
+        context = self.get_default_context()
 
         if stadium_timeframes:
             all_stadiums = self.put_out_null_stadiums_and_timesframe(
@@ -52,7 +50,6 @@ class BookStadium(ListView):
                 'page_obj': page_obj,
                 'order_form': order_form,
                 'stadium_search_result': stadium_search_result,
-                'register_form': register_form,
             })
         else:
             context['have_available_stadium'] = False
@@ -218,3 +215,9 @@ class BookStadium(ListView):
         search_obj['khung_gio'][time].append(stadium_obj)
 
         return stadium_search_result
+
+    def get_default_context(self):
+        context = super().get_default_context()
+        context['have_available_stadium'] = True
+
+        return context

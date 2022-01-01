@@ -3,11 +3,12 @@ from django.core.paginator import Paginator
 
 from book_stadium.models import Stadium
 from .book_stadium import BookStadium
+from .base import Base
 
 from datetime import datetime
 
 
-class SearchStadium(BookStadium):
+class SearchStadium(BookStadium, Base):
     def get(self, request):
         order_form = self.form_class
         user = request.user
@@ -15,6 +16,7 @@ class SearchStadium(BookStadium):
         stadium_search_result = []
         paginator = Paginator(stadiums, 20)
         today = datetime.today().strftime('%Y/%m/%d')
+        context = self.get_default_context()
 
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
@@ -26,12 +28,12 @@ class SearchStadium(BookStadium):
         stadium_search_result = self.search_stadium(
             day_search, time_frame_search, address_search, stadium_name_search)
 
-        context = {
+        context.update({
             'today': today,
             'page_obj': page_obj,
             'order_form': order_form,
             'stadium_search_result': stadium_search_result,
-        }
+        })
 
         if user.is_authenticated:
             stadiums_by_owner = Stadium.get_stadium_by_owner(user)

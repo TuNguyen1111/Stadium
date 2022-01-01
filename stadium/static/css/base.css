@@ -27,13 +27,8 @@ header {
 }
 
 .navbar {
-    background-image: linear-gradient(
-        to right,
-        #3aa0ef,
-        #3aa0ef,
-        #3aa0ef,
-        #3aa0ef
-    );
+    background: darkgrey;
+    opacity: 0.6;
 }
 
 .navbar > ul {
@@ -272,6 +267,10 @@ a#all-notification-link {
 .navbar .logo > img:hover {
     /* transform: rotate(360deg); */
     animation: rotate-ball 3s ease;
+}
+
+.view-all-stadium {
+    color: black;
 }
 
 @keyframes rotate-ball {

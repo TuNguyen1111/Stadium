@@ -14,11 +14,11 @@ class UserCreationForm(UserCreationForm):
         label="Email hoặc số điện thoại", max_length=254)
     password1 = forms.CharField(
         label="Mật khẩu", widget=forms.PasswordInput,
-        help_text="""
-        Mật khẩu không chứa thông tin cá nhân <br>
-        Mật khẩu phải lớn hơn 8 ký tự <br>
-        Mật khẩu gồm ít nhất 1 chữ hoa, 1 chữ thường, 1 số, 1 ký tự đặc biệt
-        """
+        # help_text="""
+        # Mật khẩu không chứa thông tin cá nhân <br>
+        # Mật khẩu phải lớn hơn 8 ký tự <br>
+        # Mật khẩu gồm ít nhất 1 chữ hoa, 1 chữ thường, 1 số, 1 ký tự đặc biệt
+        # """
     )
     password2 = forms.CharField(
         label="Nhập lại mật khẩu", widget=forms.PasswordInput,
