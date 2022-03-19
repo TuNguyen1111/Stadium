@@ -17,7 +17,7 @@ import environ
 env = environ.Env(
     DEBUG=(bool, True),
     SECRET_KEY=(str, 'nothingtoseehere'),
-    DATABASE_URL=(str, 'mysql://root:admin123@localhost:3306/stadium_db_2'),
+    DATABASE_URL=(str, 'mysql://root:password@127.0.0.1:3307/stadium'),
     ALLOWED_HOSTS=(list, ['testserver', 'localhost', '127.0.0.1']),
     SELENIUM_TESTING=(bool, False),
     SELENIUM_CHROME_DRIVER_PATH=(str, ''),
@@ -92,22 +92,16 @@ AUTH_USER_MODEL = 'book_stadium.User'
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
-SELENIUM_TESTING = env('SELENIUM_TESTING')
-
-_db_config = env.db()
-if SELENIUM_TESTING:
-    test_db_name = f'test_{_db_config["NAME"]}'
-    _db_config.update({
-        'NAME': test_db_name,
-        'TEST': {
-            'NAME': test_db_name,
-            'MIGRATE': False,
-        }
-    })
-
-DATABASES = {
-    'default': _db_config,
-}
+DATABASES = {  
+    'default': {  
+        'ENGINE': 'django.db.backends.mysql',  
+        'NAME': 'stadium',  
+        'USER': 'root',  
+        'PASSWORD': 'password',  
+        'HOST': '127.0.0.1',  
+        'PORT': '3307',  
+    }  
+}  
 
 
 # Password validation
