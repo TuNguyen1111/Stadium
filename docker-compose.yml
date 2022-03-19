@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    volumes:
+      - .:/django
+    ports:
+      - '8000:8000'
+    image: app:stadium
+    container_name: web_stadium
+    command: bash -c 'python manage.py migrate && python manage.py create_timeframes && python manage.py runserver 0.0.0.0:8000'
+    depends_on:
+      - db
+
+  db:
+    image: mysql:5.7
+    container_name: stadium_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: 'stadium'
+      MYSQL_USER: testdb
+      MYSQL_PASSWORD: password
+    ports:
+      - '3307:3306'
+    volumes:
+      - ./db:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
