@@ -98,8 +98,8 @@ DATABASES = {
         'NAME': 'stadium',  
         'USER': 'root',  
         'PASSWORD': 'password',  
-        'HOST': '127.0.0.1',  
-        'PORT': '3307',  
+        'HOST': 'stadium_db',  
+        'PORT': '3306',  
     }  
 }  
 
