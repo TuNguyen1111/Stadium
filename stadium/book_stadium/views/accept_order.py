@@ -21,9 +21,6 @@ class AcceptOrderView(View):
         list_field_number = list(range(1, stadium.field_count + 1))
         receiver = order.user
 
-        if receiver:
-            sender = request.user
-
         if form_type == 'accept-input':
             orders_filter = Order.objects.filter(
                 stadium_time_frame=stadium_timeframe, order_date=order_date, is_accepted=True)
@@ -54,10 +51,12 @@ class AcceptOrderView(View):
             order.is_accepted = True
             order.save()
 
-            notify.send(sender, recipient=receiver, verb=f'Thông báo từ {sender}',
-                        description=(f'Sân {order.stadium_time_frame.stadium.name} bạn đặt vào ngày {order.order_date}, '
-                                     f'khung giờ {order.stadium_time_frame.time_frame} '
-                                     'đã được duyệt! '))
+            if receiver:
+                sender = request.user
+                notify.send(sender, recipient=receiver, verb=f'Thông báo từ {sender}',
+                            description=(f'Sân {order.stadium_time_frame.stadium.name} bạn đặt vào ngày {order.order_date}, '
+                                        f'khung giờ {order.stadium_time_frame.time_frame} '
+                                        'đã được duyệt! '))
 
             # Gui thong bao "het san" cho nhung nguoi khac
             if not list_field_number:
