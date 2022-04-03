@@ -96,9 +96,9 @@ DATABASES = {
     'default': {  
         'ENGINE': 'django.db.backends.mysql',  
         'NAME': 'stadium',  
-        'USER': 'root',  
+        'USER': 'stadium',  
         'PASSWORD': 'password',  
-        'HOST': 'stadium_db',  
+        'HOST': 'stadium-db',  
         'PORT': '3306',  
     }  
 }  
