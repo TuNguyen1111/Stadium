@@ -8,7 +8,7 @@
             "name": "Python: Django",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}\\stadium\\manage.py",
+            "program": "${workspaceFolder}/stadium/manage.py",
             "args": [
                 "runserver"
             ],
